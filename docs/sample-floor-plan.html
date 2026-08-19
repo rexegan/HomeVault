@@ -1,0 +1,336 @@
+<title>HomeVault &mdash; Sample Floor Plan (3 Bed / 2 Bath / 2-Car, ~3,000 SF)</title>
+<style>
+  :root {
+    /* Bond-paper plot &mdash; warm paper, navy linework (committed single look) */
+    --sheet: #f7f4ec;
+    --sheet-2: #f1ede2;
+    --line: #16344f;
+    --line-soft: rgba(22,52,79,0.5);
+    --grid: rgba(22,52,79,0.08);
+    --ink: #16344f;
+    --muted: #5d7690;
+    --fill: rgba(22,52,79,0.02);
+    --fill-2: rgba(22,52,79,0.05);
+    --accent: #b26a12;
+    --page: #ece7db;
+  }
+  /* Committed to the bond-paper look in every theme (no blue variant). */
+  :root[data-theme="dark"],
+  :root[data-theme="light"] {
+    --sheet: #f7f4ec; --sheet-2: #f1ede2; --line: #16344f; --line-soft: rgba(22,52,79,0.5);
+    --grid: rgba(22,52,79,0.08); --ink: #16344f; --muted: #5d7690;
+    --fill: rgba(22,52,79,0.02); --fill-2: rgba(22,52,79,0.05); --accent: #b26a12; --page: #ece7db;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-text-size-adjust: 100%;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 24px 16px 72px; }
+
+  header.intro { margin: 4px 4px 18px; }
+  header.intro .eyebrow {
+    font-size: 11.5px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent);
+    font-weight: 700;
+  }
+  header.intro h1 { margin: 8px 0 0; font-size: clamp(22px,4.6vw,32px); letter-spacing: -0.01em; text-wrap: balance; }
+  header.intro p { margin: 8px 0 0; color: var(--muted); max-width: 68ch; font-size: 15px; }
+
+  /* The drawing sheet */
+  .sheet {
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      linear-gradient(160deg, var(--sheet), var(--sheet-2));
+    background-size: 26px 26px, 26px 26px, 100% 100%;
+    border: 1px solid var(--line-soft);
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.28);
+    overflow-x: auto;
+  }
+  svg.plan { display: block; width: 100%; height: auto; min-width: 720px; }
+
+  /* SVG element styling via classes so both themes work */
+  .plan .outer { fill: none; stroke: var(--line); stroke-width: 5; }
+  .plan .room  { fill: var(--fill); stroke: var(--line); stroke-width: 2; }
+  .plan .room.garage { fill: var(--fill-2); }
+  .plan .room.circ { fill: var(--fill-2); }
+  .plan .win { stroke: var(--line); stroke-width: 2; fill: none; }
+  .plan .win-bg { stroke: var(--sheet); stroke-width: 6; }
+  .plan .door { stroke: var(--line); stroke-width: 1.6; fill: none; }
+  .plan .door-open { stroke: var(--sheet); stroke-width: 6; }
+  .plan .gdoor { stroke: var(--line-soft); stroke-width: 2; stroke-dasharray: 6 5; fill: none; }
+  .plan .dim { stroke: var(--line-soft); stroke-width: 1; fill: none; }
+  .plan .rn { fill: var(--ink); font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; }
+  .plan .rd { fill: var(--muted); }
+  .plan .rs { fill: var(--muted); }
+  .plan .dimtext { fill: var(--muted); }
+  .plan .tblock { fill: none; stroke: var(--line); stroke-width: 1.4; }
+  .plan .tbline { stroke: var(--line-soft); stroke-width: 1; }
+  .plan .tbt { fill: var(--ink); }
+  .plan .tbt.big { font-weight: 800; }
+  .plan .north { fill: none; stroke: var(--line); stroke-width: 1.4; }
+  .plan .north-fill { fill: var(--line); }
+
+  .caption { margin: 12px 4px 0; color: var(--muted); font-size: 12.5px; }
+  .caption b { color: var(--ink); }
+
+  /* Questions */
+  .qwrap { margin-top: 30px; }
+  .qwrap h2 { font-size: 19px; margin: 0 4px 4px; }
+  .qwrap .sub { color: var(--muted); font-size: 14px; margin: 0 4px 16px; max-width: 66ch; }
+  .qcard {
+    background: color-mix(in srgb, var(--sheet) 30%, transparent);
+    border: 1px solid var(--line-soft); border-radius: 10px;
+    padding: 16px 18px; margin-bottom: 12px;
+  }
+  .qcard h3 {
+    margin: 0 0 10px; font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--accent); font-weight: 700;
+  }
+  .qcard ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+  @media (min-width: 640px) { .qcard ul.two { grid-template-columns: 1fr 1fr; gap: 8px 26px; } }
+  .qcard li { display: flex; gap: 10px; font-size: 14.5px; line-height: 1.4; }
+  .qcard li::before { content: "\25B8"; color: var(--accent); flex-shrink: 0; }
+  .qcard li small { display: block; color: var(--muted); font-size: 12.5px; }
+
+  .tip {
+    margin-top: 18px; padding: 14px 16px; border-radius: 10px;
+    border: 1px dashed var(--line-soft); color: var(--muted); font-size: 13.5px;
+  }
+  .tip b { color: var(--ink); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <div class="eyebrow">HomeVault &middot; Sample Plan</div>
+    <h1>A ~3,000 sq ft home, drawn to scale</h1>
+    <p>Three bedrooms, two baths, a two-car garage, and all the everyday rooms &mdash; laid out together
+      the way a real blueprint reads, with each room's size marked. This is a mock-up to react to:
+      tell me how yours differs and I'll redraw it as <em>your</em> house.</p>
+  </header>
+
+  <div class="sheet">
+    <svg class="plan" id="plan" xmlns="http://www.w3.org/2000/svg" role="img"
+      aria-label="Scaled floor plan of a three bedroom, two bath home with two-car garage"></svg>
+  </div>
+  <p class="caption"><b>Reading it:</b> the grid is 5&nbsp;ft. Each room shows its footprint
+    (width&nbsp;&#215;&nbsp;length) and area. Total &#8776;&nbsp;3,000&nbsp;sq&nbsp;ft heated (garage extra).
+    Drawn as an architect's plot on bond paper &mdash; the same look as the app.</p>
+
+  <div class="qwrap">
+    <h2>To draw your actual house, tell me&hellip;</h2>
+    <p class="sub">The more of these you can answer &mdash; even as rough numbers or a sentence &mdash; the closer
+      your real plan will be. Approximate is fine; we refine from there.</p>
+
+    <div class="qcard">
+      <h3>1 &middot; The overall shell</h3>
+      <ul class="two">
+        <li>Total heated square footage?</li>
+        <li>One story or two? <small>Which rooms are upstairs?</small></li>
+        <li>Overall footprint &mdash; width &#215; depth in feet, if you know it?</li>
+        <li>Footprint shape? <small>Simple rectangle, L-shape, T-shape&hellip;</small></li>
+        <li>Do you have the builder's plan, appraisal sketch, or survey? <small>Best source of exact sizes &mdash; a photo works.</small></li>
+        <li>Ceiling height, and any vaulted/2-story rooms?</li>
+      </ul>
+    </div>
+
+    <div class="qcard">
+      <h3>2 &middot; Every room &mdash; size &amp; place</h3>
+      <ul class="two">
+        <li>For each room, roughly how big? <small>Width &#215; length, e.g. "primary ~16 &#215; 15".</small></li>
+        <li>Which rooms open into each other? <small>e.g. kitchen opens to the living room.</small></li>
+        <li>Which rooms share a wall / sit next to each other?</li>
+        <li>Any room notably larger or smaller than my mock-up?</li>
+      </ul>
+    </div>
+
+    <div class="qcard">
+      <h3>3 &middot; The anchors (how it's oriented)</h3>
+      <ul class="two">
+        <li>Which side is the garage &mdash; left, right, or front? Attached?</li>
+        <li>How many cars, and roughly what size garage?</li>
+        <li>Where's the front door / entry?</li>
+        <li>Which end is the primary suite?</li>
+        <li>Are the other bedrooms together, or split apart?</li>
+        <li>Formal dining, eat-in kitchen, or both?</li>
+        <li>Where are laundry, pantry, office/study, mudroom?</li>
+        <li>How many bathrooms, and where? <small>Full, half, en-suite.</small></li>
+        <li>Any hallways, stairs, or bonus/media rooms?</li>
+      </ul>
+    </div>
+
+    <div class="qcard">
+      <h3>4 &middot; Outside the walls</h3>
+      <ul class="two">
+        <li>Which direction does the back of the house face?</li>
+        <li>Patio / deck &mdash; where, and how big?</li>
+        <li>Pool &mdash; where, relative to the house?</li>
+        <li>Shed, workshop, or other outbuildings &mdash; where?</li>
+        <li>Driveway &amp; walkway approach?</li>
+        <li>Fenced yard &mdash; front, back, sides?</li>
+      </ul>
+    </div>
+
+    <div class="tip"><b>Fastest path:</b> snap a photo of your builder's floor plan, appraisal sketch,
+      or even a hand drawing with a few measurements &mdash; I can turn that straight into your scaled plan.</div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var FT = 13;                 // pixels per foot
+    var OX = 92, OY = 78;        // drawing origin (top-left of the house)
+    var HW = 74, HD = 48;        // house footprint, feet
+
+    function X(f) { return OX + f * FT; }
+    function Y(f) { return OY + f * FT; }
+
+    // Rooms in feet: x,y from back-left; front of house is the bottom edge (y = HD).
+    var rooms = [
+      { n: "Bedroom 2", x: 0,  y: 0,  w: 13, h: 13 },
+      { n: "Bedroom 3", x: 0,  y: 13, w: 13, h: 13 },
+      { n: "Bath 2",    x: 13, y: 0,  w: 13, h: 11 },
+      { n: "Laundry",   x: 13, y: 11, w: 13, h: 7 },
+      { n: "Hall",      x: 13, y: 18, w: 13, h: 8,  soft: true },
+      { n: "2-Car Garage", x: 0, y: 26, w: 22, h: 22, kind: "garage" },
+      { n: "Mud",       x: 22, y: 26, w: 4,  h: 22, kind: "circ", vert: true },
+      { n: "Dining Room", x: 26, y: 0,  w: 26, h: 13 },
+      { n: "Kitchen",   x: 26, y: 13, w: 26, h: 14 },
+      { n: "Great Room",x: 26, y: 27, w: 26, h: 21 },
+      { n: "Primary Bedroom", x: 52, y: 0, w: 22, h: 17 },
+      { n: "Primary Bath", x: 52, y: 17, w: 12, h: 12 },
+      { n: "W.I.C.",    x: 64, y: 17, w: 10, h: 12, soft: true },
+      { n: "Foyer",     x: 52, y: 29, w: 11, h: 19 },
+      { n: "Study",     x: 63, y: 29, w: 11, h: 19 }
+    ];
+
+    // Front-wall doors we must NOT put windows over: [xStart, xEnd] in feet along y=HD.
+    var frontDoors = [[2, 20], [53, 57]];   // garage overhead door, front entry
+
+    var s = [];
+
+    // Room rectangles
+    rooms.forEach(function (r) {
+      s.push('<rect class="room ' + (r.kind || '') + '" x="' + X(r.x) + '" y="' + Y(r.y) +
+        '" width="' + (r.w * FT) + '" height="' + (r.h * FT) + '" />');
+    });
+
+    // Exterior windows: for each room edge on the footprint boundary, add a centered window.
+    function addWindow(fx1, fy1, fx2, fy2) {
+      // white "cut" through the wall, then the glass line
+      s.push('<line class="win-bg" x1="' + X(fx1) + '" y1="' + Y(fy1) + '" x2="' + X(fx2) + '" y2="' + Y(fy2) + '" />');
+      s.push('<line class="win" x1="' + X(fx1) + '" y1="' + Y(fy1) + '" x2="' + X(fx2) + '" y2="' + Y(fy2) + '" />');
+    }
+    function overlapsDoor(a, b) {
+      for (var i = 0; i < frontDoors.length; i++) {
+        if (a < frontDoors[i][1] && b > frontDoors[i][0]) return true;
+      }
+      return false;
+    }
+    rooms.forEach(function (r) {
+      if (r.kind === "garage" || r.kind === "circ" || r.soft) return;
+      var winLen, c;
+      // back wall (y === 0)
+      if (r.y === 0 && r.w >= 8) { winLen = Math.min(4, r.w * 0.5); c = r.x + r.w / 2; addWindow(c - winLen / 2, 0, c + winLen / 2, 0); }
+      // front wall (y + h === HD)
+      if (r.y + r.h === HD && r.w >= 8) {
+        winLen = Math.min(4, r.w * 0.5); c = r.x + r.w / 2;
+        if (!overlapsDoor(c - winLen / 2, c + winLen / 2)) addWindow(c - winLen / 2, HD, c + winLen / 2, HD);
+      }
+      // left wall (x === 0)
+      if (r.x === 0 && r.h >= 8) { winLen = Math.min(4, r.h * 0.5); c = r.y + r.h / 2; addWindow(0, c - winLen / 2, 0, c + winLen / 2); }
+      // right wall (x + w === HW)
+      if (r.x + r.w === HW && r.h >= 8) { winLen = Math.min(4, r.h * 0.5); c = r.y + r.h / 2; addWindow(HW, c - winLen / 2, HW, c + winLen / 2); }
+    });
+
+    // Outer wall (drawn over interior lines)
+    s.push('<rect class="outer" x="' + X(0) + '" y="' + Y(0) + '" width="' + (HW * FT) + '" height="' + (HD * FT) + '" />');
+
+    // Garage overhead door (dashed) just inside the front wall
+    s.push('<line class="gdoor" x1="' + X(2) + '" y1="' + (Y(HD) - 3) + '" x2="' + X(20) + '" y2="' + (Y(HD) - 3) + '" />');
+
+    // Front entry door with swing (foyer, hinge at x=53)
+    s.push('<line class="door-open" x1="' + X(53) + '" y1="' + Y(HD) + '" x2="' + X(56) + '" y2="' + Y(HD) + '" />');
+    s.push('<path class="door" d="M ' + X(53) + ' ' + Y(HD) + ' L ' + X(53) + ' ' + (Y(HD) - 3 * FT) + '" />');
+    s.push('<path class="door" d="M ' + X(56) + ' ' + Y(HD) + ' A ' + (3 * FT) + ' ' + (3 * FT) + ' 0 0 1 ' + X(53) + ' ' + (Y(HD) - 3 * FT) + '" />');
+
+    // Room labels
+    rooms.forEach(function (r) {
+      var cx = X(r.x + r.w / 2), cy = Y(r.y + r.h / 2);
+      var wpx = r.w * FT, hpx = r.h * FT;
+      var small = wpx < 74 || hpx < 58;
+      var sf = r.w * r.h;
+      if (r.vert) {
+        s.push('<text class="rn mono" x="' + cx + '" y="' + cy + '" text-anchor="middle" font-size="9" ' +
+          'transform="rotate(-90 ' + cx + ' ' + cy + ')">' + r.n.toUpperCase() + '</text>');
+        return;
+      }
+      var nmeSize = small ? 10 : 13;
+      s.push('<text class="rn" x="' + cx + '" y="' + (cy - (small ? 3 : 9)) + '" text-anchor="middle" font-size="' + nmeSize + '">' + r.n + '</text>');
+      s.push('<text class="rd mono" x="' + cx + '" y="' + (cy + (small ? 9 : 8)) + '" text-anchor="middle" font-size="' + (small ? 9 : 11) + '">' +
+        r.w + "' &#215; " + r.h + "'</text>");
+      if (!small) {
+        s.push('<text class="rs mono" x="' + cx + '" y="' + (cy + 23) + '" text-anchor="middle" font-size="10">' + sf + ' SF</text>');
+      }
+    });
+
+    // Overall dimension strings (top = width, left = depth)
+    var topY = OY - 30;
+    s.push('<line class="dim" x1="' + X(0) + '" y1="' + topY + '" x2="' + X(HW) + '" y2="' + topY + '" />');
+    s.push('<line class="dim" x1="' + X(0) + '" y1="' + (topY - 5) + '" x2="' + X(0) + '" y2="' + (topY + 5) + '" />');
+    s.push('<line class="dim" x1="' + X(HW) + '" y1="' + (topY - 5) + '" x2="' + X(HW) + '" y2="' + (topY + 5) + '" />');
+    s.push('<rect x="' + (X(HW / 2) - 34) + '" y="' + (topY - 9) + '" width="68" height="18" fill="var(--page)" opacity="0.001"/>');
+    s.push('<text class="dimtext mono" x="' + X(HW / 2) + '" y="' + (topY - 6) + '" text-anchor="middle" font-size="11">74&#39;-0&#34;</text>');
+
+    var leftX = OX - 34;
+    s.push('<line class="dim" x1="' + leftX + '" y1="' + Y(0) + '" x2="' + leftX + '" y2="' + Y(HD) + '" />');
+    s.push('<line class="dim" x1="' + (leftX - 5) + '" y1="' + Y(0) + '" x2="' + (leftX + 5) + '" y2="' + Y(0) + '" />');
+    s.push('<line class="dim" x1="' + (leftX - 5) + '" y1="' + Y(HD) + '" x2="' + (leftX + 5) + '" y2="' + Y(HD) + '" />');
+    s.push('<text class="dimtext mono" x="' + leftX + '" y="' + Y(HD / 2) + '" text-anchor="middle" font-size="11" ' +
+      'transform="rotate(-90 ' + leftX + ' ' + Y(HD / 2) + ')">48&#39;-0&#34;</text>');
+
+    // "FRONT OF HOME" note under the entry
+    s.push('<text class="dimtext mono" x="' + X(38) + '" y="' + (Y(HD) + 30) + '" text-anchor="middle" font-size="10.5" letter-spacing="2">F R O N T   O F   H O M E</text>');
+
+    // North arrow (top-right margin)
+    var nx = X(HW) + 40, ny = OY + 8;
+    s.push('<circle class="north" cx="' + nx + '" cy="' + ny + '" r="16" />');
+    s.push('<path class="north-fill" d="M ' + nx + ' ' + (ny - 12) + ' L ' + (nx - 5) + ' ' + (ny + 3) + ' L ' + nx + ' ' + (ny - 1) + ' L ' + (nx + 5) + ' ' + (ny + 3) + ' Z" />');
+    s.push('<text class="tbt mono" x="' + nx + '" y="' + (ny + 26) + '" text-anchor="middle" font-size="10" font-weight="700">N</text>');
+
+    // Scale bar (bottom-left)
+    var sbX = OX, sbY = Y(HD) + 52, seg = 5 * FT;
+    s.push('<text class="dimtext mono" x="' + sbX + '" y="' + (sbY - 8) + '" font-size="10">SCALE (FEET)</text>');
+    for (var i = 0; i < 4; i++) {
+      s.push('<rect x="' + (sbX + i * seg) + '" y="' + sbY + '" width="' + seg + '" height="7" fill="' + (i % 2 ? 'var(--fill)' : 'var(--line)') + '" stroke="var(--line)" stroke-width="1"/>');
+    }
+    [0, 5, 10, 15, 20].forEach(function (ft, i) {
+      s.push('<text class="dimtext mono" x="' + (sbX + i * seg) + '" y="' + (sbY + 20) + '" text-anchor="middle" font-size="9.5">' + ft + '</text>');
+    });
+
+    // Title block (bottom-right)
+    var tbW = 240, tbH = 92, tbX = X(HW) + 44 - tbW, tbY = Y(HD) + 26;
+    if (tbX < X(30)) tbX = X(HW) - tbW;   // keep on sheet
+    s.push('<rect class="tblock" x="' + tbX + '" y="' + tbY + '" width="' + tbW + '" height="' + tbH + '" />');
+    s.push('<line class="tbline" x1="' + tbX + '" y1="' + (tbY + 26) + '" x2="' + (tbX + tbW) + '" y2="' + (tbY + 26) + '" />');
+    s.push('<line class="tbline" x1="' + tbX + '" y1="' + (tbY + 48) + '" x2="' + (tbX + tbW) + '" y2="' + (tbY + 48) + '" />');
+    s.push('<line class="tbline" x1="' + tbX + '" y1="' + (tbY + 70) + '" x2="' + (tbX + tbW) + '" y2="' + (tbY + 70) + '" />');
+    s.push('<text class="tbt big" x="' + (tbX + 12) + '" y="' + (tbY + 17) + '" font-size="12.5">HOMEVAULT &middot; SAMPLE FLOOR PLAN</text>');
+    s.push('<text class="tbt mono" x="' + (tbX + 12) + '" y="' + (tbY + 41) + '" font-size="10.5">3 BED &middot; 2 BATH &middot; 2-CAR GARAGE</text>');
+    s.push('<text class="tbt mono" x="' + (tbX + 12) + '" y="' + (tbY + 63) + '" font-size="10.5">&#8776; 3,000 SF HEATED &middot; SINGLE STORY</text>');
+    s.push('<text class="tbt mono" x="' + (tbX + 12) + '" y="' + (tbY + 85) + '" font-size="10.5">MOCK-UP &middot; NOT TO CONSTRUCTION SPEC</text>');
+
+    var svg = document.getElementById("plan");
+    var totalW = X(HW) + 70;
+    var totalH = Y(HD) + 130;
+    svg.setAttribute("viewBox", "0 0 " + totalW + " " + totalH);
+    svg.innerHTML = s.join("");
+  })();
+</script>

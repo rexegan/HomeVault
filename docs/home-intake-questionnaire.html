@@ -1,0 +1,594 @@
+<title>HomeVault &mdash; Home Intake Questionnaire</title>
+<style>
+  :root {
+    /* Light = an architect's intake form printed on paper */
+    --paper: #f3efe6;
+    --card: #fffdf8;
+    --ink: #211d17;
+    --ink-soft: #6f6656;
+    --line: #ddd3c1;
+    --line-strong: #c8bca4;
+    --green: #2b7a4b;
+    --green-dk: #1f5c39;
+    --blue: #16344f;      /* navy ink structural accent (matches the plan) */
+    --wood: #a96e28;      /* documents / paperwork */
+    --grid: rgba(31,92,140,0.05);
+    --shadow: 0 1px 2px rgba(60,45,20,0.05), 0 10px 30px rgba(60,45,20,0.06);
+  }
+  /* Committed to the warm paper look in every theme (matches the app). */
+  :root[data-theme="light"],
+  :root[data-theme="dark"] {
+    --paper: #f3efe6; --card: #fffdf8; --ink: #211d17; --ink-soft: #6f6656;
+    --line: #ddd3c1; --line-strong: #c8bca4; --green: #2b7a4b; --green-dk: #1f5c39;
+    --blue: #16344f; --wood: #a96e28; --grid: rgba(31,92,140,0.05);
+    --shadow: 0 1px 2px rgba(60,45,20,0.05), 0 10px 30px rgba(60,45,20,0.06);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 26px 26px;
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mono {
+    font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 28px 20px 80px; }
+
+  /* ---------- Masthead ---------- */
+  .mast {
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    padding: 26px 26px 22px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .mast::before {
+    content: "";
+    position: absolute; inset: 7px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    pointer-events: none;
+  }
+  .mast-tag {
+    font-size: 11.5px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--blue); font-weight: 700;
+  }
+  .mast h1 {
+    font-size: clamp(26px, 5.4vw, 40px);
+    line-height: 1.04; margin: 10px 0 0; letter-spacing: -0.02em;
+    font-weight: 800; text-wrap: balance; max-width: 15ch;
+  }
+  .mast h1 em { font-style: normal; color: var(--green); }
+  .mast p.lede {
+    margin: 12px 0 0; max-width: 62ch; color: var(--ink-soft); font-size: 15.5px;
+  }
+  .mast-meta {
+    margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--line-strong);
+    display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center;
+    font-size: 12px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--ink-soft);
+  }
+  .mast-meta b { color: var(--ink); font-weight: 700; }
+
+  /* ---------- Progress ---------- */
+  .progress {
+    position: sticky; top: 10px; z-index: 5;
+    margin: 20px 0 26px;
+    display: flex; align-items: center; gap: 14px;
+    background: var(--card); border: 1px solid var(--line-strong);
+    border-radius: 12px; padding: 12px 16px; box-shadow: var(--shadow);
+  }
+  .progress .bar { flex: 1; height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+  .progress .fill { height: 100%; width: 0; background: var(--green); border-radius: 99px; transition: width .3s ease; }
+  .progress .count { font-size: 13px; font-weight: 700; letter-spacing: .3px; white-space: nowrap; }
+  .progress .count b { color: var(--green); }
+  .progress button {
+    font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+    border: 1px solid var(--line-strong); background: transparent; color: var(--ink-soft);
+    border-radius: 8px; padding: 7px 11px; min-height: 36px;
+  }
+  .progress button:hover { color: var(--ink); border-color: var(--ink-soft); }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 6px 18px; margin: -8px 2px 26px;
+    font-size: 12.5px; color: var(--ink-soft);
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .legend .dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* ---------- Sections ---------- */
+  .section {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px; padding: 22px 22px 8px; margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+  .sec-head { display: flex; gap: 15px; align-items: flex-start; margin-bottom: 4px; }
+  .sec-num {
+    flex-shrink: 0; font-size: 13px; font-weight: 700; letter-spacing: 1px;
+    color: var(--card); background: var(--blue);
+    padding: 5px 9px; border-radius: 7px; margin-top: 3px;
+  }
+  .section[data-accent="green"] .sec-num { background: var(--green); }
+  .section[data-accent="wood"] .sec-num { background: var(--wood); }
+  .sec-titles h2 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.01em; }
+  .sec-titles p { margin: 3px 0 0; color: var(--ink-soft); font-size: 14px; max-width: 60ch; }
+  .sec-body { margin-top: 14px; }
+
+  .grp {
+    font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--blue); font-weight: 700;
+    margin: 18px 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--line);
+  }
+  .section[data-accent="green"] .grp { color: var(--green-dk); }
+  .section[data-accent="wood"] .grp { color: var(--wood); }
+  .grp:first-child { margin-top: 2px; }
+
+  .qs { display: grid; grid-template-columns: 1fr; gap: 2px; }
+  @media (min-width: 620px) { .qs.two { grid-template-columns: 1fr 1fr; column-gap: 26px; } }
+
+  .q {
+    display: flex; gap: 12px; align-items: flex-start; width: 100%; text-align: left;
+    font: inherit; color: var(--ink); background: transparent; border: none; cursor: pointer;
+    padding: 9px 8px; border-radius: 9px; line-height: 1.4;
+  }
+  .q:hover { background: color-mix(in srgb, var(--blue) 7%, transparent); }
+  .q:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+  .q .box {
+    flex-shrink: 0; width: 20px; height: 20px; margin-top: 1px; border-radius: 5px;
+    border: 2px solid var(--line-strong); position: relative; transition: all .15s ease;
+  }
+  .q .box::after {
+    content: ""; position: absolute; left: 5px; top: 1px; width: 6px; height: 11px;
+    border: solid var(--card); border-width: 0 2.5px 2.5px 0; transform: rotate(45deg) scale(0);
+    transition: transform .15s ease;
+  }
+  .q .qt { font-size: 15px; }
+  .q .qt small { display: block; color: var(--ink-soft); font-size: 12.5px; margin-top: 1px; }
+  .q.on .box { background: var(--green); border-color: var(--green); }
+  .q.on .box::after { transform: rotate(45deg) scale(1); }
+  .q.on .qt { color: var(--ink-soft); }
+
+  /* ---------- Field-record spec block ---------- */
+  .spec {
+    border: 1.5px solid var(--green); border-radius: 14px; background: var(--card);
+    padding: 0; margin-bottom: 18px; box-shadow: var(--shadow); overflow: hidden;
+  }
+  .spec-head {
+    background: color-mix(in srgb, var(--green) 12%, var(--card));
+    padding: 16px 22px; border-bottom: 1.5px solid var(--green);
+  }
+  .spec-head .k { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--green-dk); font-weight: 700; }
+  .spec-head h2 { margin: 5px 0 0; font-size: 19px; font-weight: 800; }
+  .spec-head p { margin: 4px 0 0; color: var(--ink-soft); font-size: 13.5px; }
+  .spec-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1px; background: var(--line); padding: 1px;
+  }
+  .spec-grid .cell { background: var(--card); padding: 13px 16px; }
+  .spec-grid .cell .n { font-size: 11px; color: var(--blue); font-weight: 700; }
+  .section[data-accent] .cell .n { color: var(--green-dk); }
+  .spec-grid .cell .t { font-size: 14px; font-weight: 600; margin-top: 3px; }
+  .spec-grid .cell .h { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+
+  .endnote {
+    margin-top: 26px; padding: 18px 20px; border-radius: 12px;
+    border: 1px dashed var(--line-strong); color: var(--ink-soft); font-size: 13.5px;
+  }
+  .endnote b { color: var(--ink); }
+
+  @media print {
+    .progress button { display: none; }
+    .progress { position: static; box-shadow: none; }
+    body { background: #fff; }
+    .section, .mast, .spec { box-shadow: none; break-inside: avoid; }
+    .q .box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <div class="mast-tag">HomeVault &middot; Home Intake</div>
+    <h1>Everything about your home, <em>top to bottom.</em></h1>
+    <p class="lede">One pass through the whole property &mdash; front to back, roof to foundation, every room and
+      system &mdash; so we can draw your real floor plan and know every place a warranty, receipt, or manual
+      should live. Tap a box as you gather each answer; nothing is required, and it saves as you go.</p>
+    <div class="mast-meta mono">
+      <span>Sections <b>01&ndash;09</b></span>
+      <span>Prepared for <b>your home</b></span>
+      <span>Tap &#9656; check &#9656; it remembers</span>
+    </div>
+  </header>
+
+  <div class="progress" role="status" aria-live="polite">
+    <div class="count"><b id="done">0</b> / <span id="total">0</span> gathered</div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <button id="reset" type="button">Reset</button>
+  </div>
+
+  <div class="legend mono">
+    <span><i class="dot" style="background:var(--blue)"></i> Structure &amp; spaces</span>
+    <span><i class="dot" style="background:var(--green)"></i> Records &amp; fields</span>
+    <span><i class="dot" style="background:var(--wood)"></i> People &amp; paperwork</span>
+  </div>
+
+  <!-- 01 PROPERTY -->
+  <section class="section">
+    <div class="sec-head">
+      <div class="sec-num mono">01</div>
+      <div class="sec-titles">
+        <h2>The property &mdash; the big picture</h2>
+        <p>Establish what this home <em>is</em> before we go room by room.</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">What's the full street address?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">What year was the home built?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Architectural style? <small>Ranch, two-story, split-level, townhome, etc.</small></span></button>
+        <button class="q"><span class="box"></span><span class="qt">How many stories / levels?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Heated square footage?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Lot size / acreage?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Foundation type? <small>Slab, pier &amp; beam, crawl space, basement</small></span></button>
+        <button class="q"><span class="box"></span><span class="qt">Do you own or rent it?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Purchase / closing date?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Builder or developer name?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Is there an HOA? <small>Name and dues, if so</small></span></button>
+        <button class="q"><span class="box"></span><span class="qt">Parcel / APN &amp; legal description?</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 EXTERIOR -->
+  <section class="section">
+    <div class="sec-head">
+      <div class="sec-num mono">02</div>
+      <div class="sec-titles">
+        <h2>Exterior envelope &mdash; roof to ground</h2>
+        <p>Walk the outside of the house, top to bottom, all the way around.</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <p class="grp">Roof &amp; top</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Roof material &amp; color? <small>Asphalt shingle, metal, tile&hellip;</small></span></button>
+        <button class="q"><span class="box"></span><span class="qt">Roof age / last replaced, and by whom?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Roof warranty (material &amp; workmanship)?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Gutters &amp; downspouts &mdash; material, gutter guards?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Chimney / flue &mdash; last swept or inspected?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Soffits, fascia &amp; roof vents?</span></button>
+      </div>
+      <p class="grp">Walls &amp; openings</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Siding / wall material? <small>Brick, stucco, vinyl, fiber cement&hellip;</small></span></button>
+        <button class="q"><span class="box"></span><span class="qt">Exterior paint brand &amp; color codes? <small>Body &amp; trim</small></span></button>
+        <button class="q"><span class="box"></span><span class="qt">Windows &mdash; brand, style, glass, install date, warranty?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Exterior doors &mdash; front, back, side (brand/material)?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Garage door(s) &mdash; brand &amp; material?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Garage door opener &mdash; brand, model, remotes/keypad?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Exterior lighting &amp; fixtures?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">House numbers, mailbox, flag/package box?</span></button>
+      </div>
+      <p class="grp">Ground &amp; approach</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Driveway &mdash; material &amp; condition?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Walkways, steps &amp; front porch?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Grading / drainage / French drains?</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 SYSTEMS -->
+  <section class="section">
+    <div class="sec-head">
+      <div class="sec-num mono">03</div>
+      <div class="sec-titles">
+        <h2>Structure &amp; systems &mdash; the mechanicals</h2>
+        <p>The working guts of the house. These carry the biggest warranties and service histories.</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <p class="grp">Heating &amp; cooling</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Heating type? <small>Furnace, heat pump, boiler &mdash; brand, model, serial, fuel</small></span></button>
+        <button class="q"><span class="box"></span><span class="qt">Heating install date &amp; warranty?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">A/C condenser &amp; coil &mdash; brand, model, serial, tonnage?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">A/C install date &amp; warranty?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Thermostat(s) &mdash; brand/model, smart?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Air filter size(s) &amp; change interval?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Ductwork, zones or mini-splits?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">HVAC service company / maintenance plan?</span></button>
+      </div>
+      <p class="grp">Water &amp; plumbing</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Water heater &mdash; tank or tankless, capacity, fuel?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Water heater brand, age &amp; warranty?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">City water or well? <small>Well pump / pressure tank details</small></span></button>
+        <button class="q"><span class="box"></span><span class="qt">Main water shut-off location?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Supply pipe material? <small>PEX, copper, CPVC&hellip;</small></span></button>
+        <button class="q"><span class="box"></span><span class="qt">Water softener / filter / RO &mdash; brand &amp; service?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Sewer or septic? <small>Tank location, last pumped</small></span></button>
+        <button class="q"><span class="box"></span><span class="qt">Sump pump / drainage?</span></button>
+      </div>
+      <p class="grp">Power &amp; gas</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Electrical panel &mdash; location &amp; amperage?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Sub-panels or main breaker location?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Generator / transfer switch &mdash; brand, fuel?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Solar &mdash; panels, inverter, battery, installer, warranty?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Natural gas or propane? <small>Tank size, owned/leased, shut-off</small></span></button>
+      </div>
+      <p class="grp">Safety &amp; smart home</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Smoke &amp; CO detectors &mdash; count, hardwired/battery?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Security alarm &amp; monitoring company?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Cameras &amp; video doorbell?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Internet &mdash; ISP, modem/router, mesh?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Smart hub, locks, lighting, sensors?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Irrigation controller &amp; backflow device?</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 INTERIOR -->
+  <section class="section">
+    <div class="sec-head">
+      <div class="sec-num mono">04</div>
+      <div class="sec-titles">
+        <h2>Interior &mdash; floor by floor, room by room</h2>
+        <p>Ask the first set <em>once for every room</em>, then capture the big items each room holds.</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <p class="grp">For every room (repeat)</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Room name &amp; which floor is it on?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Flooring type &amp; material?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Wall paint brand + color code; ceiling?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Light fixtures &amp; ceiling fans?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Window coverings &mdash; blinds, shades, drapes?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Built-ins, closets &amp; storage?</span></button>
+      </div>
+      <p class="grp">Kitchen</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Refrigerator &mdash; brand, model, serial, warranty?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Range / cooktop &amp; wall oven?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Microwave &amp; vent hood?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Dishwasher &amp; garbage disposal?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Cabinets brand, countertop &amp; backsplash material?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Sink, faucet &amp; water filter?</span></button>
+      </div>
+      <p class="grp">Living, dining &amp; entry</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">TV, mount, media &amp; sound system?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Fireplace / insert &mdash; gas or wood, servicing?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Dining furniture &amp; lighting?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Entry / foyer &amp; coat closet?</span></button>
+      </div>
+      <p class="grp">Bedrooms &amp; bathrooms (each)</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Each bedroom &mdash; furniture, mattress, closet system?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Primary bedroom &mdash; safe, built-ins?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Each bath &mdash; toilet, vanity, sink &amp; faucet?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Tub / shower, glass, exhaust fan?</span></button>
+      </div>
+      <p class="grp">Utility &amp; other rooms</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Laundry &mdash; washer &amp; dryer (brand/model/serial/warranty)?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Mudroom / utility sink?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Home office &mdash; desk &amp; equipment?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Bonus / media / game room?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Pantry &amp; hall closets?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Stairs &amp; hallways?</span></button>
+      </div>
+      <p class="grp">Above &amp; below</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Attic &mdash; access, insulation type/R-value, radiant barrier, storage?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Basement &mdash; finished? mechanicals &amp; storage?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Crawl space &mdash; vapor barrier, condition?</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 GARAGE -->
+  <section class="section">
+    <div class="sec-head">
+      <div class="sec-num mono">05</div>
+      <div class="sec-titles">
+        <h2>Garage &amp; vehicles</h2>
+        <p>Half workshop, half storage &mdash; and often where the extra fridge lives.</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">How many cars, attached or detached?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Workbench, tool chest &amp; power tools?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Extra fridge or freezer?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Wall storage, shelving, overhead racks?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">EV charger &mdash; brand &amp; circuit?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Vehicles kept here &mdash; make/model/VIN &amp; service records?</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 OUTDOORS -->
+  <section class="section">
+    <div class="sec-head">
+      <div class="sec-num mono">06</div>
+      <div class="sec-titles">
+        <h2>Backyard &amp; outdoors &mdash; front to back</h2>
+        <p>Everything past the walls: living space, water, land, and what maintains it.</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <p class="grp">Living space</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Patio / deck &mdash; material, cover or pergola, builder, age?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Outdoor kitchen / grill &mdash; brand?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Outdoor / low-voltage lighting?</span></button>
+      </div>
+      <p class="grp">Water features</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Pool builder &amp; year; resurface date?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Pool pump, filter &amp; heater &mdash; brand, model, warranty?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Cleaner / robot, saltwater or chlorine, cover?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Pool service company?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Spa / hot tub &mdash; brand, cover, service?</span></button>
+      </div>
+      <p class="grp">Land &amp; structures</p>
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Fencing &amp; gates &mdash; material, height?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Irrigation zones, trees, beds, retaining walls?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Storage shed / workshop &mdash; contents?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Lawn equipment &mdash; mower, trimmer, blower (brand/model)?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Playset, trampoline, sport court?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Well house, pump house or outbuildings?</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 RECORD -->
+  <section class="section" data-accent="green">
+    <div class="spec">
+      <div class="spec-head">
+        <div class="k mono">07 &middot; The record</div>
+        <h2>For every item you store &mdash; capture these</h2>
+        <p>Whatever the room or system, each thing you save gets the same fields. This is the shape of a HomeVault entry.</p>
+      </div>
+      <div class="spec-grid">
+        <div class="cell"><div class="n mono">01</div><div class="t">Name</div><div class="h">What it is</div></div>
+        <div class="cell"><div class="n mono">02</div><div class="t">Brand / maker</div><div class="h">Manufacturer</div></div>
+        <div class="cell"><div class="n mono">03</div><div class="t">Model #</div><div class="h">From the label</div></div>
+        <div class="cell"><div class="n mono">04</div><div class="t">Serial #</div><div class="h">For claims</div></div>
+        <div class="cell"><div class="n mono">05</div><div class="t">Where bought</div><div class="h">Store / installer</div></div>
+        <div class="cell"><div class="n mono">06</div><div class="t">Purchase date</div><div class="h">&amp; price paid</div></div>
+        <div class="cell"><div class="n mono">07</div><div class="t">Warranty length</div><div class="h">&rarr; expiration date</div></div>
+        <div class="cell"><div class="n mono">08</div><div class="t">Receipt</div><div class="h">Photo or PDF</div></div>
+        <div class="cell"><div class="n mono">09</div><div class="t">Warranty doc</div><div class="h">Photo or PDF</div></div>
+        <div class="cell"><div class="n mono">10</div><div class="t">Manual</div><div class="h">User guide</div></div>
+        <div class="cell"><div class="n mono">11</div><div class="t">Photos</div><div class="h">The item itself</div></div>
+        <div class="cell"><div class="n mono">12</div><div class="t">Service history</div><div class="h">Date &middot; what &middot; who</div></div>
+        <div class="cell"><div class="n mono">13</div><div class="t">Notes</div><div class="h">Filter size, paint code, parts</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 PEOPLE -->
+  <section class="section" data-accent="wood">
+    <div class="sec-head">
+      <div class="sec-num mono">08</div>
+      <div class="sec-titles">
+        <h2>People &amp; service providers</h2>
+        <p>Your home's contact list &mdash; who to call, and the accounts tied to the property.</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Insurance agent &amp; policy number?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Realtor &amp; builder contacts?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Plumber?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Electrician?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">HVAC technician?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Roofer?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Pool service?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Landscaper / lawn care?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Pest control?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Handyman / general contractor?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Appliance repair?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">HOA management company?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Utility accounts &mdash; electric, gas, water, trash, internet?</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 DOCUMENTS -->
+  <section class="section" data-accent="wood">
+    <div class="sec-head">
+      <div class="sec-num mono">09</div>
+      <div class="sec-titles">
+        <h2>Whole-home documents</h2>
+        <p>The paperwork that belongs to the house itself &mdash; not to any one room.</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="qs two">
+        <button class="q"><span class="box"></span><span class="qt">Deed / title &amp; property survey (plat)?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Mortgage / loan documents?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Homeowners insurance policy (+ flood, if any)?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Home inspection report &amp; appraisal?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Closing / settlement statement?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Building permits &amp; certificates of occupancy?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Builder structural warranty booklet?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Property tax statements?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">HOA covenants (CC&amp;Rs) &amp; bylaws?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Remodel / improvement records (for cost basis)?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Master paint-color list?</span></button>
+        <button class="q"><span class="box"></span><span class="qt">Emergency shut-off map &mdash; water, gas, electric?</span></button>
+      </div>
+    </div>
+  </section>
+
+  <div class="endnote">
+    <b>What happens next:</b> your answers to sections 01&ndash;06 tell me how to redraw your actual floor plan;
+    sections 07&ndash;09 become the fields, contacts, and document drawer inside HomeVault. Work through it in any
+    order &mdash; every box you check is saved on this device, so you can put it down and come back.
+  </div>
+
+</div>
+
+<script>
+  (function () {
+    var KEY = "homevault-intake-v1";
+    var qs = Array.prototype.slice.call(document.querySelectorAll(".q"));
+    var doneEl = document.getElementById("done");
+    var totalEl = document.getElementById("total");
+    var fillEl = document.getElementById("fill");
+    var resetEl = document.getElementById("reset");
+    totalEl.textContent = qs.length;
+
+    // Assign a stable key by DOM order, then restore saved state.
+    var saved = {};
+    try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { saved = {}; }
+    qs.forEach(function (q, i) {
+      q.dataset.k = "q" + i;
+      if (saved["q" + i]) q.classList.add("on");
+      q.setAttribute("aria-pressed", q.classList.contains("on") ? "true" : "false");
+    });
+
+    function persist() {
+      var out = {};
+      qs.forEach(function (q) { if (q.classList.contains("on")) out[q.dataset.k] = 1; });
+      try { localStorage.setItem(KEY, JSON.stringify(out)); } catch (e) {}
+    }
+    function refresh() {
+      var n = qs.filter(function (q) { return q.classList.contains("on"); }).length;
+      doneEl.textContent = n;
+      fillEl.style.width = (qs.length ? (n / qs.length * 100) : 0) + "%";
+    }
+    qs.forEach(function (q) {
+      q.addEventListener("click", function () {
+        q.classList.toggle("on");
+        q.setAttribute("aria-pressed", q.classList.contains("on") ? "true" : "false");
+        persist(); refresh();
+      });
+    });
+    resetEl.addEventListener("click", function () {
+      qs.forEach(function (q) { q.classList.remove("on"); q.setAttribute("aria-pressed", "false"); });
+      persist(); refresh();
+    });
+    refresh();
+  })();
+</script>
