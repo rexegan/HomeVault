@@ -13,6 +13,7 @@ import ExpiringView from './components/ExpiringView.jsx'
 import ReportView from './components/ReportView.jsx'
 import HomeProfile from './components/HomeProfile.jsx'
 import WelcomeIntro from './components/WelcomeIntro.jsx'
+import SnapCapture from './components/SnapCapture.jsx'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL } from './lib/intake.js'
 
 export default function App() {
@@ -60,6 +61,14 @@ export default function App() {
     setState(next)
     setFiled((f) => ({ ...f, [questionId]: created.id }))
     flash(`Filed in ${area.name}`)
+  }
+
+  // Snap & File: create the scanned item in its room and confirm.
+  const saveSnap = (areaId, data) => {
+    setState((s) => store.addItem(s, areaId, data))
+    const area = store.areaById(state, areaId)
+    flash(area ? `Filed in ${area.name}` : 'Filed')
+    setModal(null)
   }
 
   // Filings whose vault item still exists (so a deleted item lets you re-file).
@@ -175,6 +184,9 @@ export default function App() {
 
         {view.name === 'home' && (
           <>
+            <button className="ghost" onClick={() => setModal({ type: 'snap' })} aria-label="Snap and file a receipt">
+              <Icon.camera size={18} /> Snap
+            </button>
             <button className="icon-btn" onClick={() => { setQuery(''); setView({ name: 'search' }) }} aria-label="Search">
               <Icon.search size={20} />
             </button>
@@ -299,6 +311,10 @@ export default function App() {
           onEdit={() => setModal({ type: 'item', item: liveItem(modal.itemId) })}
           onClose={() => setModal(null)}
         />
+      )}
+
+      {modal?.type === 'snap' && (
+        <SnapCapture areas={state.areas} onSave={saveSnap} onClose={() => setModal(null)} />
       )}
 
       {toast && <div className="toast">{toast}</div>}
