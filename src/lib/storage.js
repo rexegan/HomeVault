@@ -74,6 +74,33 @@ export function saveIntake(map) {
   }
 }
 
+// ---- Generic small stores (Home Care dates, service pros) ----
+function loadJSON(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (parsed && typeof parsed === 'object') return parsed
+    }
+  } catch (e) {
+    console.warn('HomeVault: could not read ' + key, e)
+  }
+  return fallback
+}
+function saveJSON(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)) }
+  catch (e) { console.warn('HomeVault: could not save ' + key, e) }
+}
+
+const CARE_KEY = 'homevault:care:v1'   // { taskId: 'YYYY-MM-DD' last done }
+export const loadCare = () => loadJSON(CARE_KEY, {})
+export const saveCare = (map) => saveJSON(CARE_KEY, map)
+
+const PROS_KEY = 'homevault:pros:v1'   // [{ id, trade, name, phone, email, notes }]
+export const loadPros = () => loadJSON(PROS_KEY, []).filter?.((p) => p && p.id) || []
+export const savePros = (list) => saveJSON(PROS_KEY, list)
+export const newProId = () => id('p')
+
 // ---- Areas ----
 export function addArea(state, data) {
   const area = { id: id('a'), name: data.name || 'New area', icon: data.icon || 'box', zone: data.zone || 'inside', variant: data.variant }

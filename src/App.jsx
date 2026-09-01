@@ -14,6 +14,9 @@ import ReportView from './components/ReportView.jsx'
 import HomeProfile from './components/HomeProfile.jsx'
 import WelcomeIntro from './components/WelcomeIntro.jsx'
 import SnapCapture from './components/SnapCapture.jsx'
+import HomeCare from './components/HomeCare.jsx'
+import ProsView from './components/ProsView.jsx'
+import { careTasks, careCounts } from './lib/maintenance.js'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL } from './lib/intake.js'
 
 export default function App() {
@@ -62,6 +65,27 @@ export default function App() {
     setFiled((f) => ({ ...f, [questionId]: created.id }))
     flash(`Filed in ${area.name}`)
   }
+
+  // Home Care: last-done dates per maintenance task.
+  const [care, setCare] = useState(store.loadCare)
+  useEffect(() => { store.saveCare(care) }, [care])
+  const markCareDone = (taskId) => {
+    const d = new Date(); d.setHours(0, 0, 0, 0)
+    const iso = d.toISOString().slice(0, 10)
+    setCare((m) => ({ ...m, [taskId]: iso }))
+    flash('Nice — logged for today')
+  }
+  const undoCare = (taskId) => setCare((m) => {
+    const next = { ...m }; delete next[taskId]; return next
+  })
+  const careDue = careCounts(careTasks(intake, state, care, today)).due
+
+  // My Pros: the home's service contacts.
+  const [pros, setPros] = useState(store.loadPros)
+  useEffect(() => { store.savePros(pros) }, [pros])
+  const addPro = (data) => { setPros((l) => [...l, { id: store.newProId(), ...data }]); flash('Added') }
+  const updatePro = (proId, data) => { setPros((l) => l.map((p) => (p.id === proId ? { ...p, ...data } : p))); flash('Saved') }
+  const deletePro = (proId) => { setPros((l) => l.filter((p) => p.id !== proId)); flash('Deleted') }
 
   // Snap & File: create the scanned item in its room and confirm.
   const saveSnap = (areaId, data) => {
@@ -168,7 +192,7 @@ export default function App() {
   const liveItem = (id) => state.items.find((it) => it.id === id) || null
   const openItem = (id) => setModal({ type: 'itemDetail', itemId: id })
 
-  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile' }
+  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros' }
 
   return (
     <div className="app">
@@ -204,7 +228,7 @@ export default function App() {
             <Icon.plus size={18} /> Add
           </button>
         )}
-        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake') && (
+        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros') && (
           <div className="brand" style={{ fontSize: 18 }}>{titles[view.name]}</div>
         )}
       </header>
@@ -222,6 +246,26 @@ export default function App() {
               onOpenExpiring={() => setView({ name: 'expiring' })}
               onOpenProfile={() => setView({ name: 'intake' })}
             />
+            <button className="profile-card" onClick={() => setView({ name: 'care' })}>
+              <span className="profile-icon care-icon"><Icon.clock size={22} /></span>
+              <span className="profile-body">
+                <strong>Home Care</strong>
+                <span className="profile-sub">Your house's own maintenance schedule — what to do and when.</span>
+              </span>
+              {careDue > 0 && <span className="care-due-pill">{careDue} due</span>}
+              <span className="profile-chev"><Icon.chevron size={20} /></span>
+            </button>
+
+            <button className="profile-card" onClick={() => setView({ name: 'pros' })}>
+              <span className="profile-icon pros-icon"><Icon.tools size={22} /></span>
+              <span className="profile-body">
+                <strong>My Pros</strong>
+                <span className="profile-sub">Plumber, electrician, A/C, appliance repair — your home's call list.</span>
+              </span>
+              {pros.length > 0 && <span className="pros-count-pill">{pros.length}</span>}
+              <span className="profile-chev"><Icon.chevron size={20} /></span>
+            </button>
+
             <button className="profile-card" onClick={() => setView({ name: 'intake' })}>
               <span className="profile-icon"><Icon.book size={22} /></span>
               <span className="profile-body">
@@ -284,6 +328,15 @@ export default function App() {
         {view.name === 'intake' && (
           <HomeProfile values={intake} onChange={setIntakeValue} onReset={resetIntake}
             filed={validFiled} onFile={fileFromProfile} />
+        )}
+
+        {view.name === 'care' && (
+          <HomeCare profile={intake} state={state} lastDone={care} today={today}
+            onMarkDone={markCareDone} onUndo={undoCare} />
+        )}
+
+        {view.name === 'pros' && (
+          <ProsView pros={pros} onAdd={addPro} onUpdate={updatePro} onDelete={deletePro} />
         )}
       </main>
 
