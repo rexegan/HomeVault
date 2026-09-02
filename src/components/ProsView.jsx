@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import Sheet from './Sheet.jsx'
 import { Icon } from '../lib/icons.jsx'
+import { saveFile, getFileURL } from '../lib/db.js'
+import { newProId } from '../lib/storage.js'
+import FileThumb from './FileThumb.jsx'
 
-// My Pros: everyone who works on your house — plumber, electrician, A/C,
-// appliance repair, painter, landscaper… — with tap-to-call and notes.
+// My Pros: everyone who works on your house — with office/cell/email, and a
+// chronological work history per pro: date, what was done, invoices & receipts.
 export const TRADES = [
   'Plumber', 'Electrician', 'A/C & Heating (HVAC)', 'Appliance repair', 'Handyman',
   'Painter', 'Landscaper / lawn care', 'Roofer', 'Pool service', 'Pest control',
@@ -14,19 +17,22 @@ export const TRADES = [
   'Insurance agent', 'Realtor', 'HOA management', 'Internet provider', 'Other',
 ]
 
+const tel = (s) => 'tel:' + String(s).replace(/[^0-9+]/g, '')
+
 export default function ProsView({ pros, onAdd, onUpdate, onDelete }) {
-  const [editing, setEditing] = useState(null)   // null | 'new' | pro object
+  const [editing, setEditing] = useState(null)   // null | 'new' | pro (contact form)
+  const [openId, setOpenId] = useState(null)     // pro detail sheet
 
   const byTrade = [...pros].sort((a, b) =>
     (a.trade || 'zz').localeCompare(b.trade || 'zz') || (a.name || '').localeCompare(b.name || ''))
+  const openPro = pros.find((p) => p.id === openId) || null
 
   return (
     <div className="pros">
       <div className="intake-lede">
         <h2>My Pros</h2>
-        <p>Everyone who works on your house, one tap away — so "who did we use for the
-          water heater?" is never a mystery again. Add anyone who's ever shown up with a
-          truck and a toolbox.</p>
+        <p>Everyone who works on your house — and everything they've ever done to it.
+          Tap a pro to see their full work history, in order, with the invoices attached.</p>
       </div>
 
       <div className="section-row">
@@ -37,42 +43,53 @@ export default function ProsView({ pros, onAdd, onUpdate, onDelete }) {
       {pros.length === 0 ? (
         <div className="empty">
           <div className="big">🛠️</div>
-          <p><strong>Build your home's call list.</strong></p>
-          <p>Plumber, electrician, A/C, appliance repair, painter, lawn care — whoever keeps
-            your house running.</p>
+          <p><strong>Build your home's call list &amp; logbook.</strong></p>
+          <p>Plumber, electrician, A/C, appliance repair, painter, lawn care — and a running
+            record of every visit, repair, and invoice.</p>
           <div style={{ marginTop: 16 }}>
             <button className="btn" onClick={() => setEditing('new')}><Icon.plus size={18} /> Add your first pro</button>
           </div>
         </div>
       ) : (
         <div className="items">
-          {byTrade.map((p) => (
-            <div className="pro-card" key={p.id}>
-              <div className="pro-main" onClick={() => setEditing(p)} role="button" tabIndex={0}>
-                <span className="pro-trade">{p.trade || 'Other'}</span>
-                <span className="pro-name">{p.name}</span>
-                {p.notes && <span className="pro-notes">{p.notes}</span>}
-              </div>
-              {p.phone && (
-                <a className="pro-call" href={'tel:' + p.phone.replace(/[^0-9+]/g, '')}
-                  aria-label={'Call ' + p.name}>
-                  📞 {p.phone}
-                </a>
-              )}
-            </div>
-          ))}
+          {byTrade.map((p) => {
+            const jobs = p.jobs || []
+            const last = jobs.length ? [...jobs].sort((a, b) => (a.date || '').localeCompare(b.date || ''))[jobs.length - 1] : null
+            return (
+              <button className="pro-card" key={p.id} onClick={() => setOpenId(p.id)}>
+                <div className="pro-main">
+                  <span className="pro-trade">{p.trade || 'Other'}</span>
+                  <span className="pro-name">{p.name}</span>
+                  <span className="pro-notes">
+                    {jobs.length === 0 ? 'No work logged yet'
+                      : `${jobs.length} ${jobs.length === 1 ? 'job' : 'jobs'} · last: ${last?.work?.slice(0, 40) || ''}${(last?.work?.length || 0) > 40 ? '…' : ''}`}
+                  </span>
+                </div>
+                <span style={{ color: 'var(--line)' }}><Icon.chevron size={20} /></span>
+              </button>
+            )
+          })}
         </div>
+      )}
+
+      {openPro && (
+        <ProDetail
+          pro={openPro}
+          onEdit={() => setEditing(openPro)}
+          onUpdate={(data) => onUpdate(openPro.id, data)}
+          onClose={() => setOpenId(null)}
+        />
       )}
 
       {editing && (
         <ProForm
           pro={editing === 'new' ? null : editing}
           onSave={(data) => {
-            if (editing === 'new') onAdd(data)
+            if (editing === 'new') onAdd({ ...data, jobs: [] })
             else onUpdate(editing.id, data)
             setEditing(null)
           }}
-          onDelete={editing !== 'new' ? () => { onDelete(editing.id); setEditing(null) } : undefined}
+          onDelete={editing !== 'new' ? () => { onDelete(editing.id); setEditing(null); setOpenId(null) } : undefined}
           onClose={() => setEditing(null)}
         />
       )}
@@ -80,16 +97,175 @@ export default function ProsView({ pros, onAdd, onUpdate, onDelete }) {
   )
 }
 
+// ---- Pro detail: contact row + chronological work history + log-work form ----
+function ProDetail({ pro, onEdit, onUpdate, onClose }) {
+  const [logging, setLogging] = useState(false)
+  const jobs = [...(pro.jobs || [])].sort((a, b) => (a.date || '').localeCompare(b.date || ''))
+
+  const addJob = (job) => {
+    onUpdate({ jobs: [...(pro.jobs || []), { id: newProId(), ...job }] })
+    setLogging(false)
+  }
+  const deleteJob = (jobId) => {
+    if (!confirm('Delete this work entry?')) return
+    onUpdate({ jobs: (pro.jobs || []).filter((j) => j.id !== jobId) })
+  }
+
+  const openFile = async (f) => {
+    const url = await getFileURL(f.id)
+    if (url) window.open(url, '_blank', 'noopener')
+  }
+
+  return (
+    <Sheet
+      title={pro.name}
+      onClose={() => { if (!logging) onClose() }}
+      footer={
+        <>
+          <button className="btn secondary" onClick={onEdit}><Icon.edit size={16} /> Contact</button>
+          <button className="btn" onClick={() => setLogging(true)}><Icon.plus size={16} /> Log work</button>
+        </>
+      }
+    >
+      <div className="pro-head">
+        <span className="pro-trade">{pro.trade || 'Other'}</span>
+        <div className="pro-contact-row">
+          {pro.officePhone && <a className="pro-call" href={tel(pro.officePhone)}>🏢 Office {pro.officePhone}</a>}
+          {pro.cellPhone && <a className="pro-call" href={tel(pro.cellPhone)}>📱 Cell {pro.cellPhone}</a>}
+          {pro.email && <a className="pro-call" href={'mailto:' + pro.email}>✉️ {pro.email}</a>}
+        </div>
+        {pro.notes && <div className="pro-headnotes">{pro.notes}</div>}
+      </div>
+
+      <div className="section-row" style={{ marginTop: 14 }}>
+        <h3>Work history{jobs.length > 0 ? ` · ${jobs.length}` : ''}</h3>
+      </div>
+
+      {jobs.length === 0 ? (
+        <div className="empty" style={{ padding: '24px 16px' }}>
+          <p><strong>Nothing logged yet.</strong></p>
+          <p>Each visit gets a date, what was done, and the invoice or receipt — building the
+            complete history of your home.</p>
+        </div>
+      ) : (
+        <div className="job-timeline">
+          {jobs.map((j) => (
+            <div className="job" key={j.id}>
+              <div className="job-dot" aria-hidden="true" />
+              <div className="job-body">
+                <div className="job-date">{fmt(j.date)}</div>
+                <div className="job-work">{j.work}</div>
+                {j.notes && <div className="job-notes">{j.notes}</div>}
+                {j.files?.length > 0 && (
+                  <div className="job-files">
+                    {j.files.map((f) => (
+                      <button className="job-file" key={f.id} onClick={() => openFile(f)}>
+                        <span className="th"><FileThumb file={f} size={16} /></span>
+                        <span className="nm">{f.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <button className="job-delete" onClick={() => deleteJob(j.id)}>remove</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {logging && <JobForm onSave={addJob} onClose={() => setLogging(false)} />}
+    </Sheet>
+  )
+}
+
+// ---- Log a job: date, specifics, invoices/receipts, notes ----
+function JobForm({ onSave, onClose }) {
+  const today = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.toISOString().slice(0, 10) }
+  const [date, setDate] = useState(today())
+  const [work, setWork] = useState('')
+  const [notes, setNotes] = useState('')
+  const [files, setFiles] = useState([])
+  const [busy, setBusy] = useState(false)
+
+  const onPick = async (e) => {
+    const picked = Array.from(e.target.files || [])
+    e.target.value = ''
+    if (!picked.length) return
+    setBusy(true)
+    try {
+      const saved = []
+      for (const f of picked) saved.push(await saveFile(f))
+      setFiles((prev) => [...prev, ...saved])
+    } finally { setBusy(false) }
+  }
+
+  return (
+    <Sheet
+      title="Log work"
+      onClose={onClose}
+      footer={
+        <>
+          <button className="btn secondary" onClick={onClose}>Cancel</button>
+          <button className="btn" disabled={!work.trim() || !date}
+            onClick={() => onSave({ date, work: work.trim(), notes: notes.trim(), files })}>
+            Save entry
+          </button>
+        </>
+      }
+    >
+      <div className="field">
+        <label>Date work was done</label>
+        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+      </div>
+      <div className="field">
+        <label>What was done?</label>
+        <textarea value={work} autoFocus
+          placeholder="e.g. Replaced water heater T&P valve; flushed tank; checked gas line"
+          onChange={(e) => setWork(e.target.value)} />
+      </div>
+      <div className="field">
+        <label>Invoice / receipt</label>
+        {files.length > 0 && (
+          <div className="attach-list">
+            {files.map((f) => (
+              <div className="attach" key={f.id}>
+                <span className="th"><FileThumb file={f} /></span>
+                <span className="nm">{f.name}</span>
+                <button className="rm" onClick={() => setFiles((p) => p.filter((x) => x.id !== f.id))} aria-label="Remove">×</button>
+              </div>
+            ))}
+          </div>
+        )}
+        <label className="add-file" style={{ marginTop: files.length ? 8 : 0 }}>
+          <Icon.plus size={18} /> {busy ? 'Adding…' : 'Attach invoice or receipt'}
+          <input type="file" accept="image/*,application/pdf" multiple onChange={onPick} />
+        </label>
+      </div>
+      <div className="field">
+        <label>Notes</label>
+        <textarea value={notes} placeholder="Cost, parts used, warranty on the work, follow-ups…"
+          onChange={(e) => setNotes(e.target.value)} />
+      </div>
+    </Sheet>
+  )
+}
+
+// ---- Contact form: office phone, cell phone, email ----
 function ProForm({ pro, onSave, onDelete, onClose }) {
   const [trade, setTrade] = useState(pro?.trade || 'Plumber')
   const [name, setName] = useState(pro?.name || '')
-  const [phone, setPhone] = useState(pro?.phone || '')
+  const [officePhone, setOfficePhone] = useState(pro?.officePhone || '')
+  const [cellPhone, setCellPhone] = useState(pro?.cellPhone || pro?.phone || '')
   const [email, setEmail] = useState(pro?.email || '')
   const [notes, setNotes] = useState(pro?.notes || '')
 
   const submit = () => {
     if (!name.trim()) return
-    onSave({ trade, name: name.trim(), phone: phone.trim(), email: email.trim(), notes: notes.trim() })
+    onSave({
+      trade, name: name.trim(),
+      officePhone: officePhone.trim(), cellPhone: cellPhone.trim(),
+      email: email.trim(), notes: notes.trim(),
+    })
   }
 
   return (
@@ -100,7 +276,7 @@ function ProForm({ pro, onSave, onDelete, onClose }) {
         <>
           {onDelete && (
             <button className="link-danger" onClick={() => {
-              if (confirm('Delete this contact?')) onDelete()
+              if (confirm('Delete this contact and their work history?')) onDelete()
             }}><Icon.trash size={18} /></button>
           )}
           <button className="btn secondary" onClick={onClose}>Cancel</button>
@@ -122,22 +298,33 @@ function ProForm({ pro, onSave, onDelete, onClose }) {
       </div>
       <div className="field-row">
         <div className="field">
-          <label>Phone</label>
-          <input type="tel" value={phone} placeholder="(512) 555-0100"
-            onChange={(e) => setPhone(e.target.value)} />
+          <label>Office phone</label>
+          <input type="tel" value={officePhone} placeholder="(512) 555-0100"
+            onChange={(e) => setOfficePhone(e.target.value)} />
         </div>
         <div className="field">
-          <label>Email</label>
-          <input type="text" inputMode="email" value={email} placeholder="optional"
-            onChange={(e) => setEmail(e.target.value)} />
+          <label>Cell phone</label>
+          <input type="tel" value={cellPhone} placeholder="(512) 555-0101"
+            onChange={(e) => setCellPhone(e.target.value)} />
         </div>
+      </div>
+      <div className="field">
+        <label>Email</label>
+        <input type="text" inputMode="email" value={email} placeholder="optional"
+          onChange={(e) => setEmail(e.target.value)} />
       </div>
       <div className="field">
         <label>Notes</label>
         <textarea value={notes}
-          placeholder="What they've done, rates, gate code, who referred them…"
+          placeholder="Rates, gate code, who referred them…"
           onChange={(e) => setNotes(e.target.value)} />
       </div>
     </Sheet>
   )
+}
+
+function fmt(d) {
+  const dt = new Date(d + 'T00:00:00')
+  if (isNaN(dt)) return d || ''
+  return dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
 }

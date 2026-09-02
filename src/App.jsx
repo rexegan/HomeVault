@@ -81,7 +81,9 @@ export default function App() {
   const careDue = careCounts(careTasks(intake, state, care, today)).due
 
   // My Pros: the home's service contacts.
-  const [pros, setPros] = useState(store.loadPros)
+  const [pros, setPros] = useState(() => store.loadPros().map((p) => ({
+    officePhone: '', cellPhone: p.phone || '', email: '', jobs: [], ...p,
+  })))
   useEffect(() => { store.savePros(pros) }, [pros])
   const addPro = (data) => { setPros((l) => [...l, { id: store.newProId(), ...data }]); flash('Added') }
   const updatePro = (proId, data) => { setPros((l) => l.map((p) => (p.id === proId ? { ...p, ...data } : p))); flash('Saved') }

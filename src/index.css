@@ -633,6 +633,49 @@ h1, h2, h3, p { margin: 0; }
   min-height: var(--tap); white-space: nowrap;
 }
 .pro-call:active { background: #d8e8d4; }
+button.pro-card { width: 100%; text-align: left; cursor: pointer; }
+button.pro-card:active { background: #fffaf0; }
+
+/* Pro detail: contact header + chronological work timeline */
+.pro-head { padding-bottom: 4px; }
+.pro-contact-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.pro-headnotes { font-size: 13px; color: var(--ink-soft); margin-top: 10px; line-height: 1.4; }
+
+.job-timeline {
+  position: relative; margin: 4px 0 8px;
+  padding-left: 18px;
+  border-left: 2px solid var(--line);
+}
+.job { position: relative; padding: 2px 0 18px 8px; }
+.job:last-child { padding-bottom: 6px; }
+.job-dot {
+  position: absolute; left: -24px; top: 6px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--brand); border: 2px solid var(--card);
+  box-shadow: 0 0 0 1.5px var(--brand);
+}
+.job-date { font-size: 12px; font-weight: 800; letter-spacing: 0.5px; color: var(--brand-dark); text-transform: uppercase; }
+.job-work { font-size: 14.5px; font-weight: 600; margin-top: 3px; line-height: 1.4; }
+.job-notes { font-size: 13px; color: var(--ink-soft); margin-top: 3px; line-height: 1.4; }
+.job-files { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; }
+.job-file {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: 999px;
+  padding: 5px 12px 5px 6px; font-size: 12.5px; font-weight: 600; color: var(--ink);
+  min-height: 34px;
+}
+.job-file .th {
+  width: 24px; height: 24px; border-radius: 50%; overflow: hidden;
+  display: grid; place-items: center; background: var(--card); color: var(--accent);
+  flex-shrink: 0;
+}
+.job-file .th img { width: 100%; height: 100%; object-fit: cover; }
+.job-file .nm { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.job-delete {
+  font-size: 11.5px; color: var(--ink-soft); padding: 4px 0; margin-top: 4px;
+  opacity: 0.7;
+}
+.job-delete:active { color: var(--danger); }
 
 /* ---------- Snap & File ---------- */
 .snap-pick { padding: 8px 0 4px; }
