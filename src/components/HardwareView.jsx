@@ -12,19 +12,26 @@ export default function HardwareView({ profile, cached, onCache }) {
   const [searchedFor, setSearchedFor] = useState(cached?.address || null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
+  const [note, setNote] = useState(null)
 
   const search = async () => {
     const q = address.trim()
     if (!q || busy) return
-    setBusy(true); setError(null)
+    setBusy(true); setError(null); setNote(null)
     try {
       const geo = await geocodeAddress(q)
-      if (!geo) { setError("Couldn't find that address — try adding the city and state."); setBusy(false); return }
+      if (!geo) {
+        setError("Couldn't place that address — check the spelling, or search by just your ZIP code or city and state.")
+        setBusy(false); return
+      }
+      if (geo.approximate) {
+        setNote(`Your exact street isn't in the map database (common for county roads), so distances are measured from ${geo.usedQuery.replace(/, USA$/, '')}.`)
+      }
       const found = await findHardwareStores(geo.lat, geo.lon)
       setStores(found)
       setSearchedFor(q)
       onCache({ address: q, stores: found, when: new Date().toISOString().slice(0, 10) })
-      if (found.length === 0) setError('No hardware stores found within 15 miles of that address.')
+      if (found.length === 0) setError('No hardware stores found within 40 miles of that address.')
     } catch (e) {
       console.warn('Local Hardware lookup failed', e)
       setError('The store lookup service didn’t answer — try again in a minute.')
@@ -63,6 +70,7 @@ export default function HardwareView({ profile, cached, onCache }) {
       {error && <div className="hw-error">{error} {address.trim() && (
         <a href={fallbackSearchURL(address)} target="_blank" rel="noopener noreferrer">Search on the map instead →</a>
       )}</div>}
+      {note && <div className="hw-note">{note}</div>}
 
       {busy && (
         <div className="snap-reading" style={{ marginTop: 22 }}>
