@@ -42,6 +42,7 @@ export const Icon = {
   search: (p) => <S {...p}><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></S>,
   info: (p) => <S {...p}><circle cx="12" cy="12" r="9" /><path d="M12 11v5" /><path d="M12 8h.01" /></S>,
   camera: (p) => <S {...p}><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L17 6h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><circle cx="12" cy="13" r="3.5" /></S>,
+  referral: (p) => <S {...p}><circle cx="8.5" cy="8" r="3.2" /><path d="M2.8 19c.6-3.2 2.9-5 5.7-5s5.1 1.8 5.7 5" /><circle cx="16.5" cy="9.5" r="2.6" /><path d="M15.5 14.2c2.6.1 4.5 1.7 5.1 4.3" /><path d="m17.5 3.5 1 1 2-2" /></S>,
   storefront: (p) => <S {...p}><path d="M4 10 5.2 4h13.6L20 10" /><path d="M4 10c0 1.4 1.1 2.5 2.5 2.5S9 11.4 9 10c0 1.4 1.1 2.5 2.5 2.5S14 11.4 14 10c0 1.4 1.1 2.5 2.5 2.5S20 11.4 20 10" /><path d="M5 12.5V20h14v-7.5" /><path d="M9 20v-4.5h6V20" /></S>,
   clock: (p) => <S {...p}><circle cx="12" cy="12" r="8" /><path d="M12 8v4l3 2" /></S>,
   tag: (p) => <S {...p}><path d="M3 12V4h8l9 9-8 8z" /><circle cx="7.5" cy="7.5" r="1.2" /></S>,

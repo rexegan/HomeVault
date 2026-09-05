@@ -594,7 +594,8 @@ h1, h2, h3, p { margin: 0; }
   /* Rails line up with the plan and keep their cards in view while you scroll */
   .home-rail { position: sticky; top: 82px; }
   /* Stack the report/backup bars vertically so they read well in a narrow rail */
-  .home-rail .backup-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+  .home-rail .backup-bar { flex-direction: column; align-items: stretch; gap: 9px; padding: 14px; }
+  .home-rail .backup-text { flex: 0 0 auto; }
   .home-rail .backup-actions { display: flex; gap: 8px; }
   .home-rail .backup-actions .btn { flex: 1; }
   .home-rail .profile-card { align-items: flex-start; padding: 15px 14px; gap: 11px; }
@@ -731,6 +732,20 @@ button.pro-card:active { background: #fffaf0; }
   opacity: 0.7;
 }
 .job-delete:active { color: var(--danger); }
+
+/* ---------- Repair Referrals ---------- */
+.refs-icon { background: #e7f0e5 !important; color: var(--brand-dark) !important; }
+.ref-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 13px 15px; box-shadow: var(--shadow);
+  text-decoration: none; color: var(--ink);
+}
+.ref-row:active { background: #fffaf0; }
+.ref-body { flex: 1; min-width: 0; }
+.ref-name { display: block; font-weight: 700; font-size: 15px; }
+.ref-desc { display: block; font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; line-height: 1.4; }
+.ref-open { flex-shrink: 0; font-size: 13px; font-weight: 700; color: var(--brand-dark); }
 
 /* ---------- Local Hardware ---------- */
 .hw-icon { background: #f6ecdd !important; color: #8a6a3a !important; }

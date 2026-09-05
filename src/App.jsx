@@ -17,6 +17,7 @@ import SnapCapture from './components/SnapCapture.jsx'
 import HomeCare from './components/HomeCare.jsx'
 import ProsView from './components/ProsView.jsx'
 import HardwareView from './components/HardwareView.jsx'
+import ReferralsView from './components/ReferralsView.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL } from './lib/intake.js'
 
@@ -208,7 +209,7 @@ export default function App() {
   const liveItem = (id) => state.items.find((it) => it.id === id) || null
   const openItem = (id) => setModal({ type: 'itemDetail', itemId: id })
 
-  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware' }
+  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals' }
 
   return (
     <div className="app">
@@ -244,7 +245,7 @@ export default function App() {
             <Icon.plus size={18} /> Add
           </button>
         )}
-        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware') && (
+        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals') && (
           <div className="brand" style={{ fontSize: 18 }}>{titles[view.name]}</div>
         )}
       </header>
@@ -311,6 +312,15 @@ export default function App() {
               <span className="profile-body">
                 <strong>Local Hardware</strong>
                 <span className="profile-sub">The closest hardware stores to your address, with directions.</span>
+              </span>
+              <span className="profile-chev"><Icon.chevron size={20} /></span>
+            </button>
+
+            <button className="profile-card" onClick={() => setView({ name: 'referrals' })}>
+              <span className="profile-icon refs-icon"><Icon.referral size={22} /></span>
+              <span className="profile-body">
+                <strong>Repair Referrals</strong>
+                <span className="profile-sub">Angi, Christian home repair, Thumbtack — trusted ways to find help.</span>
               </span>
               <span className="profile-chev"><Icon.chevron size={20} /></span>
             </button>
@@ -394,6 +404,10 @@ export default function App() {
 
         {view.name === 'hardware' && (
           <HardwareView profile={intake} cached={hardware} onCache={cacheHardware} />
+        )}
+
+        {view.name === 'referrals' && (
+          <ReferralsView profile={intake} />
         )}
       </main>
 
