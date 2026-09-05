@@ -1,12 +1,14 @@
-import { Icon, CAT_ICONS } from '../lib/icons.jsx'
-import { CATEGORIES } from '../lib/defaults.js'
+import { Icon } from '../lib/icons.jsx'
 import { itemsForArea, warrantyStatus } from '../lib/storage.js'
-import FileThumb from './FileThumb.jsx'
+import { suggestionsFor } from '../lib/suggestions.js'
 
-// Detail screen for one room / area: its stored items, with an Add button.
-export default function AreaView({ state, area, today, onEditArea, onAddItem, onOpenItem }) {
+// Detail screen for one room / area: a dropdown-first "Add to this area" and a
+// compact table of everything stored here — item, store/brand, purchase date,
+// price and warranty all visible together.
+export default function AreaView({ state, area, today, onEditArea, onQuickAdd, onOpenItem }) {
   const items = itemsForArea(state, area.id)
   const AreaIcon = Icon[area.icon] || Icon.box
+  const suggestions = suggestionsFor(area.name)
 
   return (
     <>
@@ -19,58 +21,59 @@ export default function AreaView({ state, area, today, onEditArea, onAddItem, on
         <button className="edit" onClick={onEditArea}><Icon.edit size={18} /> Edit</button>
       </div>
 
-      <div className="section-row">
-        <h3>Stored here</h3>
-        <button className="btn small" onClick={onAddItem}><Icon.plus size={16} /> Add</button>
+      <div className="quickadd">
+        <label htmlFor="quickadd-select">Add to this area</label>
+        <select id="quickadd-select" value=""
+          onChange={(e) => { if (e.target.value) onQuickAdd(e.target.value === '__other' ? '' : e.target.value) }}>
+          <option value="">Pick an item…</option>
+          {suggestions.map((s) => <option key={s} value={s}>{s}</option>)}
+          <option value="__other">Something else…</option>
+        </select>
       </div>
 
       {items.length === 0 ? (
-        <div className="empty">
-          <div className="big">📦</div>
-          <p><strong>Nothing here yet.</strong></p>
-          <p>Add a warranty, receipt, manual or a photo of anything in this space.</p>
-          <div style={{ marginTop: 16 }}>
-            <button className="btn" onClick={onAddItem}><Icon.plus size={18} /> Add something</button>
-          </div>
+        <div className="empty" style={{ marginTop: 16 }}>
+          <p><strong>Nothing here yet.</strong> Pick an item above to start the list.</p>
         </div>
       ) : (
-        <div className="items">
-          {items.map((it) => (
-            <ItemRow key={it.id} item={it} today={today} onClick={() => onOpenItem(it.id)} />
-          ))}
+        <div className="area-table-wrap">
+          <table className="area-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Store / brand</th>
+                <th>Purchased</th>
+                <th className="num">Price paid</th>
+                <th>Warranty expires</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((it) => {
+                const w = warrantyStatus(it, today)
+                return (
+                  <tr key={it.id} onClick={() => onOpenItem(it.id)}>
+                    <td className="cell-item">
+                      {it.name}
+                      {it.files?.length > 0 && <span className="cell-clip">📎{it.files.length}</span>}
+                    </td>
+                    <td>{it.vendor || '—'}</td>
+                    <td>{it.purchaseDate ? fmt(it.purchaseDate) : '—'}</td>
+                    <td className="num">{it.price || '—'}</td>
+                    <td>
+                      {it.warrantyExpires ? (
+                        <span className={'tag ' + (w?.state === 'expired' ? 'danger' : w?.state === 'soon' ? 'warn' : 'ok')}>
+                          {fmt(it.warrantyExpires)}
+                        </span>
+                      ) : '—'}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
       )}
     </>
-  )
-}
-
-function ItemRow({ item, today, onClick }) {
-  const cat = CATEGORIES.find((c) => c.id === item.category)
-  const CatIcon = Icon[CAT_ICONS[item.category] || 'tag']
-  const w = warrantyStatus(item, today)
-  const cover = item.files?.find((f) => f.type?.startsWith('image/'))
-
-  return (
-    <button className="item" onClick={onClick}>
-      <span className="thumb">{cover ? <FileThumb file={cover} /> : <CatIcon size={22} />}</span>
-      <span className="body">
-        <span className="title">{item.name}</span>
-        {(item.vendor || item.purchaseDate) && (
-          <span className="meta">
-            {item.vendor}{item.vendor && item.purchaseDate ? ' · ' : ''}
-            {item.purchaseDate ? fmt(item.purchaseDate) : ''}
-          </span>
-        )}
-        <span className="tags">
-          {cat && <span className="tag cat">{cat.label}</span>}
-          {item.files?.length > 0 && <span className="tag files">{item.files.length} 📎</span>}
-          {w?.state === 'ok' && <span className="tag ok">Warranty {w.days}d left</span>}
-          {w?.state === 'soon' && <span className="tag warn">Expires in {w.days}d</span>}
-          {w?.state === 'expired' && <span className="tag danger">Warranty expired</span>}
-        </span>
-      </span>
-      <span style={{ color: 'var(--line)', alignSelf: 'center' }}><Icon.chevron size={20} /></span>
-    </button>
   )
 }
 

@@ -8,10 +8,16 @@ import FileThumb from './FileThumb.jsx'
 
 // Add or edit a stored item (warranty / receipt / manual / appliance / …),
 // including photo & PDF attachments.
-export default function ItemForm({ item, area, onSave, onDelete, onClose }) {
+export default function ItemForm({ item, area, presetName, onSave, onDelete, onClose }) {
   const suggestions = suggestionsFor(area?.name)
   const editing = !!item
-  const [name, setName] = useState(item?.name || '')
+  const [name, setName] = useState(item?.name || presetName || '')
+  // The name is dropdown-first; the free-text line appears only for "Something else…"
+  const [custom, setCustom] = useState(() => {
+    if (item) return !suggestions.includes(item.name)
+    if (presetName === '') return true
+    return false
+  })
   const [category, setCategory] = useState(item?.category || 'warranty')
   const [vendor, setVendor] = useState(item?.vendor || '')
   const [purchaseDate, setPurchaseDate] = useState(item?.purchaseDate || '')
@@ -73,16 +79,23 @@ export default function ItemForm({ item, area, onSave, onDelete, onClose }) {
         <label>What is it?</label>
         <select
           className="item-quickpick"
-          value={suggestions.includes(name) ? name : ''}
-          onChange={(e) => { if (e.target.value) setName(e.target.value) }}
+          value={custom ? '__other' : (suggestions.includes(name) ? name : '')}
+          onChange={(e) => {
+            const v = e.target.value
+            if (v === '__other') { setCustom(true); setName('') }
+            else if (v) { setCustom(false); setName(v) }
+          }}
         >
-          <option value="">{area ? `Pick a common ${area.name} item…` : 'Pick a common item…'}</option>
+          <option value="">Pick an item…</option>
           {suggestions.map((s) => <option key={s} value={s}>{s}</option>)}
+          <option value="__other">Something else…</option>
         </select>
-        <input type="text" value={name} autoFocus={!editing}
-          placeholder="…or type your own (brand, model, anything)"
-          onChange={(e) => setName(e.target.value)}
-          style={{ marginTop: 8 }} />
+        {custom && (
+          <input type="text" value={name} autoFocus
+            placeholder="Type what it is (brand, model, anything)"
+            onChange={(e) => setName(e.target.value)}
+            style={{ marginTop: 8 }} />
+        )}
       </div>
 
       <div className="field">

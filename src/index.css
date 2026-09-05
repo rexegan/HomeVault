@@ -733,6 +733,42 @@ button.pro-card:active { background: #fffaf0; }
 }
 .job-delete:active { color: var(--danger); }
 
+/* ---------- Area view: quick-add + inventory table ---------- */
+.quickadd {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 12px 16px; box-shadow: var(--shadow);
+}
+.quickadd label { font-size: 14px; font-weight: 700; white-space: nowrap; }
+.quickadd select {
+  flex: 1; min-height: var(--tap); padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--bg);
+  font-weight: 600; min-width: 0;
+}
+
+.area-table-wrap {
+  margin-top: 16px;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+.area-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 560px; }
+.area-table th {
+  text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--ink-soft); padding: 11px 14px; border-bottom: 2px solid var(--line);
+  white-space: nowrap;
+}
+.area-table td {
+  padding: 11px 14px; border-bottom: 1px solid var(--line);
+  white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.area-table tbody tr { cursor: pointer; }
+.area-table tbody tr:active { background: #fffaf0; }
+.area-table tbody tr:last-child td { border-bottom: none; }
+.area-table .num { text-align: right; }
+.area-table .cell-item { font-weight: 700; }
+.area-table .cell-clip { margin-left: 7px; font-size: 12px; color: var(--ink-soft); font-weight: 600; }
+
 /* ---------- Repair Referrals ---------- */
 .refs-icon { background: #e7f0e5 !important; color: var(--brand-dark) !important; }
 .ref-row {

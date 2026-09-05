@@ -371,7 +371,7 @@ export default function App() {
             area={currentArea}
             today={today}
             onEditArea={() => setModal({ type: 'area', area: currentArea, zone: currentArea.zone })}
-            onAddItem={() => setModal({ type: 'item', item: null, areaId: currentArea.id })}
+            onQuickAdd={(nm) => setModal({ type: 'item', item: null, areaId: currentArea.id, presetName: nm })}
             onOpenItem={openItem}
           />
         )}
@@ -423,6 +423,7 @@ export default function App() {
       {modal?.type === 'item' && (
         <ItemForm
           item={modal.item}
+          presetName={modal.presetName}
           area={store.areaById(state, modal.areaId || modal.item?.areaId)}
           onSave={saveItem}
           onDelete={removeItem}
