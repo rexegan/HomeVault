@@ -117,15 +117,17 @@ export default function App() {
     if (view.name === 'area' && !currentArea) setView({ name: 'home' })
   }, [view, currentArea])
 
-  // Count of warranties needing attention (for the topbar badge).
-  const attention = useMemo(() => {
-    let n = 0
+  // Warranty counts for the dashboard strip and topbar badge.
+  const dashTotals = useMemo(() => {
+    let soon = 0, expired = 0
     for (const it of state.items) {
       const w = warrantyStatus(it, today)
-      if (w && (w.state === 'soon' || w.state === 'expired')) n++
+      if (w?.state === 'soon') soon++
+      else if (w?.state === 'expired') expired++
     }
-    return n
+    return { soon, expired }
   }, [state, today])
+  const attention = dashTotals.soon + dashTotals.expired
 
   // ---- Area actions ----
   const saveArea = (data) => {
@@ -235,19 +237,43 @@ export default function App() {
         )}
       </header>
 
-      <main className="content">
+      <main className={'content' + (view.name === 'home' ? ' wide' : '')}>
         {view.name === 'home' && (
           <>
             {showWelcome && <WelcomeIntro onDismiss={dismissWelcome} />}
-            <FloorPlan
-              state={state}
-              today={today}
-              profile={intake}
-              onOpenArea={(areaId) => setView({ name: 'area', areaId })}
-              onAddArea={(zone) => setModal({ type: 'area', area: null, zone })}
-              onOpenExpiring={() => setView({ name: 'expiring' })}
-              onOpenProfile={() => setView({ name: 'intake' })}
-            />
+
+            <div className="dash">
+              <div className="stat">
+                <div className="n">{state.items.length}</div>
+                <div className="l">Things stored</div>
+              </div>
+              <div className="stat">
+                <div className="n">{state.areas.length}</div>
+                <div className="l">Rooms &amp; areas</div>
+              </div>
+              <button className={'stat as-btn' + (dashTotals.soon ? ' alert' : '')} onClick={() => setView({ name: 'expiring' })}>
+                <div className="n">{dashTotals.soon}</div>
+                <div className="l">Warranties expiring soon</div>
+              </button>
+              <button className={'stat as-btn' + (dashTotals.expired ? ' danger' : '')} onClick={() => setView({ name: 'expiring' })}>
+                <div className="n">{dashTotals.expired}</div>
+                <div className="l">Warranties expired</div>
+              </button>
+            </div>
+
+            <div className="home-grid">
+              <div className="home-center">
+                <FloorPlan
+                  state={state}
+                  today={today}
+                  profile={intake}
+                  onOpenArea={(areaId) => setView({ name: 'area', areaId })}
+                  onAddArea={(zone) => setModal({ type: 'area', area: null, zone })}
+                  onOpenProfile={() => setView({ name: 'intake' })}
+                />
+              </div>
+
+              <aside className="home-rail rail-left">
             <button className="profile-card" onClick={() => setView({ name: 'care' })}>
               <span className="profile-icon care-icon"><Icon.clock size={22} /></span>
               <span className="profile-body">
@@ -267,7 +293,9 @@ export default function App() {
               {pros.length > 0 && <span className="pros-count-pill">{pros.length}</span>}
               <span className="profile-chev"><Icon.chevron size={20} /></span>
             </button>
+              </aside>
 
+              <aside className="home-rail rail-right">
             <button className="profile-card" onClick={() => setView({ name: 'intake' })}>
               <span className="profile-icon"><Icon.book size={22} /></span>
               <span className="profile-body">
@@ -300,6 +328,8 @@ export default function App() {
                 <button className="btn secondary small" onClick={() => importRef.current?.click()}><Icon.file size={16} /> Import</button>
               </div>
               <input ref={importRef} type="file" accept="application/json,.json" style={{ display: 'none' }} onChange={onImportPick} />
+            </div>
+              </aside>
             </div>
           </>
         )}

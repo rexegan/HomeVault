@@ -572,6 +572,39 @@ h1, h2, h3, p { margin: 0; }
 
 .hint { font-size: 12.5px; color: var(--ink-soft); margin-top: 6px; }
 
+/* ---------- Wide home layout: side rails flanking the blueprint ---------- */
+.content.wide { max-width: 1480px; }
+
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px 20px;
+  align-items: start;
+}
+.home-center { min-width: 0; }
+.home-rail { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.home-rail .profile-card { margin-top: 0; }
+.home-rail .backup-bar { margin-top: 0; }
+
+@media (min-width: 1180px) {
+  .home-grid { grid-template-columns: 300px minmax(0, 1fr) 300px; gap: 0 24px; }
+  .home-center { grid-column: 2; grid-row: 1; }
+  .home-rail.rail-left { grid-column: 1; grid-row: 1; }
+  .home-rail.rail-right { grid-column: 3; grid-row: 1; }
+  /* Rails line up with the plan and keep their cards in view while you scroll */
+  .home-rail { position: sticky; top: 82px; }
+  /* Stack the report/backup bars vertically so they read well in a narrow rail */
+  .home-rail .backup-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+  .home-rail .backup-actions { display: flex; gap: 8px; }
+  .home-rail .backup-actions .btn { flex: 1; }
+  .home-rail .profile-card { align-items: flex-start; padding: 15px 14px; gap: 11px; }
+  .home-rail .profile-chev { margin-top: 2px; }
+  .home-rail .profile-icon { width: 38px; height: 38px; }
+  .home-rail .profile-body strong { font-size: 15px; }
+  .home-rail .profile-sub { font-size: 12.5px; line-height: 1.4; }
+  .home-rail .backup-text span { font-size: 12.5px; line-height: 1.4; }
+}
+
 /* ---------- Home Care ---------- */
 .care-icon { background: #fbead0 !important; color: #a5661a !important; }
 .care-due-pill {

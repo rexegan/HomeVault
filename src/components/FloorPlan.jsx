@@ -5,31 +5,11 @@ import Blueprint from './Blueprint.jsx'
 
 // Home screen: an architectural blueprint of the house. Each room is tappable and
 // shows how many things are stored there, with a badge when a warranty is due.
-export default function FloorPlan({ state, today, profile, onOpenArea, onAddArea, onOpenExpiring, onOpenProfile }) {
-  const totals = summarize(state, today)
+export default function FloorPlan({ state, today, profile, onOpenArea, onAddArea, onOpenProfile }) {
   const { name, facts } = homeFacts(profile)
 
   return (
     <>
-      <div className="dash">
-        <div className="stat">
-          <div className="n">{state.items.length}</div>
-          <div className="l">Things stored</div>
-        </div>
-        <div className="stat">
-          <div className="n">{state.areas.length}</div>
-          <div className="l">Rooms &amp; areas</div>
-        </div>
-        <button className={'stat as-btn' + (totals.soon ? ' alert' : '')} onClick={onOpenExpiring}>
-          <div className="n">{totals.soon}</div>
-          <div className="l">Warranties expiring soon</div>
-        </button>
-        <button className={'stat as-btn' + (totals.expired ? ' danger' : '')} onClick={onOpenExpiring}>
-          <div className="n">{totals.expired}</div>
-          <div className="l">Warranties expired</div>
-        </button>
-      </div>
-
       <div className="plan-header">
         <div>
           <h2>Your Home</h2>
@@ -69,12 +49,3 @@ function RoomTile({ area, state, today, onOpen }) {
   )
 }
 
-function summarize(state, today) {
-  let soon = 0, expired = 0
-  for (const it of state.items) {
-    const w = warrantyStatus(it, today)
-    if (w?.state === 'soon') soon++
-    if (w?.state === 'expired') expired++
-  }
-  return { soon, expired }
-}
