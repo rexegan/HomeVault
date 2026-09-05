@@ -797,6 +797,11 @@ button.hw-store { width: 100%; text-align: left; cursor: pointer; }
 .hwc-v { flex: 1; font-size: 14.5px; line-height: 1.5; min-width: 0; overflow-wrap: anywhere; }
 .hwc-v a { color: var(--brand-dark); font-weight: 700; }
 .hwc-hour { display: block; }
+.hwc-actions { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.hwc-actions-row { display: flex; gap: 10px; }
+.hwc-actions-row .btn { flex: 1; }
+.hwc-web-btn { width: 100%; }
+
 .hwc-more {
   display: inline-block; margin-top: 14px;
   font-size: 13.5px; font-weight: 700; color: var(--brand-dark);

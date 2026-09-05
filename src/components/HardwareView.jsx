@@ -157,11 +157,18 @@ function StoreCard({ store, onClose }) {
       title={store.name}
       onClose={onClose}
       footer={
-        <>
-          <button className="btn secondary" onClick={onClose}>Close</button>
-          <a className="btn" href={directionsURL(store)} target="_blank" rel="noopener noreferrer"
-            style={{ textDecoration: 'none' }}>Directions</a>
-        </>
+        <div className="hwc-actions">
+          <div className="hwc-actions-row">
+            <button className="btn secondary" onClick={onClose}>Close</button>
+            <a className="btn" href={directionsURL(store)} target="_blank" rel="noopener noreferrer"
+              style={{ textDecoration: 'none' }}>Directions</a>
+          </div>
+          <a className="btn secondary hwc-web-btn"
+            href={site || ('https://www.google.com/search?q=' + encodeURIComponent(store.name + ' ' + (store.addr || '') + ' website'))}
+            target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+            🌐 Website
+          </a>
+        </div>
       }
     >
       <div className="hwc-top">
