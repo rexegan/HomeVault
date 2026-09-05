@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../lib/icons.jsx'
 import { KEY_FIELDS } from '../lib/intake.js'
 import { geocodeAddress, findHardwareStores, directionsURL, fallbackSearchURL } from '../lib/hardware.js'
@@ -12,20 +12,17 @@ export default function HardwareView({ profile, cached, onCache }) {
   const [searchedFor, setSearchedFor] = useState(cached?.address || null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
-  const [note, setNote] = useState(null)
+  const ranAuto = useRef(false)
 
-  const search = async () => {
-    const q = address.trim()
+  const search = async (q) => {
+    q = (q ?? address).trim()
     if (!q || busy) return
-    setBusy(true); setError(null); setNote(null)
+    setBusy(true); setError(null)
     try {
       const geo = await geocodeAddress(q)
       if (!geo) {
         setError("Couldn't place that address — check the spelling, or search by just your ZIP code or city and state.")
         setBusy(false); return
-      }
-      if (geo.approximate) {
-        setNote(`Your exact street isn't in the map database (common for county roads), so distances are measured from ${geo.usedQuery.replace(/, USA$/, '')}.`)
       }
       const found = await findHardwareStores(geo.lat, geo.lon)
       setStores(found)
@@ -39,6 +36,17 @@ export default function HardwareView({ profile, cached, onCache }) {
       setBusy(false)
     }
   }
+
+  // Pull up the list automatically: cached results show instantly; otherwise
+  // search the Home Profile address the moment this screen opens.
+  useEffect(() => {
+    if (ranAuto.current) return
+    ranAuto.current = true
+    if (!cached?.stores?.length && (cached?.address || profileAddress)) {
+      search(cached?.address || profileAddress)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="hw">
@@ -57,7 +65,7 @@ export default function HardwareView({ profile, cached, onCache }) {
             onChange={(e) => setAddress(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') search() }} />
         </div>
-        <button className="btn" onClick={search} disabled={busy || !address.trim()}>
+        <button className="btn" onClick={() => search()} disabled={busy || !address.trim()}>
           {busy ? 'Searching…' : (stores ? 'Refresh' : 'Find stores')}
         </button>
       </div>
@@ -70,7 +78,6 @@ export default function HardwareView({ profile, cached, onCache }) {
       {error && <div className="hw-error">{error} {address.trim() && (
         <a href={fallbackSearchURL(address)} target="_blank" rel="noopener noreferrer">Search on the map instead →</a>
       )}</div>}
-      {note && <div className="hw-note">{note}</div>}
 
       {busy && (
         <div className="snap-reading" style={{ marginTop: 22 }}>
