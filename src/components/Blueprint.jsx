@@ -288,7 +288,7 @@ function RoomFixtures({ area, plan }) {
     case 'bath 2':
       tub(x + 0.6, y + 0.5, 5, 2.6); toilet(x + 8.5, y + 0.4)
       vanity(x + 0.6, y + h - 2.2, 5); shower(x + w - 3.4, y + h - 3.4, 2.8)
-      door(x + 1.6, y + h, 2.4, 0, 270); break
+      door(x + 6.6, y + h, 2.4, 0, 270); break
     case 'laundry room':
       washerDryer(x + 0.7, y + 0.6); Tx(x + w - 2.5, y + 3.6, 'SINK'); R(x + w - 3, y + 0.6, 2, 1.8, 'bp-fx-soft')
       door(x + 1.5, y + h, 2.2, 0, 270); break
@@ -312,25 +312,25 @@ function RoomFixtures({ area, plan }) {
       break
     case 'great room':
       sofa(x + 3, y + h - 5, 10, 3.2); R(x + w / 2 - 3, y + 0.4, 6, 0.7, 'bp-fx-soft'); Tx(x + w / 2, y + 1.9, 'TV')
-      door(x, y + 3.5, 2.6, 0, 90); outlet(x + w - 0.15, y + 10); break
+      door(x, y + 3.5, 2.6, 90, 0); outlet(x + w - 0.15, y + 10); break
     case 'primary bedroom':
       bed(x + w / 2 - 3.2, y + 0.6, 6.4, 6.7, 'top')
       R(x + w / 2 - 5.2, y + 0.6, 1.6, 1.6, 'bp-fx-soft'); R(x + w / 2 + 3.6, y + 0.6, 1.6, 1.6, 'bp-fx-soft')
-      door(x + 3, y + h, 2.8, 180, 270); outlet(x + w - 0.15, y + 4); outlet(x + 4, y + 0.15); break
+      door(x, y + 9, 2.6, 270, 0); outlet(x + w - 0.15, y + 4); outlet(x + 4, y + 0.15); break
     case 'primary bath':
       tub(x + 0.5, y + 0.5, 5, 2.6); shower(x + w - 3.4, y + 0.5, 2.8)
       toilet(x + 0.5, y + h - 2.2); vanity(x + 4, y + h - 2, 7)
-      door(x + 2, y, 2.4, 90, 0); break
+      door(x + 6, y, 2.4, 0, 90); break
     case 'primary closet':
-      rod(x + 0.7, y + 0.7, x + 0.7, y + h - 0.7); rod(x + w - 0.7, y + 0.7, x + w - 0.7, y + h - 0.7)
-      rod(x + 0.7, y + 0.7, x + w - 0.7, y + 0.7); Tx(x + w / 2, y + h / 2 + 3, 'SHELVES')
-      door(x, y + 2, 2.2, 90, 0); break
+      rod(x + w - 0.7, y + 0.7, x + w - 0.7, y + h - 0.7)
+      rod(x + 1.4, y + 0.7, x + w - 0.7, y + 0.7); Tx(x + w / 2, y + h / 2 + 3, 'SHELVES')
+      door(x, y + h - 4.4, 2.2, 90, 0); break
     case 'foyer':
       closet(x + 0.5, y + 0.6, 3.2, 2)
-      door(x, y + 4, 2.4, 0, 90); break
+      door(x, y + 4, 2.4, 90, 0); break
     case 'study':
       desk(x + 1, y + 0.6, 5); R(x + w - 1.4, y + 1, 1, h - 6, 'bp-fx-soft')
-      door(x, y + 2, 2.2, 90, 0); outlet(x + w - 0.15, y + h - 4); break
+      door(x, y + 6, 2.2, 90, 0); outlet(x + w - 0.15, y + h - 4); break
     default: break
   }
 
