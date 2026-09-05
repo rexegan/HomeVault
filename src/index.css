@@ -671,8 +671,30 @@ button.pro-card:active { background: #fffaf0; }
 
 /* Pro detail: contact header + chronological work timeline */
 .pro-head { padding-bottom: 4px; }
+.pro-owner { font-size: 13.5px; color: var(--ink-soft); margin-top: 9px; }
+.pro-owner b { color: var(--ink); }
 .pro-contact-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.pro-address {
+  display: inline-flex; align-items: flex-start; gap: 6px; margin-top: 10px;
+  font-size: 13.5px; font-weight: 600; color: #16344f; text-decoration: none;
+  background: #e7eef4; padding: 9px 13px; border-radius: 12px; line-height: 1.35;
+}
+.pro-address:active { background: #d9e4ee; }
+.pro-extra {
+  display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px;
+  font-size: 12.5px; color: var(--ink-soft); font-weight: 600;
+}
 .pro-headnotes { font-size: 13px; color: var(--ink-soft); margin-top: 10px; line-height: 1.4; }
+
+/* Add-a-pro form: section dividers + city/state/zip row */
+.form-section {
+  font-size: 11px; font-weight: 800; letter-spacing: 1.3px; text-transform: uppercase;
+  color: var(--accent); margin: 18px 2px 10px; padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.addr-row .addr-city { flex: 2.2; }
+.addr-row .addr-state { flex: 1; }
+.addr-row .addr-zip { flex: 1.3; }
 
 .job-timeline {
   position: relative; margin: 4px 0 8px;

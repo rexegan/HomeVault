@@ -129,11 +129,29 @@ function ProDetail({ pro, onEdit, onUpdate, onClose }) {
     >
       <div className="pro-head">
         <span className="pro-trade">{pro.trade || 'Other'}</span>
+        {pro.owner && <div className="pro-owner">Owner / contact: <b>{pro.owner}</b></div>}
         <div className="pro-contact-row">
           {pro.officePhone && <a className="pro-call" href={tel(pro.officePhone)}>🏢 Office {pro.officePhone}</a>}
           {pro.cellPhone && <a className="pro-call" href={tel(pro.cellPhone)}>📱 Cell {pro.cellPhone}</a>}
           {pro.email && <a className="pro-call" href={'mailto:' + pro.email}>✉️ {pro.email}</a>}
+          {pro.website && (
+            <a className="pro-call" href={/^https?:\/\//i.test(pro.website) ? pro.website : 'https://' + pro.website}
+              target="_blank" rel="noopener noreferrer">🌐 {pro.website.replace(/^https?:\/\//i, '')}</a>
+          )}
         </div>
+        {(pro.street || pro.city || pro.zip) && (
+          <a className="pro-address"
+            href={'https://maps.apple.com/?q=' + encodeURIComponent([pro.name, pro.street, pro.city, pro.state, pro.zip].filter(Boolean).join(', '))}
+            target="_blank" rel="noopener noreferrer">
+            📍 {[pro.street, [pro.city, pro.state].filter(Boolean).join(', '), pro.zip].filter(Boolean).join(' · ')}
+          </a>
+        )}
+        {(pro.license || pro.referredBy) && (
+          <div className="pro-extra">
+            {pro.license && <span>License #{pro.license}</span>}
+            {pro.referredBy && <span>Referred by {pro.referredBy}</span>}
+          </div>
+        )}
         {pro.notes && <div className="pro-headnotes">{pro.notes}</div>}
       </div>
 
@@ -250,21 +268,32 @@ function JobForm({ onSave, onClose }) {
   )
 }
 
-// ---- Contact form: office phone, cell phone, email ----
+// ---- Contact form: the full business record ----
 function ProForm({ pro, onSave, onDelete, onClose }) {
   const [trade, setTrade] = useState(pro?.trade || 'Plumber')
   const [name, setName] = useState(pro?.name || '')
+  const [owner, setOwner] = useState(pro?.owner || '')
   const [officePhone, setOfficePhone] = useState(pro?.officePhone || '')
   const [cellPhone, setCellPhone] = useState(pro?.cellPhone || pro?.phone || '')
   const [email, setEmail] = useState(pro?.email || '')
+  const [website, setWebsite] = useState(pro?.website || '')
+  const [street, setStreet] = useState(pro?.street || '')
+  const [city, setCity] = useState(pro?.city || '')
+  const [stateCode, setStateCode] = useState(pro?.state || '')
+  const [zip, setZip] = useState(pro?.zip || '')
+  const [license, setLicense] = useState(pro?.license || '')
+  const [referredBy, setReferredBy] = useState(pro?.referredBy || '')
   const [notes, setNotes] = useState(pro?.notes || '')
 
   const submit = () => {
     if (!name.trim()) return
     onSave({
-      trade, name: name.trim(),
+      trade, name: name.trim(), owner: owner.trim(),
       officePhone: officePhone.trim(), cellPhone: cellPhone.trim(),
-      email: email.trim(), notes: notes.trim(),
+      email: email.trim(), website: website.trim(),
+      street: street.trim(), city: city.trim(), state: stateCode.trim(), zip: zip.trim(),
+      license: license.trim(), referredBy: referredBy.trim(),
+      notes: notes.trim(),
     })
   }
 
@@ -291,11 +320,18 @@ function ProForm({ pro, onSave, onDelete, onClose }) {
         </select>
       </div>
       <div className="field">
-        <label>Name / company</label>
+        <label>Business / company name</label>
         <input type="text" value={name} autoFocus={!pro}
-          placeholder="e.g. Mike's Plumbing — Mike Rivera"
+          placeholder="e.g. Mike's Plumbing"
           onChange={(e) => setName(e.target.value)} />
       </div>
+      <div className="field">
+        <label>Owner / contact person</label>
+        <input type="text" value={owner} placeholder="e.g. Mike Rivera"
+          onChange={(e) => setOwner(e.target.value)} />
+      </div>
+
+      <div className="form-section">Phones &amp; online</div>
       <div className="field-row">
         <div className="field">
           <label>Office phone</label>
@@ -308,15 +344,60 @@ function ProForm({ pro, onSave, onDelete, onClose }) {
             onChange={(e) => setCellPhone(e.target.value)} />
         </div>
       </div>
+      <div className="field-row">
+        <div className="field">
+          <label>Email</label>
+          <input type="text" inputMode="email" value={email} placeholder="optional"
+            onChange={(e) => setEmail(e.target.value)} />
+        </div>
+        <div className="field">
+          <label>Website</label>
+          <input type="text" inputMode="url" value={website} placeholder="mikesplumbing.com"
+            onChange={(e) => setWebsite(e.target.value)} />
+        </div>
+      </div>
+
+      <div className="form-section">Business address</div>
       <div className="field">
-        <label>Email</label>
-        <input type="text" inputMode="email" value={email} placeholder="optional"
-          onChange={(e) => setEmail(e.target.value)} />
+        <label>Street address</label>
+        <input type="text" value={street} placeholder="1200 Trade Center Blvd, Suite 4"
+          onChange={(e) => setStreet(e.target.value)} />
+      </div>
+      <div className="field-row addr-row">
+        <div className="field addr-city">
+          <label>City</label>
+          <input type="text" value={city} placeholder="Austin"
+            onChange={(e) => setCity(e.target.value)} />
+        </div>
+        <div className="field addr-state">
+          <label>State</label>
+          <input type="text" value={stateCode} placeholder="TX" maxLength={14}
+            onChange={(e) => setStateCode(e.target.value)} />
+        </div>
+        <div className="field addr-zip">
+          <label>ZIP</label>
+          <input type="text" inputMode="numeric" value={zip} placeholder="78701"
+            onChange={(e) => setZip(e.target.value)} />
+        </div>
+      </div>
+
+      <div className="form-section">More details</div>
+      <div className="field-row">
+        <div className="field">
+          <label>License #</label>
+          <input type="text" value={license} placeholder="optional"
+            onChange={(e) => setLicense(e.target.value)} />
+        </div>
+        <div className="field">
+          <label>Referred by</label>
+          <input type="text" value={referredBy} placeholder="optional"
+            onChange={(e) => setReferredBy(e.target.value)} />
+        </div>
       </div>
       <div className="field">
         <label>Notes</label>
         <textarea value={notes}
-          placeholder="Rates, gate code, who referred them…"
+          placeholder="Rates, gate code, preferred hours, insurance details…"
           onChange={(e) => setNotes(e.target.value)} />
       </div>
     </Sheet>
