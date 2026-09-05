@@ -45,7 +45,7 @@ export default function HardwareView({ profile, cached, onCache }) {
     }
   }
 
-  const shown = stores ? stores.filter((s) => s.dist <= radius).slice(0, 12) : null
+  const shown = stores ? stores.filter((s) => s.dist <= radius).slice(0, 20) : null
 
   // Pull up the list automatically: cached results show instantly; otherwise
   // search the Home Profile address the moment this screen opens.
@@ -83,7 +83,7 @@ export default function HardwareView({ profile, cached, onCache }) {
       <div className="hw-controls">
         <label htmlFor="hw-radius">Distance</label>
         <select id="hw-radius" value={radius} onChange={(e) => changeRadius(+e.target.value)}>
-          {[5, 7, 10, 12, 15].map((m) => <option key={m} value={m}>{m} miles</option>)}
+          {[5, 7, 10, 12, 15, 20, 25, 30, 35].map((m) => <option key={m} value={m}>{m} miles</option>)}
         </select>
       </div>
       {!profileAddress && !address && (

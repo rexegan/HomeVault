@@ -104,12 +104,10 @@ async function overpassQuery(lat, lon, radiusMiles) {
   return res.json()
 }
 
-export async function findHardwareStores(lat, lon, radiusMiles = 20) {
-  let js = await overpassQuery(lat, lon, radiusMiles)
-  // Rural area with few hits? Widen the net once.
-  if ((js.elements || []).length < 8) {
-    try { js = await overpassQuery(lat, lon, 40) } catch { /* keep first result */ }
-  }
+export async function findHardwareStores(lat, lon, radiusMiles = 35) {
+  // One wide fetch covers every option in the distance dropdown, so changing
+  // the dropdown filters instantly with no new lookups.
+  const js = await overpassQuery(lat, lon, radiusMiles)
 
   const seen = new Map()
   for (const el of js.elements || []) {
@@ -139,7 +137,7 @@ export async function findHardwareStores(lat, lon, radiusMiles = 20) {
 
   return [...seen.values()]
     .sort((a, b) => a.dist - b.dist)
-    .slice(0, 24)
+    .slice(0, 50)
     .map((s) => ({ ...s, distLabel: s.dist < 10 ? s.dist.toFixed(1) + ' mi' : Math.round(s.dist) + ' mi' }))
 }
 
