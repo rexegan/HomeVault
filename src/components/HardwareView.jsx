@@ -17,9 +17,15 @@ export default function HardwareView({ profile, cached, onCache }) {
   const [openStore, setOpenStore] = useState(null)
   const ranAuto = useRef(false)
 
+  // Picking a distance shows stores in that range immediately: results already
+  // loaded filter instantly; if nothing is loaded yet, the search starts itself.
   const changeRadius = (r) => {
     setRadius(r)
-    if (stores) onCache({ address: searchedFor || address, stores, radius: r, when: new Date().toISOString().slice(0, 10) })
+    if (stores) {
+      onCache({ address: searchedFor || address, stores, radius: r, when: new Date().toISOString().slice(0, 10) })
+    } else if (address.trim() && !busy) {
+      search()
+    }
   }
 
   const search = async (q) => {
