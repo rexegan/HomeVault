@@ -16,6 +16,7 @@ import WelcomeIntro from './components/WelcomeIntro.jsx'
 import SnapCapture from './components/SnapCapture.jsx'
 import HomeCare from './components/HomeCare.jsx'
 import ProsView from './components/ProsView.jsx'
+import HardwareView from './components/HardwareView.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL } from './lib/intake.js'
 
@@ -90,6 +91,15 @@ export default function App() {
   const addPro = (data) => { setPros((l) => [...l, { id: store.newProId(), ...data }]); flash('Added') }
   const updatePro = (proId, data) => { setPros((l) => l.map((p) => (p.id === proId ? { ...p, ...data } : p))); flash('Saved') }
   const deletePro = (proId) => { setPros((l) => l.filter((p) => p.id !== proId)); flash('Deleted') }
+
+  // Local Hardware: cached nearby-store results.
+  const [hardware, setHardware] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('homevault:hardware:v1') || 'null') } catch { return null }
+  })
+  const cacheHardware = (data) => {
+    setHardware(data)
+    try { localStorage.setItem('homevault:hardware:v1', JSON.stringify(data)) } catch { /* ignore */ }
+  }
 
   // Snap & File: create the scanned item in its room and confirm.
   const saveSnap = (areaId, data) => {
@@ -198,7 +208,7 @@ export default function App() {
   const liveItem = (id) => state.items.find((it) => it.id === id) || null
   const openItem = (id) => setModal({ type: 'itemDetail', itemId: id })
 
-  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros' }
+  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware' }
 
   return (
     <div className="app">
@@ -234,7 +244,7 @@ export default function App() {
             <Icon.plus size={18} /> Add
           </button>
         )}
-        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros') && (
+        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware') && (
           <div className="brand" style={{ fontSize: 18 }}>{titles[view.name]}</div>
         )}
       </header>
@@ -293,6 +303,15 @@ export default function App() {
                 <span className="profile-sub">Plumber, electrician, A/C, appliance repair — your home's call list.</span>
               </span>
               {pros.length > 0 && <span className="pros-count-pill">{pros.length}</span>}
+              <span className="profile-chev"><Icon.chevron size={20} /></span>
+            </button>
+
+            <button className="profile-card" onClick={() => setView({ name: 'hardware' })}>
+              <span className="profile-icon hw-icon"><Icon.storefront size={22} /></span>
+              <span className="profile-body">
+                <strong>Local Hardware</strong>
+                <span className="profile-sub">The closest hardware stores to your address, with directions.</span>
+              </span>
               <span className="profile-chev"><Icon.chevron size={20} /></span>
             </button>
               </aside>
@@ -371,6 +390,10 @@ export default function App() {
 
         {view.name === 'pros' && (
           <ProsView pros={pros} onAdd={addPro} onUpdate={updatePro} onDelete={deletePro} />
+        )}
+
+        {view.name === 'hardware' && (
+          <HardwareView profile={intake} cached={hardware} onCache={cacheHardware} />
         )}
       </main>
 
