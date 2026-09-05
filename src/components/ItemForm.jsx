@@ -3,11 +3,13 @@ import Sheet from './Sheet.jsx'
 import { Icon } from '../lib/icons.jsx'
 import { CATEGORIES } from '../lib/defaults.js'
 import { saveFile, deleteFile } from '../lib/db.js'
+import { suggestionsFor } from '../lib/suggestions.js'
 import FileThumb from './FileThumb.jsx'
 
 // Add or edit a stored item (warranty / receipt / manual / appliance / …),
 // including photo & PDF attachments.
-export default function ItemForm({ item, onSave, onDelete, onClose }) {
+export default function ItemForm({ item, area, onSave, onDelete, onClose }) {
+  const suggestions = suggestionsFor(area?.name)
   const editing = !!item
   const [name, setName] = useState(item?.name || '')
   const [category, setCategory] = useState(item?.category || 'warranty')
@@ -69,9 +71,18 @@ export default function ItemForm({ item, onSave, onDelete, onClose }) {
     >
       <div className="field">
         <label>What is it?</label>
+        <select
+          className="item-quickpick"
+          value={suggestions.includes(name) ? name : ''}
+          onChange={(e) => { if (e.target.value) setName(e.target.value) }}
+        >
+          <option value="">{area ? `Pick a common ${area.name} item…` : 'Pick a common item…'}</option>
+          {suggestions.map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
         <input type="text" value={name} autoFocus={!editing}
-          placeholder="e.g. Samsung Fridge, Roof warranty, Costco receipt"
-          onChange={(e) => setName(e.target.value)} />
+          placeholder="…or type your own (brand, model, anything)"
+          onChange={(e) => setName(e.target.value)}
+          style={{ marginTop: 8 }} />
       </div>
 
       <div className="field">

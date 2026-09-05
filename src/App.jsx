@@ -423,6 +423,7 @@ export default function App() {
       {modal?.type === 'item' && (
         <ItemForm
           item={modal.item}
+          area={store.areaById(state, modal.areaId || modal.item?.areaId)}
           onSave={saveItem}
           onDelete={removeItem}
           onClose={() => setModal(null)}
