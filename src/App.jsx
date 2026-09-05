@@ -94,11 +94,11 @@ export default function App() {
 
   // Local Hardware: cached nearby-store results.
   const [hardware, setHardware] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('homevault:hardware:v1') || 'null') } catch { return null }
+    try { return JSON.parse(localStorage.getItem('homevault:hardware:v2') || 'null') } catch { return null }
   })
   const cacheHardware = (data) => {
     setHardware(data)
-    try { localStorage.setItem('homevault:hardware:v1', JSON.stringify(data)) } catch { /* ignore */ }
+    try { localStorage.setItem('homevault:hardware:v2', JSON.stringify(data)) } catch { /* ignore */ }
   }
 
   // Snap & File: create the scanned item in its room and confirm.

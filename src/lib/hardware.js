@@ -16,6 +16,33 @@ export function isChain(name) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
+// The US Census geocoder is the best source for rural street addresses (county
+// roads etc.). It has no CORS headers, but supports JSONP.
+let jsonpN = 0
+function jsonp(urlNeedingCallback, timeoutMs = 9000) {
+  return new Promise((resolve, reject) => {
+    const cb = '__hvCensus' + (++jsonpN)
+    const script = document.createElement('script')
+    const timer = setTimeout(() => { cleanup(); reject(new Error('geocoder timeout')) }, timeoutMs)
+    function cleanup() { clearTimeout(timer); delete window[cb]; script.remove() }
+    window[cb] = (data) => { cleanup(); resolve(data) }
+    script.onerror = () => { cleanup(); reject(new Error('geocoder script failed')) }
+    script.src = urlNeedingCallback + cb
+    document.head.appendChild(script)
+  })
+}
+
+async function censusGeocode(query) {
+  const url = 'https://geocoding.geo.census.gov/geocoder/locations/onelineaddress' +
+    '?benchmark=Public_AR_Current&format=jsonp&address=' + encodeURIComponent(query) + '&callback='
+  const data = await jsonp(url)
+  const m = data?.result?.addressMatches
+  if (m && m.length) {
+    return { lat: m[0].coordinates.y, lon: m[0].coordinates.x, display: m[0].matchedAddress, approximate: false, usedQuery: query }
+  }
+  return null
+}
+
 async function geocodeOnce(query) {
   const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=us&q=' + encodeURIComponent(query)
   const res = await fetch(url, { headers: { Accept: 'application/json' } })
@@ -29,6 +56,12 @@ async function geocodeOnce(query) {
 // the house-number level. Fall back gracefully: exact address → ZIP code → city &
 // state — so the search always lands in the right area.
 export async function geocodeAddress(query) {
+  // Exact rooftop match from the Census first — it knows county roads.
+  try {
+    const hit = await censusGeocode(query)
+    if (hit) return hit
+  } catch { /* fall through to OSM */ }
+
   const attempts = [{ q: query, approx: false }]
 
   const zip = query.match(/\b(\d{5})(?:-\d{4})?\b/)
@@ -87,21 +120,26 @@ export async function findHardwareStores(lat, lon, radiusMiles = 20) {
     const slon = el.lon ?? el.center?.lon
     if (slat == null || slon == null) continue
     const dist = miles(lat, lon, slat, slon)
-    const addr = [
-      [t['addr:housenumber'], t['addr:street']].filter(Boolean).join(' '),
-      t['addr:city'],
-    ].filter(Boolean).join(', ')
+    const street = [t['addr:housenumber'], t['addr:street']].filter(Boolean).join(' ')
+    const addr = [street, t['addr:city']].filter(Boolean).join(', ')
+    const fullAddr = [street, t['addr:city'], [t['addr:state'], t['addr:postcode']].filter(Boolean).join(' ')]
+      .filter(Boolean).join(', ')
     // Dedupe near-identical entries (same name within ~0.3 mi), keep the closest.
     const key = name.toLowerCase().replace(/[^a-z0-9]/g, '') + '|' + dist.toFixed(0)
     const existing = seen.get(key)
     if (!existing || dist < existing.dist) {
-      seen.set(key, { name, dist, lat: slat, lon: slon, addr, chain: isChain(name) })
+      seen.set(key, {
+        name, dist, lat: slat, lon: slon, addr, fullAddr, chain: isChain(name),
+        phone: t.phone || t['contact:phone'] || '',
+        website: t.website || t['contact:website'] || t['brand:website'] || '',
+        hours: t.opening_hours || '',
+      })
     }
   }
 
   return [...seen.values()]
     .sort((a, b) => a.dist - b.dist)
-    .slice(0, 12)
+    .slice(0, 24)
     .map((s) => ({ ...s, distLabel: s.dist < 10 ? s.dist.toFixed(1) + ' mi' : Math.round(s.dist) + ' mi' }))
 }
 
@@ -110,3 +148,19 @@ export const directionsURL = (s) =>
 
 export const fallbackSearchURL = (address) =>
   'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('hardware store near ' + address)
+
+export const webSearchURL = (s) =>
+  'https://www.google.com/search?q=' + encodeURIComponent(s.name + ' ' + (s.addr || 'near me') + ' hours phone')
+
+// OSM opening_hours ("Mo-Fr 06:00-21:00; Sa 07:00-20:00") → readable lines.
+export function formatHours(oh) {
+  if (!oh) return null
+  if (/24\s*\/\s*7/.test(oh)) return ['Open 24 hours']
+  const days = { Mo: 'Mon', Tu: 'Tue', We: 'Wed', Th: 'Thu', Fr: 'Fri', Sa: 'Sat', Su: 'Sun', PH: 'Holidays', SH: 'School holidays' }
+  return oh.split(/\s*;\s*/).map((part) =>
+    part
+      .replace(/\b(Mo|Tu|We|Th|Fr|Sa|Su|PH|SH)\b/g, (m) => days[m])
+      .replace(/\boff\b/gi, 'closed')
+      .trim()
+  ).filter(Boolean)
+}
