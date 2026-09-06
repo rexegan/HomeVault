@@ -161,7 +161,7 @@ function Room({ area, plan, onOpen }) {
 function BadgeAt({ x, y, badge }) {
   return (
     <g transform={`translate(${x}, ${y})`}>
-      <circle r="11" className={'bp-badge' + (badge.danger ? ' danger' : '')} />
+      <circle r="11" className={'bp-badge' + (badge.cls || '')} />
       <text className="bp-badge-t" textAnchor="middle" y="4">{badge.n}</text>
     </g>
   )
@@ -182,13 +182,18 @@ function RoomLabel({ area, plan, items, today }) {
     if (st?.state === 'soon') soon++
     if (st?.state === 'expired') expired++
   }
-  const badge = expired ? { n: expired, danger: true } : soon ? { n: soon, danger: false } : null
+  // Badge = how many items live in this room; color flags warranty trouble
+  // (red = something expired, orange = something expiring soon, navy = all good).
+  const badge = items.length > 0
+    ? { n: items.length, cls: expired ? ' danger' : soon ? '' : ' calm' }
+    : null
 
   if (vert) {
     return (
       <g className="bp-label">
         <text className="bp-name" x={cx} y={cy} textAnchor="middle" fontSize="8.5"
           transform={`rotate(-90 ${cx} ${cy})`}>{area.name.toUpperCase()}</text>
+        {badge && <BadgeAt x={cx} y={Y(y) + 15} badge={badge} />}
       </g>
     )
   }

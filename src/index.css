@@ -975,6 +975,7 @@ button.hw-store { width: 100%; text-align: left; cursor: pointer; }
 
 .bp-badge { fill: var(--warn); }
 .bp-badge.danger { fill: var(--danger); }
+.bp-badge.calm { fill: #16344f; }
 .bp-badge-t { fill: #fff; font-size: 12px; font-weight: 800; }
 
 /* Fixtures / furniture / outlets */
