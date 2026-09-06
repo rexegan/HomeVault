@@ -973,9 +973,21 @@ button.hw-store { width: 100%; text-align: left; cursor: pointer; }
 .bp-scalebar { fill: #16344f; stroke: #16344f; }
 .bp-scalebar.empty { fill: transparent; }
 
-.bp-badge { fill: var(--warn); }
-.bp-badge.danger { fill: var(--danger); }
-.bp-badge.calm { fill: #16344f; }
+/* Count badges: each number 1-10 gets its own color; a red/orange ring means a
+   warranty inside that room is expired / expiring soon. */
+.bp-badge { fill: #16344f; }
+.bp-badge.n1 { fill: #4a7fd4; }
+.bp-badge.n2 { fill: #2b7a4b; }
+.bp-badge.n3 { fill: #c9873e; }
+.bp-badge.n4 { fill: #7b5cd6; }
+.bp-badge.n5 { fill: #0f9488; }
+.bp-badge.n6 { fill: #c2588f; }
+.bp-badge.n7 { fill: #8a6a3a; }
+.bp-badge.n8 { fill: #557a95; }
+.bp-badge.n9 { fill: #6d8f3c; }
+.bp-badge.n10 { fill: #16344f; }
+.bp-badge.ring-danger { stroke: var(--danger); stroke-width: 3; }
+.bp-badge.ring-warn { stroke: var(--warn); stroke-width: 3; }
 .bp-badge-t { fill: #fff; font-size: 12px; font-weight: 800; }
 
 /* Fixtures / furniture / outlets */

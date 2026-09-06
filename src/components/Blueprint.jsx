@@ -42,6 +42,16 @@ const PLAN = {
 // Front-wall openings (feet along y = HY1): [start, end]
 const FRONT_DOORS = [[2, 20], [53, 56]]  // garage overhead door, front entry
 
+// Hand-picked empty spot (feet, badge center) in each room so the count circle
+// never covers furniture, doors, or the room label. Fallback: top-right corner.
+const BADGE_POS = {
+  'bedroom 2': [2, 26], 'bedroom 3': [1.8, 38.8], 'bath 2': [24.2, 28.5],
+  'laundry room': [23.5, 40], 'hall closet': [15, 47.5], '2-car garage': [2, 52],
+  'mudroom': [24, 70.5], 'dining room': [27.8, 25.8], 'kitchen': [49.5, 48.5],
+  'great room': [49, 53], 'primary bedroom': [71.5, 38], 'primary bath': [53.3, 49.3],
+  'primary closet': [65.6, 43.6], 'foyer': [61, 55], 'study': [67, 68.5],
+}
+
 export default function Blueprint({ state, today, profile, onOpenArea, onAddArea }) {
   const placed = []
   const unplaced = []
@@ -182,18 +192,24 @@ function RoomLabel({ area, plan, items, today }) {
     if (st?.state === 'soon') soon++
     if (st?.state === 'expired') expired++
   }
-  // Badge = how many items live in this room; color flags warranty trouble
-  // (red = something expired, orange = something expiring soon, navy = all good).
+  // Badge = how many items live in this room. Each count 1-10 gets its own
+  // color; a red/orange ring flags an expired / expiring-soon warranty inside.
   const badge = items.length > 0
-    ? { n: items.length, cls: expired ? ' danger' : soon ? '' : ' calm' }
+    ? {
+        n: items.length,
+        cls: ' n' + Math.min(items.length, 10) + (expired ? ' ring-danger' : soon ? ' ring-warn' : ''),
+      }
     : null
+  const bpos = BADGE_POS[area.name.trim().toLowerCase()]
+  const bx = bpos ? X(bpos[0]) : X(x + w) - 15
+  const by = bpos ? Y(bpos[1]) : Y(y) + 15
 
   if (vert) {
     return (
       <g className="bp-label">
         <text className="bp-name" x={cx} y={cy} textAnchor="middle" fontSize="8.5"
           transform={`rotate(-90 ${cx} ${cy})`}>{area.name.toUpperCase()}</text>
-        {badge && <BadgeAt x={cx} y={Y(y) + 15} badge={badge} />}
+        {badge && <BadgeAt x={bx} y={by} badge={badge} />}
       </g>
     )
   }
@@ -205,7 +221,7 @@ function RoomLabel({ area, plan, items, today }) {
         <rect className="bp-label-bg" x={lx - 6} y={ly - 13} width={area.name.length * 7.4 + 12} height={34} rx={5} />
         <text className="bp-name" x={lx} y={ly} textAnchor="start" fontSize="12">{area.name}</text>
         <text className="bp-count" x={lx} y={ly + 16} textAnchor="start" fontSize="11">{countText}</text>
-        {badge && <BadgeAt x={X(x + w) - 15} y={Y(y) + 15} badge={badge} />}
+        {badge && <BadgeAt x={bx} y={by} badge={badge} />}
       </g>
     )
   }
@@ -222,7 +238,7 @@ function RoomLabel({ area, plan, items, today }) {
       {showDims && (
         <text className="bp-dims" x={cx} y={cy + 20} textAnchor="middle" fontSize="9.5">{w}&#39; &#215; {h}&#39;</text>
       )}
-      {badge && <BadgeAt x={X(x + w) - 15} y={Y(y) + 15} badge={badge} />}
+      {badge && <BadgeAt x={bx} y={by} badge={badge} />}
     </g>
   )
 }
