@@ -3,6 +3,7 @@ import Sheet from './Sheet.jsx'
 import { Icon } from '../lib/icons.jsx'
 import { CATEGORIES } from '../lib/defaults.js'
 import { saveFile, deleteFile } from '../lib/db.js'
+import { formatPrice } from '../lib/storage.js'
 import { suggestionsFor } from '../lib/suggestions.js'
 import FileThumb from './FileThumb.jsx'
 
@@ -57,7 +58,7 @@ export default function ItemForm({ item, area, presetName, onSave, onDelete, onC
       vendor: vendor.trim(),
       purchaseDate,
       warrantyExpires,
-      price: price.toString().trim(),
+      price: formatPrice(price),
       notes: notes.trim(),
       files,
     })
@@ -121,7 +122,8 @@ export default function ItemForm({ item, area, presetName, onSave, onDelete, onC
         <div className="field">
           <label>Price</label>
           <input type="text" inputMode="decimal" value={price} placeholder="$"
-            onChange={(e) => setPrice(e.target.value)} />
+            onChange={(e) => setPrice(e.target.value)}
+            onBlur={() => setPrice(formatPrice(price))} />
         </div>
       </div>
 

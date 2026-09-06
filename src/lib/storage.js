@@ -142,6 +142,16 @@ export function areaById(state, areaId) {
   return state.areas.find((a) => a.id === areaId) || null
 }
 
+// "$2,499" from "2499", "2499.5", "$2499", etc. Empty/invalid → ''.
+export function formatPrice(input) {
+  if (!input) return ''
+  const n = parseFloat(String(input).replace(/[^0-9.]/g, ''))
+  if (isNaN(n)) return String(input).trim()
+  const hasCents = /\.\d/.test(String(input))
+  return '$' + n.toLocaleString(undefined,
+    hasCents ? { minimumFractionDigits: 2, maximumFractionDigits: 2 } : { maximumFractionDigits: 2 })
+}
+
 // Warranty status relative to `today` (a Date). Returns null when no warranty.
 export function warrantyStatus(item, today) {
   if (!item.warrantyExpires) return null

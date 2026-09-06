@@ -1,5 +1,5 @@
 import { Icon } from '../lib/icons.jsx'
-import { itemsForArea, warrantyStatus } from '../lib/storage.js'
+import { itemsForArea, warrantyStatus, formatPrice } from '../lib/storage.js'
 import { suggestionsFor } from '../lib/suggestions.js'
 
 // Detail screen for one room / area: a dropdown-first "Add to this area" and a
@@ -58,7 +58,7 @@ export default function AreaView({ state, area, today, onEditArea, onQuickAdd, o
                     </td>
                     <td>{it.vendor || '—'}</td>
                     <td>{it.purchaseDate ? fmt(it.purchaseDate) : '—'}</td>
-                    <td className="num">{it.price || '—'}</td>
+                    <td className="num">{formatPrice(it.price) || '—'}</td>
                     <td>
                       {it.warrantyExpires ? (
                         <span className={'tag ' + (w?.state === 'expired' ? 'danger' : w?.state === 'soon' ? 'warn' : 'ok')}>
