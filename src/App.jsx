@@ -18,6 +18,8 @@ import HomeCare from './components/HomeCare.jsx'
 import ProsView from './components/ProsView.jsx'
 import HardwareView from './components/HardwareView.jsx'
 import ReferralsView from './components/ReferralsView.jsx'
+import AllItemsView from './components/AllItemsView.jsx'
+import RoomsView from './components/RoomsView.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
 import { buildSample } from './lib/sample.js'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL } from './lib/intake.js'
@@ -231,7 +233,7 @@ export default function App() {
   const liveItem = (id) => state.items.find((it) => it.id === id) || null
   const openItem = (id) => setModal({ type: 'itemDetail', itemId: id })
 
-  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals' }
+  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas' }
 
   return (
     <div className="app">
@@ -267,7 +269,7 @@ export default function App() {
             <Icon.plus size={18} /> Add
           </button>
         )}
-        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals') && (
+        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms') && (
           <div className="brand" style={{ fontSize: 18 }}>{titles[view.name]}</div>
         )}
       </header>
@@ -278,14 +280,14 @@ export default function App() {
             {showWelcome && <WelcomeIntro onDismiss={dismissWelcome} onLoadSample={loadSample} />}
 
             <div className="dash">
-              <div className="stat">
+              <button className="stat as-btn" onClick={() => setView({ name: 'allItems' })}>
                 <div className="n">{state.items.length}</div>
                 <div className="l">Things stored</div>
-              </div>
-              <div className="stat">
+              </button>
+              <button className="stat as-btn" onClick={() => setView({ name: 'rooms' })}>
                 <div className="n">{state.areas.length}</div>
                 <div className="l">Rooms &amp; areas</div>
-              </div>
+              </button>
               <button className={'stat as-btn' + (dashTotals.soon ? ' alert' : '')} onClick={() => setView({ name: 'expiring' })}>
                 <div className="n">{dashTotals.soon}</div>
                 <div className="l">Warranties expiring soon</div>
@@ -430,6 +432,16 @@ export default function App() {
 
         {view.name === 'referrals' && (
           <ReferralsView profile={intake} />
+        )}
+
+        {view.name === 'allItems' && (
+          <AllItemsView state={state} today={today} onOpenItem={openItem} />
+        )}
+
+        {view.name === 'rooms' && (
+          <RoomsView state={state} today={today}
+            onOpenArea={(areaId) => setView({ name: 'area', areaId })}
+            onAddArea={() => setModal({ type: 'area', area: null, zone: 'inside' })} />
         )}
       </main>
 
