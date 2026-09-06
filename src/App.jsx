@@ -19,6 +19,7 @@ import ProsView from './components/ProsView.jsx'
 import HardwareView from './components/HardwareView.jsx'
 import ReferralsView from './components/ReferralsView.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
+import { buildSample } from './lib/sample.js'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL } from './lib/intake.js'
 
 export default function App() {
@@ -100,6 +101,27 @@ export default function App() {
   const cacheHardware = (data) => {
     setHardware(data)
     try { localStorage.setItem('homevault:hardware:v3', JSON.stringify(data)) } catch { /* ignore */ }
+  }
+
+  // Load the complete sample home (items, profile, care history, pros).
+  const loadSample = () => {
+    if (state.items.length > 0 || pros.length > 0) {
+      if (!confirm('Load the sample home? This replaces the items, Home Profile, Home Care history and Pros currently on this device.')) return
+    }
+    const sample = buildSample(today)
+    let next = { ...state, items: [] }
+    for (const it of sample.items) {
+      const area = next.areas.find((a) => a.name.toLowerCase() === it.areaName.toLowerCase())
+      if (!area) continue
+      const { areaName, ...data } = it
+      next = store.addItem(next, area.id, { files: [], ...data })
+    }
+    setState(next)
+    setIntake(sample.intake)
+    setCare(sample.care)
+    setPros(sample.pros(store.newProId))
+    setShowWelcome(false)
+    flash('Sample home loaded — explore away!')
   }
 
   // Snap & File: create the scanned item in its room and confirm.
@@ -253,7 +275,7 @@ export default function App() {
       <main className={'content' + (view.name === 'home' ? ' wide' : '')}>
         {view.name === 'home' && (
           <>
-            {showWelcome && <WelcomeIntro onDismiss={dismissWelcome} />}
+            {showWelcome && <WelcomeIntro onDismiss={dismissWelcome} onLoadSample={loadSample} />}
 
             <div className="dash">
               <div className="stat">

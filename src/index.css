@@ -1126,7 +1126,14 @@ button.hw-store { width: 100%; text-align: left; cursor: pointer; }
 }
 .wp strong { display: block; font-size: 14px; }
 .wp span { display: block; font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; line-height: 1.35; }
-.welcome-cta { margin-top: 20px; }
+.welcome-cta { margin-top: 0; }
+.welcome-cta-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 20px; }
+.welcome-sample {
+  font-size: 13.5px; color: var(--ink-soft); min-height: var(--tap);
+  padding: 8px 4px; text-align: left;
+}
+.welcome-sample b { color: var(--brand-dark); }
+.welcome-sample:active b { text-decoration: underline; }
 
 /* ---------- Home Profile card (on home screen) ---------- */
 .profile-card {
