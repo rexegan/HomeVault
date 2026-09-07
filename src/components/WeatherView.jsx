@@ -87,8 +87,17 @@ export default function WeatherView({ profile, cached, onCache }) {
               <div className="wx-day" key={d.date}>
                 <span className="wx-icon">{w.icon}</span>
                 <span className="wx-body">
-                  <span className="wx-name">{dayName(d.date, i)}</span>
-                  <span className="wx-label">{w.label}{d.rain >= 20 ? ` · ${d.rain}% rain` : ''}{d.wind >= 20 ? ` · wind ${d.wind} mph` : ''}</span>
+                  <span className="wx-name">{dayName(d.date, i)}
+                    <span className="wx-cond"> — {w.label}{d.feels > d.hi + 2 ? ` · feels ${d.feels}°` : ''}</span>
+                  </span>
+                  <span className="wx-chips">
+                    <span className="wx-chip">💧 {d.rain}% rain{d.rainAmt >= 0.05 ? ` · ${d.rainAmt}"` : ''}{d.rainHrs > 0 ? ` over ${d.rainHrs}h` : ''}</span>
+                    <span className="wx-chip">💦 {d.hum}% humidity</span>
+                    <span className="wx-chip">💨 {d.wind} mph{d.gust >= d.wind + 8 ? ` (gusts ${d.gust})` : ''}</span>
+                    <span className="wx-chip">☀️ UV {d.uv}</span>
+                    {d.sunrise && <span className="wx-chip">🌅 {d.sunrise}</span>}
+                    {d.sunset && <span className="wx-chip">🌇 {d.sunset}</span>}
+                  </span>
                 </span>
                 <span className="wx-temps">
                   <b className={d.hi >= 100 ? 'hot' : ''}>{d.hi}°</b>

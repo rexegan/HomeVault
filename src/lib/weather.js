@@ -5,19 +5,31 @@
 export async function fetchForecast(lat, lon) {
   const url = 'https://api.open-meteo.com/v1/forecast' +
     `?latitude=${lat}&longitude=${lon}` +
-    '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max' +
-    '&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&forecast_days=16'
+    '&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,' +
+    'precipitation_probability_max,precipitation_sum,precipitation_hours,' +
+    'relative_humidity_2m_mean,wind_speed_10m_max,wind_gusts_10m_max,uv_index_max,sunrise,sunset' +
+    '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch' +
+    '&timezone=auto&forecast_days=16'
   const res = await fetch(url)
   if (!res.ok) throw new Error('forecast ' + res.status)
   const js = await res.json()
   const d = js.daily
+  const clock = (iso) => iso ? new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase().replace(' ', '') : ''
   return d.time.map((date, i) => ({
     date,
     code: d.weather_code[i],
     hi: Math.round(d.temperature_2m_max[i]),
     lo: Math.round(d.temperature_2m_min[i]),
-    rain: d.precipitation_probability_max[i] ?? 0,
+    feels: Math.round(d.apparent_temperature_max?.[i] ?? d.temperature_2m_max[i]),
+    rain: d.precipitation_probability_max?.[i] ?? 0,
+    rainAmt: +(d.precipitation_sum?.[i] ?? 0).toFixed(2),
+    rainHrs: Math.round(d.precipitation_hours?.[i] ?? 0),
+    hum: Math.round(d.relative_humidity_2m_mean?.[i] ?? 0),
     wind: Math.round(d.wind_speed_10m_max[i]),
+    gust: Math.round(d.wind_gusts_10m_max?.[i] ?? 0),
+    uv: Math.round(d.uv_index_max?.[i] ?? 0),
+    sunrise: clock(d.sunrise?.[i]),
+    sunset: clock(d.sunset?.[i]),
   }))
 }
 

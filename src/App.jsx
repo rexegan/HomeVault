@@ -315,7 +315,7 @@ export default function App() {
               </button>
               <button className="stat as-btn stat-tool" onClick={() => setView({ name: 'weather' })}>
                 <div className="n">🌤️</div>
-                <div className="l">Weather &amp; weather care</div>
+                <div className="l">Weather &amp; maintenance</div>
               </button>
             </div>
 

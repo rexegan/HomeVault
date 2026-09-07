@@ -797,6 +797,13 @@ button.pro-card:active { background: #fffaf0; }
 .wx-body { flex: 1; min-width: 0; }
 .wx-name { display: block; font-weight: 700; font-size: 15px; }
 .wx-label { display: block; font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; line-height: 1.4; }
+.wx-cond { font-weight: 600; font-size: 13px; color: var(--ink-soft); }
+.wx-chips { display: flex; flex-wrap: wrap; gap: 5px 8px; margin-top: 7px; }
+.wx-chip {
+  font-size: 11.5px; font-weight: 600; color: var(--ink-soft);
+  background: var(--bg-2); border-radius: 999px; padding: 3px 9px;
+  white-space: nowrap;
+}
 .wx-temps { flex-shrink: 0; display: flex; align-items: baseline; gap: 8px; font-variant-numeric: tabular-nums; }
 .wx-temps b { font-size: 18px; }
 .wx-temps b.hot { color: var(--danger); }
