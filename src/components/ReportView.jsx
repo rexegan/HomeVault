@@ -6,7 +6,7 @@ import { homeFacts } from '../lib/intake.js'
 
 // A clean, printable home inventory — good for insurance or personal records.
 // "Print / Save as PDF" uses the browser's own print dialog (works on iPad too).
-export default function ReportView({ state, today, profile }) {
+export default function ReportView({ state, today, profile, onOpenAllItems, onOpenRooms, onOpenExpiring, onOpenArea, onOpenItem }) {
   const home = homeFacts(profile)
   const summary = useMemo(() => {
     let value = 0, active = 0, soon = 0, expired = 0
@@ -46,12 +46,12 @@ export default function ReportView({ state, today, profile }) {
         </div>
 
         <div className="report-summary">
-          <SumCell n={state.items.length} l="Items" />
-          <SumCell n={areasWithItems.length} l="Areas in use" />
-          <SumCell n={summary.value ? money(summary.value) : '—'} l="Estimated value" />
-          <SumCell n={summary.active} l="Warranties active" />
-          <SumCell n={summary.soon} l="Expiring soon" />
-          <SumCell n={summary.expired} l="Expired" />
+          <SumCell n={state.items.length} l="Items" onClick={onOpenAllItems} />
+          <SumCell n={areasWithItems.length} l="Areas in use" onClick={onOpenRooms} />
+          <SumCell n={summary.value ? money(summary.value) : '—'} l="Estimated value" onClick={onOpenAllItems} />
+          <SumCell n={summary.active} l="Warranties active" onClick={onOpenExpiring} />
+          <SumCell n={summary.soon} l="Expiring soon" onClick={onOpenExpiring} />
+          <SumCell n={summary.expired} l="Expired" onClick={onOpenExpiring} />
         </div>
 
         {areasWithItems.length === 0 && (
@@ -66,7 +66,7 @@ export default function ReportView({ state, today, profile }) {
             <div className="report-zone" key={zone.id}>
               <h2 className="report-zone-title">{zone.label}</h2>
               {zoneAreas.map((area) => (
-                <AreaBlock key={area.id} area={area} items={itemsForArea(state, area.id)} today={today} />
+                <AreaBlock key={area.id} area={area} items={itemsForArea(state, area.id)} today={today} onOpenArea={onOpenArea} onOpenItem={onOpenItem} />
               ))}
             </div>
           )
@@ -80,11 +80,14 @@ export default function ReportView({ state, today, profile }) {
   )
 }
 
-function AreaBlock({ area, items, today }) {
+function AreaBlock({ area, items, today, onOpenArea, onOpenItem }) {
   const AreaIcon = Icon[area.icon] || Icon.box
   return (
     <div className="report-area">
-      <h3 className="report-area-title"><AreaIcon size={18} /> {area.name} <span className="muted">· {items.length}</span></h3>
+      <button className="report-area-title as-title-btn" onClick={() => onOpenArea(area.id)}
+        title={'Open ' + area.name}>
+        <AreaIcon size={18} /> {area.name} <span className="muted">· {items.length} · open ›</span>
+      </button>
       <table className="report-table">
         <thead>
           <tr>
@@ -97,7 +100,8 @@ function AreaBlock({ area, items, today }) {
             const cat = CATEGORIES.find((c) => c.id === it.category)?.label || ''
             const w = warrantyStatus(it, today)
             return (
-              <tr key={it.id}>
+              <tr key={it.id} className="report-row" onClick={() => onOpenItem(it.id)}
+                title="Tap to see details & stored photos">
                 <td>
                   <div className="cell-name">{it.name}</div>
                   {it.notes && <div className="cell-notes">{it.notes}</div>}
@@ -107,7 +111,7 @@ function AreaBlock({ area, items, today }) {
                 <td>{it.purchaseDate ? fmt(it.purchaseDate) : '—'}</td>
                 <td className="num">{it.price ? money(parsePrice(it.price)) : '—'}</td>
                 <td>{warrantyText(it, w)}</td>
-                <td className="num">{it.files?.length || 0}</td>
+                <td className="num">{it.files?.length ? <span className="files-link">📎 {it.files.length}</span> : '—'}</td>
               </tr>
             )
           })}
@@ -117,8 +121,12 @@ function AreaBlock({ area, items, today }) {
   )
 }
 
-function SumCell({ n, l }) {
-  return <div className="sum-cell"><div className="sum-n">{n}</div><div className="sum-l">{l}</div></div>
+function SumCell({ n, l, onClick }) {
+  return (
+    <button className="sum-cell sum-btn" onClick={onClick}>
+      <div className="sum-n">{n}</div><div className="sum-l">{l}</div>
+    </button>
+  )
 }
 
 function warrantyText(it, w) {

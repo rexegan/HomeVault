@@ -434,7 +434,13 @@ export default function App() {
         )}
 
         {view.name === 'report' && (
-          <ReportView state={state} today={today} profile={intake} />
+          <ReportView state={state} today={today} profile={intake}
+            onOpenAllItems={() => setView({ name: 'allItems' })}
+            onOpenRooms={() => setView({ name: 'rooms' })}
+            onOpenExpiring={() => setView({ name: 'expiring' })}
+            onOpenArea={(areaId) => setView({ name: 'area', areaId })}
+            onOpenItem={openItem}
+          />
         )}
 
         {view.name === 'intake' && (
