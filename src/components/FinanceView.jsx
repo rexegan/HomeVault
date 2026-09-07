@@ -68,7 +68,7 @@ export default function FinanceView({ values, onChange, civicInfo }) {
     ['Annual tax', money(v('tax', 'annualTax')) || '—'],
   ]
 
-  const g = (q) => 'https://www.google.com/search?q=' + encodeURIComponent(q)
+  const g = (q) => 'https://duckduckgo.com/?q=' + encodeURIComponent('\\' + q)  // straight to the official page
   const links = county ? [
     ['🏛️', county + ' Appraisal District', 'Look up your appraised value & exemptions.', g(county + ' appraisal district property search')],
     ['💰', 'Pay / view property taxes', 'Statements and payment for ' + county + '.', g(county + ' tax office pay property tax')],

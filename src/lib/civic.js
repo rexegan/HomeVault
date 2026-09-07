@@ -62,7 +62,7 @@ export async function lookupJurisdiction(address, fallbackCoords) {
 
 // Useful local-government resources, aimed by county/city name.
 export function civicLinks(j, stateName) {
-  const g = (q) => 'https://www.google.com/search?q=' + encodeURIComponent(q)
+  const g = (q) => 'https://duckduckgo.com/?q=' + encodeURIComponent('\\' + q)  // jumps straight to the top result — the official page
   const county = j.countyName ? j.countyName + (stateName ? ', ' + stateName : '') : ''
   const cityOrCounty = j.city || j.countyName || ''
   const links = []
@@ -90,7 +90,7 @@ export function civicLinks(j, stateName) {
 
 // Elected officials & first responders for this address, top of the ballot down.
 export function repLinks(j, stateName, address) {
-  const g = (q) => 'https://www.google.com/search?q=' + encodeURIComponent(q)
+  const g = (q) => 'https://duckduckgo.com/?q=' + encodeURIComponent('\\' + q)  // jumps straight to the top result — the official page
   const maps = (q) => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q + (address ? ' near ' + address : ''))
   const st = stateName || 'my state'
   const county = j.countyName || 'my county'
@@ -110,9 +110,10 @@ export function repLinks(j, stateName, address) {
     ['🗳️', county + ' Commissioners Court', 'Your county commissioners by precinct.', g(county + ' ' + st + ' commissioners court precincts')],
     ['🎖️', county + ' Constable', 'Constable precincts and contact.', g(county + ' ' + st + ' constable precincts')],
     ['🚔', county + " Sheriff's Office", 'The sheriff, staff, divisions and non-emergency line.', g(county + ' ' + st + " sheriff's office staff divisions contact")],
-    ['👮', city + ' Police — nearest stations', 'Closest stations to your address, on the map.', maps('police station')],
-    ['🚑', 'Ambulance & EMS', 'EMS service and nearest stations for ' + county + '.', maps('EMS ambulance station')],
-    ['🚒', 'Fire department', 'Your fire station and district.', maps('fire station')],
+    ['👮', city + ' Police Department', 'The department\'s own page — plus a map of the nearest stations below.', g(city + ' ' + st + ' police department official website')],
+    ['🚑', 'Ambulance & EMS', 'Your EMS service\'s page for ' + county + '.', g(county + ' ' + st + ' EMS ambulance service')],
+    ['🚒', 'Fire department', 'Your fire department\'s page.', g(city + ' ' + st + ' fire department official website')],
+    ['🗺️', 'Nearest stations map', 'Police, fire and EMS stations closest to your address.', maps('police fire EMS station')],
   )
   return rows
 }
