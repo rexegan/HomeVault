@@ -22,6 +22,7 @@ import AllItemsView from './components/AllItemsView.jsx'
 import RoomsView from './components/RoomsView.jsx'
 import ScansView from './components/ScansView.jsx'
 import WeatherView from './components/WeatherView.jsx'
+import CivicView from './components/CivicView.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
 import { buildSample } from './lib/sample.js'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL, KEY_FIELDS } from './lib/intake.js'
@@ -128,6 +129,15 @@ export default function App() {
   const cacheWeather = (data) => {
     setWeather(data)
     try { localStorage.setItem('homevault:weather:v1', JSON.stringify(data)) } catch { /* ignore */ }
+  }
+
+  // County/City jurisdiction cache.
+  const [civic, setCivic] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('homevault:civic:v1') || 'null') } catch { return null }
+  })
+  const cacheCivic = (data) => {
+    setCivic(data)
+    try { localStorage.setItem('homevault:civic:v1', JSON.stringify(data)) } catch { /* ignore */ }
   }
 
   // Load the complete sample home (items, profile, care history, pros).
@@ -257,7 +267,7 @@ export default function App() {
   const liveItem = (id) => state.items.find((it) => it.id === id) || null
   const openItem = (id) => setModal({ type: 'itemDetail', itemId: id })
 
-  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans', weather: 'Weather at home' }
+  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans', weather: 'Weather at home', civic: 'County / City' }
 
   return (
     <div className="app">
@@ -286,7 +296,7 @@ export default function App() {
             <Icon.plus size={18} /> Add
           </button>
         )}
-        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans' || view.name === 'weather') && (
+        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans' || view.name === 'weather' || view.name === 'civic') && (
           <div className="brand" style={{ fontSize: 18 }}>{titles[view.name]}</div>
         )}
       </header>
@@ -312,6 +322,10 @@ export default function App() {
               <button className={'stat as-btn' + (dashTotals.expired ? ' danger' : '')} onClick={() => setView({ name: 'expiring' })}>
                 <div className="n">{dashTotals.expired}</div>
                 <div className="l">Warranties expired</div>
+              </button>
+              <button className="stat as-btn stat-tool" onClick={() => setView({ name: 'civic' })}>
+                <div className="n">🏛️</div>
+                <div className="l">County / City</div>
               </button>
               <button className="stat as-btn stat-tool" onClick={() => setView({ name: 'weather' })}>
                 <div className="n">🌤️</div>
@@ -483,6 +497,10 @@ export default function App() {
 
         {view.name === 'referrals' && (
           <ReferralsView profile={intake} />
+        )}
+
+        {view.name === 'civic' && (
+          <CivicView profile={intake} weatherCache={weather} cached={civic} onCache={cacheCivic} />
         )}
 
         {view.name === 'weather' && (

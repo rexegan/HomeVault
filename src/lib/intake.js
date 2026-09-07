@@ -15,7 +15,7 @@ const SECTIONS = [
         "What's the full street address?",
         'What year was the home built?',
         ['Architectural style?', 'Ranch, two-story, split-level, townhome, etc.', ['Ranch', 'Two-story', 'Split-level', 'Craftsman', 'Colonial', 'Contemporary', 'Townhome', 'Farmhouse']],
-        ['How many stories / levels?', null, ['1', '1.5', '2', '3']],
+        ['How many stories / levels?', null, ['1', '1.5', '2', '2.5', '3']],
         'Heated square footage?',
         'Lot size / acreage?',
         ['Foundation type?', 'Slab, pier & beam, crawl space, basement', ['Slab', 'Pier & beam', 'Crawl space', 'Basement', 'Full basement']],

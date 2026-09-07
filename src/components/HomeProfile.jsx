@@ -76,9 +76,21 @@ export default function HomeProfile({ values, onChange, onReset, filed = {}, onF
   )
 }
 
+// Date questions get an input mask: typing "05202000" becomes "05/20/2000" as
+// you go. Typed text (like "May 20, 2016") passes through untouched.
+function maskDate(v) {
+  if (!/^[\d/]*$/.test(v)) return v
+  const digits = v.replace(/\D/g, '').slice(0, 8)
+  if (digits.length > 4) return digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4)
+  if (digits.length > 2) return digits.slice(0, 2) + '/' + digits.slice(2)
+  return digits
+}
+
 function Field({ item, value, onChange, isFiled, onFile }) {
   const filled = value.trim() !== ''
   const listId = item.options ? 'dl-' + item.id.replace(/[:]/g, '-') : undefined
+  const isDate = /\bdate\b/i.test(item.q)
+  const handleChange = (v) => onChange(isDate ? maskDate(v) : v)
   return (
     <div className={'intake-field' + (filled ? ' filled' : '')}>
       <label htmlFor={item.id}>
@@ -90,8 +102,10 @@ function Field({ item, value, onChange, isFiled, onFile }) {
         type="text"
         list={listId}
         value={value}
-        placeholder={item.hint || (item.options ? 'Pick or type…' : 'Add detail…')}
-        onChange={(e) => onChange(e.target.value)}
+        placeholder={isDate ? 'MM/DD/YYYY — just type the numbers'
+          : (item.hint || (item.options ? 'Pick or type…' : 'Add detail…'))}
+        onChange={(e) => handleChange(e.target.value)}
+        inputMode={isDate ? 'numeric' : undefined}
       />
       {item.options && (
         <datalist id={listId}>
