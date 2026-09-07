@@ -441,9 +441,10 @@ export default function App() {
                 <button className="btn secondary small" onClick={() => {
                   const addr = (intake[KEY_FIELDS.address] || '').trim()
                   if (!addr) { flash('Add your address in the Home Profile first'); setView({ name: 'intake' }); return }
-                  // Jump straight to the home's public Zillow page (top result),
-                  // skipping Zillow's search screen and owner-view prompt.
-                  window.open('https://duckduckgo.com/?q=' + encodeURIComponent('\\' + addr + ' site:zillow.com'), '_blank', 'noopener')
+                  // Zillow's canonical address deep-link: for an exact match it
+                  // redirects server-side straight to the home's property page.
+                  const slug = encodeURIComponent(addr.replace(/\s+/g, '-')).replace(/%2C/g, ',')
+                  window.open('https://www.zillow.com/homes/' + slug + '_rb/', '_blank', 'noopener')
                 }}>🏠 Open Zillow</button>
               </div>
             </div>
