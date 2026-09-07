@@ -24,7 +24,7 @@ import ScansView from './components/ScansView.jsx'
 import WeatherView from './components/WeatherView.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
 import { buildSample } from './lib/sample.js'
-import { INTAKE_QUESTIONS, INTAKE_TOTAL } from './lib/intake.js'
+import { INTAKE_QUESTIONS, INTAKE_TOTAL, KEY_FIELDS } from './lib/intake.js'
 
 export default function App() {
   const [state, setState] = useState(store.load)
@@ -402,6 +402,20 @@ export default function App() {
               </div>
               <div className="backup-actions">
                 <button className="btn secondary small" onClick={() => setView({ name: 'report' })}><Icon.file size={16} /> View report</button>
+              </div>
+            </div>
+            <div className="backup-bar">
+              <div className="backup-text">
+                <strong>Zillow</strong>
+                <span>Your home's page — value, history and details from your address.</span>
+              </div>
+              <div className="backup-actions">
+                <button className="btn secondary small" onClick={() => {
+                  const addr = (intake[KEY_FIELDS.address] || '').trim()
+                  if (!addr) { flash('Add your address in the Home Profile first'); setView({ name: 'intake' }); return }
+                  const slug = addr.replace(/,/g, '').replace(/\s+/g, '-')
+                  window.open('https://www.zillow.com/homes/' + encodeURIComponent(slug) + '_rb/', '_blank', 'noopener')
+                }}>🏠 Open Zillow</button>
               </div>
             </div>
             <div className="backup-bar">
