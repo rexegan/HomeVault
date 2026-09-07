@@ -1389,3 +1389,6 @@ button.sum-btn:active { background: var(--bg-2); }
   border: 1px dashed var(--line-strong, #c8bca4); color: var(--ink-soft); font-size: 13px;
 }
 .intake-foot svg { flex-shrink: 0; color: var(--brand); margin-top: 1px; }
+
+/* ---------- Insurance / Taxes ---------- */
+.fin-quick { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }

@@ -23,6 +23,7 @@ import RoomsView from './components/RoomsView.jsx'
 import ScansView from './components/ScansView.jsx'
 import WeatherView from './components/WeatherView.jsx'
 import CivicView from './components/CivicView.jsx'
+import FinanceView from './components/FinanceView.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
 import { buildSample } from './lib/sample.js'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL, KEY_FIELDS } from './lib/intake.js'
@@ -139,6 +140,15 @@ export default function App() {
     setCivic(data)
     try { localStorage.setItem('homevault:civic:v1', JSON.stringify(data)) } catch { /* ignore */ }
   }
+
+  // Insurance / taxes record.
+  const [finance, setFinance] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('homevault:finance:v1') || '{}') } catch { return {} }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('homevault:finance:v1', JSON.stringify(finance)) } catch { /* ignore */ }
+  }, [finance])
+  const setFinanceValue = (id, val) => setFinance((m) => ({ ...m, [id]: val }))
 
   // Load the complete sample home (items, profile, care history, pros).
   const loadSample = () => {
@@ -267,7 +277,7 @@ export default function App() {
   const liveItem = (id) => state.items.find((it) => it.id === id) || null
   const openItem = (id) => setModal({ type: 'itemDetail', itemId: id })
 
-  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans', weather: 'Weather at home', civic: 'County / City' }
+  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans', weather: 'Weather at home', civic: 'County / City', finance: 'Insurance / Taxes' }
 
   return (
     <div className="app">
@@ -296,7 +306,7 @@ export default function App() {
             <Icon.plus size={18} /> Add
           </button>
         )}
-        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans' || view.name === 'weather' || view.name === 'civic') && (
+        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans' || view.name === 'weather' || view.name === 'civic' || view.name === 'finance') && (
           <div className="brand" style={{ fontSize: 18 }}>{titles[view.name]}</div>
         )}
       </header>
@@ -322,6 +332,10 @@ export default function App() {
               <button className={'stat as-btn' + (dashTotals.expired ? ' danger' : '')} onClick={() => setView({ name: 'expiring' })}>
                 <div className="n">{dashTotals.expired}</div>
                 <div className="l">Warranties expired</div>
+              </button>
+              <button className="stat as-btn stat-tool" onClick={() => setView({ name: 'finance' })}>
+                <div className="n">🛡️</div>
+                <div className="l">Insurance / Taxes</div>
               </button>
               <button className="stat as-btn stat-tool" onClick={() => setView({ name: 'civic' })}>
                 <div className="n">🏛️</div>
@@ -497,6 +511,10 @@ export default function App() {
 
         {view.name === 'referrals' && (
           <ReferralsView profile={intake} />
+        )}
+
+        {view.name === 'finance' && (
+          <FinanceView values={finance} onChange={setFinanceValue} civicInfo={civic?.info} />
         )}
 
         {view.name === 'civic' && (
