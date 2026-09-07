@@ -20,6 +20,7 @@ import HardwareView from './components/HardwareView.jsx'
 import ReferralsView from './components/ReferralsView.jsx'
 import AllItemsView from './components/AllItemsView.jsx'
 import RoomsView from './components/RoomsView.jsx'
+import ScansView from './components/ScansView.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
 import { buildSample } from './lib/sample.js'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL } from './lib/intake.js'
@@ -104,6 +105,20 @@ export default function App() {
     setHardware(data)
     try { localStorage.setItem('homevault:hardware:v3', JSON.stringify(data)) } catch { /* ignore */ }
   }
+
+  // 3D scans index (model blobs live in IndexedDB; this is just the list).
+  const [scans, setScans] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('homevault:scans:v1') || '[]') } catch { return [] }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('homevault:scans:v1', JSON.stringify(scans)) } catch { /* ignore */ }
+  }, [scans])
+  const addScan = (data) => {
+    const d = new Date(); d.setHours(0, 0, 0, 0)
+    setScans((l) => [...l, { id: store.newProId(), added: d.toISOString().slice(0, 10), ...data }])
+    flash('3D scan saved')
+  }
+  const deleteScan = (scanId) => { setScans((l) => l.filter((s) => s.id !== scanId)); flash('Scan deleted') }
 
   // Load the complete sample home (items, profile, care history, pros).
   const loadSample = () => {
@@ -233,7 +248,7 @@ export default function App() {
   const liveItem = (id) => state.items.find((it) => it.id === id) || null
   const openItem = (id) => setModal({ type: 'itemDetail', itemId: id })
 
-  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas' }
+  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans' }
 
   return (
     <div className="app">
@@ -269,7 +284,7 @@ export default function App() {
             <Icon.plus size={18} /> Add
           </button>
         )}
-        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms') && (
+        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans') && (
           <div className="brand" style={{ fontSize: 18 }}>{titles[view.name]}</div>
         )}
       </header>
@@ -346,6 +361,16 @@ export default function App() {
                 <strong>Repair Referrals</strong>
                 <span className="profile-sub">Angi, Christian home repair, Thumbtack — trusted ways to find help.</span>
               </span>
+              <span className="profile-chev"><Icon.chevron size={20} /></span>
+            </button>
+
+            <button className="profile-card" onClick={() => setView({ name: 'scans' })}>
+              <span className="profile-icon scans-icon"><Icon.house size={22} /></span>
+              <span className="profile-body">
+                <strong>3D Home Scans</strong>
+                <span className="profile-sub">Scan rooms with your phone and spin them in 3D, right here.</span>
+              </span>
+              {scans.length > 0 && <span className="pros-count-pill">{scans.length}</span>}
               <span className="profile-chev"><Icon.chevron size={20} /></span>
             </button>
               </aside>
@@ -432,6 +457,10 @@ export default function App() {
 
         {view.name === 'referrals' && (
           <ReferralsView profile={intake} />
+        )}
+
+        {view.name === 'scans' && (
+          <ScansView scans={scans} onAdd={addScan} onDelete={deleteScan} />
         )}
 
         {view.name === 'allItems' && (

@@ -769,6 +769,34 @@ button.pro-card:active { background: #fffaf0; }
 .area-table .cell-item { font-weight: 700; }
 .area-table .cell-clip { margin-left: 7px; font-size: 12px; color: var(--ink-soft); font-weight: 600; }
 
+/* ---------- 3D Home Scans ---------- */
+.scans-icon { background: #ece6f7 !important; color: #5b45a8 !important; }
+.scan-row {
+  display: flex; align-items: stretch; gap: 8px;
+}
+.scan-main {
+  flex: 1; display: flex; align-items: center; gap: 12px; text-align: left;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 13px 15px; box-shadow: var(--shadow);
+  min-width: 0; cursor: pointer;
+}
+.scan-main:active { background: #fffaf0; }
+.scan-cube {
+  width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+  display: grid; place-items: center; font-size: 20px;
+  background: #ece6f7; color: #5b45a8; font-style: normal;
+}
+.scan-body { flex: 1; min-width: 0; }
+.scan-name { display: block; font-weight: 700; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.scan-sub { display: block; font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+.scan-view { flex-shrink: 0; font-size: 13px; font-weight: 700; color: var(--brand-dark); }
+.scan-delete {
+  flex-shrink: 0; width: 46px; border-radius: var(--radius);
+  border: 1px solid var(--line); background: var(--card); color: var(--ink-soft);
+  display: grid; place-items: center;
+}
+.scan-delete:active { color: var(--danger); background: #fdefec; }
+
 /* ---------- Rooms & areas list ---------- */
 .room-row {
   display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
