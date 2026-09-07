@@ -52,7 +52,7 @@ const BADGE_POS = {
   'primary closet': [65.6, 43.6], 'foyer': [61, 55], 'study': [67, 68.5],
 }
 
-export default function Blueprint({ state, today, profile, onOpenArea, onAddArea }) {
+export default function Blueprint({ state, today, profile, onOpenArea, onAddArea, onOpenProfile }) {
   const placed = []
   const unplaced = []
   for (const area of state.areas) {
@@ -74,11 +74,15 @@ export default function Blueprint({ state, today, profile, onOpenArea, onAddArea
   return (
     <div className="blueprint-wrap">
       <div className="bp-titleblock">
-        <div className="bp-tb-main">
+        <button className="bp-tb-main" onClick={onOpenProfile}
+          title="Tap to edit your address & home details">
           <div className="bp-tb-eyebrow">HomeVault &middot; Floor Plan</div>
           <div className="bp-tb-name">{name || 'Your Home'}</div>
-          <div className="bp-tb-facts">{facts.length > 0 ? facts.join('  ·  ') : 'Tap a room to open it'}</div>
-        </div>
+          <div className="bp-tb-facts">
+            {facts.length > 0 ? facts.join('  ·  ') : 'Tap a room to open it'}
+            <span className="bp-tb-edit"> · edit</span>
+          </div>
+        </button>
         <div className="bp-tb-tag">
           <span>TO<br />SCALE</span>
         </div>

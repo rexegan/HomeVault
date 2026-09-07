@@ -954,7 +954,9 @@ button.hw-store { width: 100%; text-align: left; cursor: pointer; }
   background: rgba(255,255,255,0.35);
   margin-bottom: 12px; overflow: hidden;
 }
-.bp-tb-main { padding: 10px 14px; min-width: 0; }
+.bp-tb-main { padding: 10px 14px; min-width: 0; text-align: left; cursor: pointer; flex: 1; }
+.bp-tb-main:active { background: rgba(22,52,79,0.05); }
+.bp-tb-edit { color: #b26a12; font-weight: 700; }
 .bp-tb-eyebrow {
   font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase;
   font-weight: 800; color: #b26a12;

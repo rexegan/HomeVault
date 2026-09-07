@@ -22,7 +22,7 @@ export default function FloorPlan({ state, today, profile, onOpenArea, onAddArea
         )}
       </div>
 
-      <Blueprint state={state} today={today} profile={profile} onOpenArea={onOpenArea} onAddArea={onAddArea} />
+      <Blueprint state={state} today={today} profile={profile} onOpenArea={onOpenArea} onAddArea={onAddArea} onOpenProfile={onOpenProfile} />
     </>
   )
 }
