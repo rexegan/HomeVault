@@ -14,6 +14,7 @@ const SECTIONS = [
       { items: [
         "What's the full street address?",
         'What year was the home built?',
+        ['Home builder', 'Who built the house? Their card appears below.'],
         ['Architectural style?', 'Ranch, two-story, split-level, townhome, etc.', ['Ranch', 'Two-story', 'Split-level', 'Craftsman', 'Colonial', 'Contemporary', 'Townhome', 'Farmhouse']],
         ['How many stories / levels?', null, ['1', '1.5', '2', '2.5', '3']],
         'Heated square footage?',
@@ -21,7 +22,6 @@ const SECTIONS = [
         ['Foundation type?', 'Slab, pier & beam, crawl space, basement', ['Slab', 'Pier & beam', 'Crawl space', 'Basement', 'Full basement']],
         ['Do you own or rent it?', null, ['Own', 'Rent']],
         'Purchase / closing date?',
-        'Builder or developer name?',
         ['Is there an HOA?', 'Name and dues, if so'],
         'Parcel / APN & legal description?',
       ] },
@@ -280,9 +280,10 @@ export const INTAKE_TOTAL = INTAKE_QUESTIONS.length
 export const KEY_FIELDS = {
   address: 'property:0:0',
   yearBuilt: 'property:0:1',
-  style: 'property:0:2',
-  stories: 'property:0:3',
-  sqft: 'property:0:4',
+  builder: 'property:0:2',
+  style: 'property:0:3',
+  stories: 'property:0:4',
+  sqft: 'property:0:5',
 }
 
 // Build a home name + a short facts line from whatever the user has filled in.

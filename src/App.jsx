@@ -22,6 +22,7 @@ import AllItemsView from './components/AllItemsView.jsx'
 import RoomsView from './components/RoomsView.jsx'
 import ScansView from './components/ScansView.jsx'
 import WeatherView from './components/WeatherView.jsx'
+import PoolForm from './components/PoolForm.jsx'
 import CivicView from './components/CivicView.jsx'
 import FinanceView from './components/FinanceView.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
@@ -35,7 +36,24 @@ export default function App() {
   const [modal, setModal] = useState(null)
   const [toast, setToast] = useState(null)
   const [query, setQuery] = useState('')
-  const [intake, setIntake] = useState(store.loadIntake)
+  const [intake, setIntake] = useState(() => {
+    const m = store.loadIntake()
+    // One-time migration: 'Home builder' moved up to slot 2 in section 01.
+    try {
+      if (!localStorage.getItem('homevault:intake:migr1')) {
+        const remap = { 'property:0:9': 'property:0:2', 'property:0:2': 'property:0:3',
+          'property:0:3': 'property:0:4', 'property:0:4': 'property:0:5', 'property:0:5': 'property:0:6',
+          'property:0:6': 'property:0:7', 'property:0:7': 'property:0:8', 'property:0:8': 'property:0:9' }
+        const out = { ...m }
+        for (const from of Object.keys(remap)) delete out[from]
+        for (const [from, to] of Object.entries(remap)) if (m[from] != null) out[to] = m[from]
+        localStorage.setItem('homevault:intake:migr1', '1')
+        store.saveIntake(out)
+        return out
+      }
+    } catch { /* ignore */ }
+    return m
+  })
   // The welcome intro greets you on every open; the X only hides it for this session.
   const [showWelcome, setShowWelcome] = useState(true)
   const importRef = useRef(null)
@@ -170,6 +188,15 @@ export default function App() {
     setShowWelcome(false)
     flash('Sample home loaded — explore away!')
   }
+
+  // Swimming Pool profile.
+  const [pool, setPool] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('homevault:pool:v1') || '{}') } catch { return {} }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('homevault:pool:v1', JSON.stringify(pool)) } catch { /* ignore */ }
+  }, [pool])
+  const setPoolValue = (k, val) => setPool((m) => ({ ...m, [k]: val }))
 
   // Snap & File: create the scanned item in its room and confirm.
   const saveSnap = (areaId, data) => {
@@ -496,7 +523,7 @@ export default function App() {
 
         {view.name === 'intake' && (
           <HomeProfile values={intake} onChange={setIntakeValue} onReset={resetIntake}
-            filed={validFiled} onFile={fileFromProfile} />
+            filed={validFiled} onFile={fileFromProfile} onAddPro={(d) => addPro(d)} />
         )}
 
         {view.name === 'care' && (
@@ -543,7 +570,16 @@ export default function App() {
         )}
       </main>
 
-      {modal?.type === 'area' && (
+      {modal?.type === 'area' && modal.area && (modal.area.variant === 'pool' || /swimming pool/i.test(modal.area.name)) ? (
+        <PoolForm
+          area={modal.area}
+          values={pool}
+          onChange={setPoolValue}
+          coords={weather?.lat ? { lat: weather.lat, lon: weather.lon } : null}
+          onAddPro={(data) => addPro(data)}
+          onClose={() => setModal(null)}
+        />
+      ) : modal?.type === 'area' && (
         <AreaForm
           area={modal.area}
           defaultZone={modal.zone}

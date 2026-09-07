@@ -1,11 +1,11 @@
 import { Icon } from '../lib/icons.jsx'
-import { INTAKE, INTAKE_TOTAL } from '../lib/intake.js'
+import { INTAKE, INTAKE_TOTAL, KEY_FIELDS } from '../lib/intake.js'
 
 // The Home Profile: the full intake questionnaire, inside the app — but now every
 // question is an input you fill in. Questions with a defined set of choices show a
 // dropdown you can pick from OR type your own (a <datalist>); the rest are free text.
 // Answers are held by App and persisted. Section 07 is a reference spec.
-export default function HomeProfile({ values, onChange, onReset, filed = {}, onFile }) {
+export default function HomeProfile({ values, onChange, onReset, filed = {}, onFile, onAddPro }) {
   const done = countFilled(values)
   const pct = INTAKE_TOTAL ? Math.round((done / INTAKE_TOTAL) * 100) : 0
 
@@ -58,7 +58,7 @@ export default function HomeProfile({ values, onChange, onReset, filed = {}, onF
                   {g.items.map((item) => (
                     <Field key={item.id} item={item}
                       value={values[item.id] || ''} onChange={(v) => onChange(item.id, v)}
-                      isFiled={!!filed[item.id]} onFile={onFile} />
+                      isFiled={!!filed[item.id]} onFile={onFile} onAddPro={onAddPro} />
                   ))}
                 </div>
               </div>
@@ -86,31 +86,57 @@ function maskDate(v) {
   return digits
 }
 
-function Field({ item, value, onChange, isFiled, onFile }) {
+function Field({ item, value, onChange, isFiled, onFile, onAddPro }) {
   const filled = value.trim() !== ''
-  const listId = item.options ? 'dl-' + item.id.replace(/[:]/g, '-') : undefined
   const isDate = /\bdate\b/i.test(item.q)
   const handleChange = (v) => onChange(isDate ? maskDate(v) : v)
+  const isBuilder = item.id === KEY_FIELDS.builder
+  const custom = item.options ? (filled && !item.options.includes(value)) : false
   return (
     <div className={'intake-field' + (filled ? ' filled' : '')}>
       <label htmlFor={item.id}>
         <span className="chk" aria-hidden="true">{filled ? '✓' : ''}</span>
         <span className="q">{item.q}</span>
       </label>
-      <input
-        id={item.id}
-        type="text"
-        list={listId}
-        value={value}
-        placeholder={isDate ? 'MM/DD/YYYY — just type the numbers'
-          : (item.hint || (item.options ? 'Pick or type…' : 'Add detail…'))}
-        onChange={(e) => handleChange(e.target.value)}
-        inputMode={isDate ? 'numeric' : undefined}
-      />
-      {item.options && (
-        <datalist id={listId}>
-          {item.options.map((o) => <option key={o} value={o} />)}
-        </datalist>
+      {item.options ? (
+        <>
+          <select id={item.id} value={custom ? '__other' : value}
+            onChange={(e) => {
+              const v = e.target.value
+              onChange(v === '__other' ? (custom ? value : ' ') : v)
+            }}>
+            <option value="">Pick one…</option>
+            {item.options.map((o) => <option key={o} value={o}>{o}</option>)}
+            <option value="__other">Other…</option>
+          </select>
+          {custom && (
+            <input type="text" value={value.trim()} style={{ marginTop: 8 }}
+              placeholder="Type it in" onChange={(e) => onChange(e.target.value || ' ')} />
+          )}
+        </>
+      ) : (
+        <input
+          id={item.id}
+          type="text"
+          value={value}
+          placeholder={isDate ? 'MM/DD/YYYY — just type the numbers' : (item.hint || 'Add detail…')}
+          onChange={(e) => handleChange(e.target.value)}
+          inputMode={isDate ? 'numeric' : undefined}
+        />
+      )}
+      {isBuilder && filled && (
+        <div className="builder-card">
+          <div className="bc-name">{value.trim()}</div>
+          <div className="bc-line">🌐 <a href={'https://duckduckgo.com/?q=' + encodeURIComponent('\\' + value.trim() + ' home builder')}
+            target="_blank" rel="noopener noreferrer">Their website</a></div>
+          {onAddPro && (
+            <button className="file-btn" onClick={() => onAddPro({
+              trade: 'General contractor', name: value.trim(), owner: '', officePhone: '', cellPhone: '',
+              email: '', website: '', street: '', city: '', state: '', zip: '', license: '',
+              referredBy: 'Built the house', notes: 'Home builder', jobs: [],
+            })}>+ Save to My Pros</button>
+          )}
+        </div>
       )}
       {item.file && filled && (
         isFiled ? (

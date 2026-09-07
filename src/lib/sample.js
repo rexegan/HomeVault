@@ -82,9 +82,10 @@ export function buildSample(today) {
   const intake = {
     // 01 · Property
     'property:0:0': '1284 Wildflower Lane, Cleburne, TX 76031',
-    'property:0:1': '2003', 'property:0:2': 'Ranch', 'property:0:3': '1',
-    'property:0:4': '3,010', 'property:0:5': '1.5 acres', 'property:0:6': 'Slab',
-    'property:0:7': 'Own', 'property:0:8': 'May 20, 2016', 'property:0:9': 'Bluebonnet Custom Homes',
+    'property:0:1': '2003', 'property:0:2': 'Bluebonnet Custom Homes',
+    'property:0:3': 'Ranch', 'property:0:4': '1',
+    'property:0:5': '3,010', 'property:0:6': '1.5 acres', 'property:0:7': 'Slab',
+    'property:0:8': 'Own', 'property:0:9': 'May 20, 2016',
     'property:0:10': 'No HOA', 'property:0:11': 'APN 126-0440-0021',
     // 02 · Exterior
     'exterior:0:0': 'Architectural shingle — weathered wood', 'exterior:0:1': 'Replaced 2021 by TopLine Roofing',
