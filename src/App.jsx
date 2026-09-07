@@ -436,6 +436,7 @@ export default function App() {
               <div className="backup-text">
                 <strong>Zillow</strong>
                 <span>Your home's page — value, history and details from your address.</span>
+                <span className="zillow-hint">Signed into Zillow as the owner? Tap “Public view” there to see the photos.</span>
               </div>
               <div className="backup-actions">
                 <button className="btn secondary small" onClick={() => {

@@ -342,6 +342,7 @@ h1, h2, h3, p { margin: 0; }
 .backup-text { display: flex; flex-direction: column; flex: 1 1 220px; }
 .backup-text strong { font-size: 15px; }
 .backup-text span { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+.zillow-hint { font-size: 11.5px !important; color: #a5661a !important; font-weight: 600; }
 .backup-actions { display: flex; gap: 10px; }
 
 .items { display: flex; flex-direction: column; gap: 10px; }
