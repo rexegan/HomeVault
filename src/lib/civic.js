@@ -30,6 +30,8 @@ function parseGeos(geos, matchedAddress) {
   const school = pick('unified school districts')
   const congress = pick('congressional')
   const tract = pick('census tracts')
+  const sldUpper = pick('upper')
+  const sldLower = pick('lower')
   return {
     matchedAddress: matchedAddress || '',
     city: place?.NAME || null,                       // null → unincorporated
@@ -38,6 +40,8 @@ function parseGeos(geos, matchedAddress) {
     subdivision: subdiv?.NAME || null,
     schoolDistrict: school?.NAME || null,
     congressional: congress?.NAME || null,
+    stateSenate: sldUpper?.NAME || null,
+    stateHouse: sldLower?.NAME || null,
     tract: tract?.NAME || null,
   }
 }
@@ -82,4 +86,33 @@ export function civicLinks(j, stateName) {
   }
   links.push(['🗳️', 'Voter & elections info', 'Registration, precinct and sample ballots.', g(county ? county + ' elections voter registration' : 'county elections voter registration')])
   return links
+}
+
+// Elected officials & first responders for this address, top of the ballot down.
+export function repLinks(j, stateName, address) {
+  const g = (q) => 'https://www.google.com/search?q=' + encodeURIComponent(q)
+  const maps = (q) => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q + (address ? ' near ' + address : ''))
+  const st = stateName || 'my state'
+  const county = j.countyName || 'my county'
+  const city = j.city || county
+  const rows = [
+    ['🏵️', 'Governor of ' + st, 'Current governor, office and contact.', g('governor of ' + st)],
+    ['🏛️', st + ' U.S. Senators', 'Both senators, offices and contact forms.', g(st + ' current US senators contact')],
+  ]
+  if (j.congressional) rows.push(['🏛️', 'U.S. Representative — ' + j.congressional,
+    'Your congressman and district offices.', g(st + ' ' + j.congressional + ' current representative')])
+  if (j.stateSenate) rows.push(['🏵️', st + ' ' + j.stateSenate,
+    'Your state senator.', g(st + ' ' + j.stateSenate + ' current senator')])
+  if (j.stateHouse) rows.push(['🏵️', st + ' ' + j.stateHouse,
+    'Your state representative.', g(st + ' ' + j.stateHouse + ' current representative')])
+  rows.push(
+    ['⚖️', county + ' Judge', 'The county judge and commissioners court agenda.', g(county + ' ' + st + ' county judge')],
+    ['🗳️', county + ' Commissioners Court', 'Your county commissioners by precinct.', g(county + ' ' + st + ' commissioners court precincts')],
+    ['🎖️', county + ' Constable', 'Constable precincts and contact.', g(county + ' ' + st + ' constable precincts')],
+    ['🚔', county + " Sheriff's Office", 'The sheriff, staff, divisions and non-emergency line.', g(county + ' ' + st + " sheriff's office staff divisions contact")],
+    ['👮', city + ' Police — nearest stations', 'Closest stations to your address, on the map.', maps('police station')],
+    ['🚑', 'Ambulance & EMS', 'EMS service and nearest stations for ' + county + '.', maps('EMS ambulance station')],
+    ['🚒', 'Fire department', 'Your fire station and district.', maps('fire station')],
+  )
+  return rows
 }

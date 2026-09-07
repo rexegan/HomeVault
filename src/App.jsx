@@ -134,11 +134,11 @@ export default function App() {
 
   // County/City jurisdiction cache.
   const [civic, setCivic] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('homevault:civic:v1') || 'null') } catch { return null }
+    try { return JSON.parse(localStorage.getItem('homevault:civic:v2') || 'null') } catch { return null }
   })
   const cacheCivic = (data) => {
     setCivic(data)
-    try { localStorage.setItem('homevault:civic:v1', JSON.stringify(data)) } catch { /* ignore */ }
+    try { localStorage.setItem('homevault:civic:v2', JSON.stringify(data)) } catch { /* ignore */ }
   }
 
   // Insurance / taxes record.

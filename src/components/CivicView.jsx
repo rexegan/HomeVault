@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../lib/icons.jsx'
 import { KEY_FIELDS } from '../lib/intake.js'
-import { lookupJurisdiction, civicLinks } from '../lib/civic.js'
+import { lookupJurisdiction, civicLinks, repLinks } from '../lib/civic.js'
 
 // County / City: where the home officially sits — its incorporated city (or
 // unincorporated county), county, school district — plus the local-government
@@ -37,6 +37,7 @@ export default function CivicView({ profile, weatherCache, cached, onCache }) {
 
   const stateName = (address.match(/\b(TX|Texas)\b/i) ? 'Texas' : (address.split(',').slice(-1)[0] || '').replace(/\b\d{5}(-\d{4})?\b/, '').trim())
   const links = info ? civicLinks(info, stateName) : []
+  const reps = info ? repLinks(info, stateName, address) : []
 
   return (
     <div className="civic">
@@ -84,8 +85,22 @@ export default function CivicView({ profile, weatherCache, cached, onCache }) {
           </div>
 
           <div className="section-row"><h3>Your local offices</h3></div>
-          <div className="items">
+          <div className="ref-grid">
             {links.map(([icon, name, desc, url]) => (
+              <a className="ref-row" key={name} href={url} target="_blank" rel="noopener noreferrer">
+                <span className="wx-icon" style={{ fontSize: 20 }}>{icon}</span>
+                <span className="ref-body">
+                  <span className="ref-name">{name}</span>
+                  <span className="ref-desc">{desc}</span>
+                </span>
+                <span className="ref-open">Open ↗</span>
+              </a>
+            ))}
+          </div>
+
+          <div className="section-row" style={{ marginTop: 20 }}><h3>Representatives &amp; first responders</h3></div>
+          <div className="ref-grid">
+            {reps.map(([icon, name, desc, url]) => (
               <a className="ref-row" key={name} href={url} target="_blank" rel="noopener noreferrer">
                 <span className="wx-icon" style={{ fontSize: 20 }}>{icon}</span>
                 <span className="ref-body">

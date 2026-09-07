@@ -1392,3 +1392,8 @@ button.sum-btn:active { background: var(--bg-2); }
 
 /* ---------- Insurance / Taxes ---------- */
 .fin-quick { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+
+/* Two-column link grids (civic offices & representatives) */
+.ref-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 760px) { .ref-grid { grid-template-columns: 1fr 1fr; } }
+.ref-grid .ref-row { padding: 10px 13px; }
