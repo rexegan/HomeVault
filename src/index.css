@@ -139,20 +139,24 @@ h1, h2, h3, p { margin: 0; }
 /* ---------- Dashboard strip ---------- */
 .dash {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 18px;
+  justify-content: flex-start;
+  margin-bottom: 16px;
 }
 .stat {
-  flex: 1 1 140px;
+  flex: 0 1 auto;
+  min-width: 118px;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 14px 16px;
+  border-radius: 12px;
+  padding: 8px 12px;
   box-shadow: var(--shadow);
 }
-.stat .n { font-size: 26px; font-weight: 800; line-height: 1; }
-.stat .l { font-size: 13px; color: var(--ink-soft); margin-top: 6px; }
+.stat .n { font-size: 18px; font-weight: 800; line-height: 1.1; }
+.stat .l { font-size: 11px; color: var(--ink-soft); margin-top: 3px; line-height: 1.25; }
+.stat-tool { border-style: dashed; }
+.stat-tool .l { color: var(--brand-dark); font-weight: 700; }
 .stat.alert { border-color: #eccbb0; background: #fff6ec; }
 .stat.alert .n { color: var(--warn); }
 .stat.danger { border-color: #e6c3ba; background: #fdefec; }
@@ -777,7 +781,46 @@ button.pro-card:active { background: #fffaf0; }
 .th-sort.on .th-arrow { opacity: 1; color: var(--brand-dark); }
 .area-table .cell-clip { margin-left: 7px; font-size: 12px; color: var(--ink-soft); font-weight: 600; }
 
+/* ---------- Weather ---------- */
+.wx-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.wx-tab {
+  padding: 9px 15px; border-radius: 999px; font-weight: 700; font-size: 14px;
+  border: 2px solid var(--line); background: var(--card); min-height: 42px;
+}
+.wx-tab.on { border-color: var(--brand); background: #e8f2e6; color: var(--brand-dark); }
+.wx-day {
+  display: flex; align-items: center; gap: 13px;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 11px 15px; box-shadow: var(--shadow);
+}
+.wx-icon { font-size: 24px; flex-shrink: 0; width: 34px; text-align: center; }
+.wx-body { flex: 1; min-width: 0; }
+.wx-name { display: block; font-weight: 700; font-size: 15px; }
+.wx-label { display: block; font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; line-height: 1.4; }
+.wx-temps { flex-shrink: 0; display: flex; align-items: baseline; gap: 8px; font-variant-numeric: tabular-nums; }
+.wx-temps b { font-size: 18px; }
+.wx-temps b.hot { color: var(--danger); }
+.wx-temps .lo { color: var(--ink-soft); font-weight: 600; }
+.wx-temps .lo.cold { color: #2b6cb0; font-weight: 800; }
+.wx-alert {
+  display: flex; align-items: flex-start; gap: 13px;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 13px 15px; box-shadow: var(--shadow);
+}
+.wx-alert.danger { border-left: 4px solid var(--danger); }
+.wx-alert.warn { border-left: 4px solid var(--warn); }
+.wx-alert.ok { border-left: 4px solid var(--ok); }
+.wx-season {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 15px 18px; box-shadow: var(--shadow);
+  margin-bottom: 12px;
+}
+.wx-season h4 { font-size: 15.5px; margin-bottom: 8px; }
+.wx-season ul { margin: 0; padding-left: 20px; }
+.wx-season li { font-size: 13.5px; color: var(--ink-soft); line-height: 1.55; margin-bottom: 4px; }
+
 /* ---------- 3D Home Scans ---------- */
+.scans .intake-lede p { max-width: none; }
 .scans-icon { background: #ece6f7 !important; color: #5b45a8 !important; }
 .scan-row {
   display: flex; align-items: stretch; gap: 8px;
@@ -1166,9 +1209,9 @@ button.sum-btn:active { background: var(--bg-2); }
     linear-gradient(165deg, #fffdf8 0%, #f2eee2 100%);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 26px 24px 24px;
+  padding: 18px 22px 16px;
   box-shadow: var(--shadow);
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   overflow: hidden;
 }
 .welcome-x {

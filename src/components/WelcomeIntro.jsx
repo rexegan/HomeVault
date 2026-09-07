@@ -16,22 +16,7 @@ export default function WelcomeIntro({ onDismiss, onLoadSample }) {
         never have to chase down another warranty, receipt, or repair detail again.
       </p>
 
-      <div className="welcome-props">
-        <div className="wp">
-          <span className="wp-i"><Icon.box size={20} /></span>
-          <div><strong>Everything in one place</strong><span>Warranties, receipts, manuals &amp; photos — filed by room.</span></div>
-        </div>
-        <div className="wp">
-          <span className="wp-i"><Icon.clock size={20} /></span>
-          <div><strong>Never miss a warranty</strong><span>See what's expiring before it lapses.</span></div>
-        </div>
-        <div className="wp">
-          <span className="wp-i"><Icon.shield size={20} /></span>
-          <div><strong>Less stress for the family</strong><span>Anyone can find what they need in seconds.</span></div>
-        </div>
-      </div>
-
-      <div className="welcome-cta-row">
+      <div className="welcome-cta-row" style={{ marginTop: 14 }}>
         <button className="btn welcome-cta" onClick={onDismiss}>Start with your home <Icon.chevron size={18} /></button>
         {onLoadSample && (
           <button className="welcome-sample" onClick={onLoadSample}>

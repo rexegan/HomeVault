@@ -21,6 +21,7 @@ import ReferralsView from './components/ReferralsView.jsx'
 import AllItemsView from './components/AllItemsView.jsx'
 import RoomsView from './components/RoomsView.jsx'
 import ScansView from './components/ScansView.jsx'
+import WeatherView from './components/WeatherView.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
 import { buildSample } from './lib/sample.js'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL } from './lib/intake.js'
@@ -120,6 +121,15 @@ export default function App() {
   }
   const deleteScan = (scanId) => { setScans((l) => l.filter((s) => s.id !== scanId)); flash('Scan deleted') }
 
+  // Weather cache (coords + last forecast).
+  const [weather, setWeather] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('homevault:weather:v1') || 'null') } catch { return null }
+  })
+  const cacheWeather = (data) => {
+    setWeather(data)
+    try { localStorage.setItem('homevault:weather:v1', JSON.stringify(data)) } catch { /* ignore */ }
+  }
+
   // Load the complete sample home (items, profile, care history, pros).
   const loadSample = () => {
     if (state.items.length > 0 || pros.length > 0) {
@@ -179,7 +189,6 @@ export default function App() {
     }
     return { soon, expired }
   }, [state, today])
-  const attention = dashTotals.soon + dashTotals.expired
 
   // ---- Area actions ----
   const saveArea = (data) => {
@@ -248,7 +257,7 @@ export default function App() {
   const liveItem = (id) => state.items.find((it) => it.id === id) || null
   const openItem = (id) => setModal({ type: 'itemDetail', itemId: id })
 
-  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans' }
+  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans', weather: 'Weather at home' }
 
   return (
     <div className="app">
@@ -270,13 +279,6 @@ export default function App() {
             <button className="icon-btn" onClick={() => { setQuery(''); setView({ name: 'search' }) }} aria-label="Search">
               <Icon.search size={20} />
             </button>
-            <button className="icon-btn" onClick={() => setView({ name: 'expiring' })} aria-label="Warranties">
-              <Icon.clock size={20} />
-              {attention > 0 && <span className="dot-badge">{attention}</span>}
-            </button>
-            <button className="ghost" onClick={() => setModal({ type: 'area', area: null, zone: 'inside' })}>
-              <Icon.plus size={18} /> Add area
-            </button>
           </>
         )}
         {view.name === 'area' && currentArea && (
@@ -284,7 +286,7 @@ export default function App() {
             <Icon.plus size={18} /> Add
           </button>
         )}
-        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans') && (
+        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans' || view.name === 'weather') && (
           <div className="brand" style={{ fontSize: 18 }}>{titles[view.name]}</div>
         )}
       </header>
@@ -310,6 +312,10 @@ export default function App() {
               <button className={'stat as-btn' + (dashTotals.expired ? ' danger' : '')} onClick={() => setView({ name: 'expiring' })}>
                 <div className="n">{dashTotals.expired}</div>
                 <div className="l">Warranties expired</div>
+              </button>
+              <button className="stat as-btn stat-tool" onClick={() => setView({ name: 'weather' })}>
+                <div className="n">🌤️</div>
+                <div className="l">Weather &amp; weather care</div>
               </button>
             </div>
 
@@ -463,6 +469,10 @@ export default function App() {
 
         {view.name === 'referrals' && (
           <ReferralsView profile={intake} />
+        )}
+
+        {view.name === 'weather' && (
+          <WeatherView profile={intake} cached={weather} onCache={cacheWeather} />
         )}
 
         {view.name === 'scans' && (
