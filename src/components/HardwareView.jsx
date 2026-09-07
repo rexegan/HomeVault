@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import Sheet from './Sheet.jsx'
 import { Icon } from '../lib/icons.jsx'
 import { KEY_FIELDS } from '../lib/intake.js'
-import { geocodeAddress, findHardwareStores, directionsURL, fallbackSearchURL, webSearchURL, formatHours } from '../lib/hardware.js'
+import { geocodeAddress, findHardwareStores, directionsURL, fallbackSearchURL, webSearchURL, websiteFor, formatHours } from '../lib/hardware.js'
 
 // Local Hardware: the closest hardware & home-improvement stores to the home
 // address, sorted by distance, with one-tap directions.
@@ -149,9 +149,6 @@ export default function HardwareView({ profile, cached, onCache }) {
 // The store "database card": everything known about the business in one box.
 function StoreCard({ store, onClose }) {
   const hours = formatHours(store.hours)
-  const site = store.website
-    ? (/^https?:\/\//i.test(store.website) ? store.website : 'https://' + store.website)
-    : null
   return (
     <Sheet
       title={store.name}
@@ -164,7 +161,7 @@ function StoreCard({ store, onClose }) {
               style={{ textDecoration: 'none' }}>Directions</a>
           </div>
           <a className="btn secondary hwc-web-btn"
-            href={site || ('https://www.google.com/search?q=' + encodeURIComponent(store.name + ' ' + (store.addr || '') + ' website'))}
+            href={websiteFor(store)}
             target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
             🌐 Website
           </a>
@@ -200,9 +197,9 @@ function StoreCard({ store, onClose }) {
         <div className="hwc-row">
           <span className="hwc-k">🌐 Website</span>
           <span className="hwc-v">
-            {site
-              ? <a href={site} target="_blank" rel="noopener noreferrer">{site.replace(/^https?:\/\//i, '').replace(/\/$/, '')}</a>
-              : 'Not listed'}
+            <a href={websiteFor(store)} target="_blank" rel="noopener noreferrer">
+              {websiteFor(store).replace(/^https?:\/\//i, '').replace(/\/.*$/, '')}
+            </a>
           </span>
         </div>
       </div>

@@ -147,6 +147,34 @@ export const directionsURL = (s) =>
 export const fallbackSearchURL = (address) =>
   'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('hardware store near ' + address)
 
+// Official sites for the big chains, so the Website button goes straight there
+// even when the map data has no website tag for that branch.
+const CHAIN_SITES = [
+  ['home depot', 'https://www.homedepot.com/'],
+  ["lowe's", 'https://www.lowes.com/'], ['lowes', 'https://www.lowes.com/'],
+  ['tractor supply', 'https://www.tractorsupply.com/'],
+  ['atwoods', 'https://www.atwoods.com/'],
+  ['harbor freight', 'https://www.harborfreight.com/'],
+  ["mccoy's", 'https://www.mccoys.com/'], ['mccoys', 'https://www.mccoys.com/'],
+  ['ace hardware', 'https://www.acehardware.com/'],
+  ['menards', 'https://www.menards.com/'],
+  ['true value', 'https://www.truevalue.com/'],
+  ['northern tool', 'https://www.northerntool.com/'],
+  ['rural king', 'https://www.ruralking.com/'],
+  ['orscheln', 'https://www.bomgaars.com/'],
+  ['do it best', 'https://www.doitbest.com/'],
+]
+
+// Always resolve to a real website: the branch's own page when the map knows it,
+// the chain's official site otherwise, and for local shops a search that jumps
+// straight to the first result instead of a results page.
+export function websiteFor(s) {
+  if (s.website) return /^https?:\/\//i.test(s.website) ? s.website : 'https://' + s.website
+  const n = (s.name || '').toLowerCase()
+  for (const [key, url] of CHAIN_SITES) if (n.includes(key)) return url
+  return 'https://duckduckgo.com/?q=' + encodeURIComponent('\\' + s.name + ' ' + (s.addr || '') + ' website')
+}
+
 export const webSearchURL = (s) =>
   'https://www.google.com/search?q=' + encodeURIComponent(s.name + ' ' + (s.addr || 'near me') + ' hours phone')
 
