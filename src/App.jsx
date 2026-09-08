@@ -175,15 +175,56 @@ export default function App() {
   }, [moneyRec])
   const setMoneyValue = (id, val) => setMoneyRec((m) => ({ ...m, [id]: val }))
 
-  // Paint & finishes per room: { [areaId]: { field: value } }.
+  // Paint / flooring / wallpaper history per room: { [areaId]: [entries] }.
   const [finishes, setFinishes] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('homevault:finishes:v1') || '{}') } catch { return {} }
+    try {
+      const v2 = JSON.parse(localStorage.getItem('homevault:finishes:v2') || 'null')
+      if (v2) return v2
+      // Migrate the old single-profile format into stacked entries.
+      const v1 = JSON.parse(localStorage.getItem('homevault:finishes:v1') || '{}')
+      const out = {}
+      for (const [areaId, f] of Object.entries(v1)) {
+        const list = []
+        const mk = (kind, e) => list.push({ id: store.newProId(), kind, ...e })
+        if (f.paintBrand || f.wallColor) mk('Paint', {
+          where: 'Whole room', product: f.paintBrand || '', colorName: f.wallColor || '',
+          finish: f.sheen || '', store: f.paintStore || '', doneBy: f.paintedBy || '',
+          date: f.paintedDate || '', qty: f.gallons ? f.gallons + ' gal' : '', totalCost: f.paintCost || '',
+          notes: [f.trimColor && 'Trim: ' + f.trimColor, f.ceilingColor && 'Ceiling: ' + f.ceilingColor].filter(Boolean).join(' · '),
+        })
+        if (f.floorType || f.floorBrand) mk('Flooring', {
+          where: 'Whole room', product: f.floorBrand || '', colorName: f.floorColor || '',
+          finish: f.floorType || '', store: f.floorStore || '', doneBy: f.floorInstaller || '',
+          date: f.floorDate || '', qty: f.floorArea ? f.floorArea + ' sq ft' : '', totalCost: f.floorCost || '',
+          notes: f.floorCostSqft ? f.floorCostSqft + '/sq ft' : '',
+        })
+        if (f.wallpaper) mk('Wallpaper', { product: f.wallpaper })
+        if (f.tile) mk('Tile / backsplash', { product: f.tile })
+        if (f.countertops) mk('Countertops', { product: f.countertops })
+        if (f.molding) mk('Trim / molding', { product: f.molding })
+        if (f.hardware) mk('Hardware', { product: f.hardware })
+        if (list.length) out[areaId] = list
+      }
+      return out
+    } catch { return {} }
   })
   useEffect(() => {
-    try { localStorage.setItem('homevault:finishes:v1', JSON.stringify(finishes)) } catch { /* ignore */ }
+    try { localStorage.setItem('homevault:finishes:v2', JSON.stringify(finishes)) } catch { /* ignore */ }
   }, [finishes])
-  const setFinishValue = (areaId, key, val) =>
-    setFinishes((m) => ({ ...m, [areaId]: { ...(m[areaId] || {}), [key]: val } }))
+  const saveFinishEntry = (areaId, entryId, draft) => {
+    setFinishes((m) => {
+      const list = m[areaId] || []
+      const next = entryId
+        ? list.map((e) => (e.id === entryId ? { ...e, ...draft, id: entryId } : e))
+        : [...list, { ...draft, id: store.newProId() }]
+      return { ...m, [areaId]: next }
+    })
+    flash('Entry saved')
+  }
+  const deleteFinishEntry = (areaId, entryId) => {
+    setFinishes((m) => ({ ...m, [areaId]: (m[areaId] || []).filter((e) => e.id !== entryId) }))
+    flash('Entry deleted')
+  }
 
   // Load the complete sample home (items, profile, care history, pros).
   const loadSample = () => {
@@ -206,7 +247,7 @@ export default function App() {
       const fm = {}
       for (const [areaName, vals] of Object.entries(sample.finishes)) {
         const area = next.areas.find((a) => a.name.toLowerCase() === areaName.toLowerCase())
-        if (area) fm[area.id] = vals
+        if (area) fm[area.id] = vals.map((e) => ({ id: store.newProId(), ...e }))
       }
       setFinishes(fm)
     }
@@ -526,8 +567,9 @@ export default function App() {
             area={currentArea}
             today={today}
             poolValues={pool}
-            finishesValues={finishes[currentArea.id]}
-            onEditFinishes={() => setModal({ type: 'finishes', areaId: currentArea.id })}
+            finishEntries={finishes[currentArea.id]}
+            onAddFinish={() => setModal({ type: 'finishes', areaId: currentArea.id, entryId: null })}
+            onEditFinish={(entryId) => setModal({ type: 'finishes', areaId: currentArea.id, entryId })}
             onEditArea={() => setModal({ type: 'area', area: currentArea, zone: currentArea.zone })}
             onQuickAdd={(nm) => setModal({ type: 'item', item: null, areaId: currentArea.id, presetName: nm })}
             onOpenItem={openItem}
@@ -645,15 +687,17 @@ export default function App() {
 
       {modal?.type === 'finishes' && (() => {
         const fa = store.areaById(state, modal.areaId)
-        return fa ? (
+        if (!fa) return null
+        const entry = modal.entryId ? (finishes[fa.id] || []).find((e) => e.id === modal.entryId) : null
+        return (
           <FinishesForm
             area={fa}
-            values={finishes[fa.id]}
-            onChange={(k, val) => setFinishValue(fa.id, k, val)}
-            onSaved={() => { setModal(null); flash('Finishes saved') }}
+            entry={entry}
+            onSave={(draft) => { saveFinishEntry(fa.id, modal.entryId, draft); setModal(null) }}
+            onDelete={() => { deleteFinishEntry(fa.id, modal.entryId); setModal(null) }}
             onClose={() => setModal(null)}
           />
-        ) : null
+        )
       })()}
 
       {modal?.type === 'snap' && (

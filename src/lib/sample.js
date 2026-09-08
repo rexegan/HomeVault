@@ -183,32 +183,37 @@ export function buildSample(today) {
   ]
 
   const finishes = {
-    'Kitchen': {
-      paintBrand: 'Sherwin-Williams', wallColor: 'SW 7029 Agreeable Gray', sheen: 'Eggshell',
-      trimColor: 'SW 7006 Extra White, semi-gloss', paintStore: 'Sherwin-Williams — Cleburne',
-      paintedDate: '04/12/2024', paintedBy: 'Fresh Coat Painting', gallons: '3', paintCost: '$780',
-      floorType: 'Luxury vinyl plank', floorBrand: 'Shaw Paragon Plus', floorColor: 'Cut Pine',
-      floorStore: "Floor & Decor", floorInstaller: 'Metro Flooring', floorDate: '06/20/2022',
-      floorArea: '364', floorCostSqft: '$4.85', floorCost: '$1,765.40',
-      tile: 'Daltile 3x6 subway, Arctic White, gray grout', countertops: 'Granite — Santa Cecilia',
-      hardware: 'Brushed nickel, Amerock',
-    },
-    'Great Room': {
-      paintBrand: 'Sherwin-Williams', wallColor: 'SW 7015 Repose Gray', sheen: 'Eggshell',
-      ceilingColor: 'SW 7757 High Reflective White', paintedDate: '04/12/2024',
-      paintedBy: 'Fresh Coat Painting', gallons: '5', paintCost: '$1,150',
-      floorType: 'Luxury vinyl plank', floorBrand: 'Shaw Paragon Plus', floorColor: 'Cut Pine',
-      floorArea: '546', floorCostSqft: '$4.85', floorCost: '$2,648.10',
-      molding: '5.25\" crown, painted trim white',
-    },
-    'Primary Bedroom': {
-      paintBrand: 'Behr', wallColor: 'Behr N510-2 Silver Screen', sheen: 'Matte',
-      paintStore: 'Home Depot — Burleson', paintedDate: '09/03/2023', paintedBy: 'Us',
-      gallons: '2', paintCost: '$142.50',
-      floorType: 'Carpet', floorBrand: 'Mohawk SmartStrand', floorColor: 'Tahoe Taupe',
-      floorInstaller: "Lowe's install", floorDate: '05/15/2021', floorArea: '374',
-      floorCostSqft: '$3.25', floorCost: '$1,215.50',
-    },
+    'Kitchen': [
+      { kind: 'Paint', where: 'Whole room', product: 'Sherwin-Williams Duration',
+        colorName: 'SW 7029 Agreeable Gray', finish: 'Eggshell', store: 'Sherwin-Williams — Cleburne',
+        doneBy: 'Fresh Coat Painting', date: '04/12/2024', qty: '3 gal', totalCost: '$780',
+        notes: 'Trim: SW 7006 Extra White semi-gloss' },
+      { kind: 'Flooring', where: 'Whole room', product: 'Shaw Paragon Plus', colorName: 'Cut Pine',
+        finish: 'Luxury vinyl plank', store: 'Floor & Decor', doneBy: 'Metro Flooring',
+        date: '06/20/2022', qty: '364 sq ft', totalCost: '$1,765.40', notes: '$4.85/sq ft' },
+      { kind: 'Tile / backsplash', where: 'Backsplash', product: 'Daltile 3x6 subway',
+        colorName: 'Arctic White', finish: 'Gray grout', date: '06/25/2022', totalCost: '$410' },
+      { kind: 'Countertops', product: 'Granite — Santa Cecilia', date: '05/10/2016' },
+    ],
+    'Great Room': [
+      { kind: 'Paint', where: 'Walls', product: 'Sherwin-Williams Duration',
+        colorName: 'SW 7015 Repose Gray', finish: 'Eggshell', doneBy: 'Fresh Coat Painting',
+        date: '04/12/2024', qty: '5 gal', totalCost: '$1,150' },
+      { kind: 'Paint', where: 'Ceiling', colorName: 'SW 7757 High Reflective White',
+        finish: 'Flat', doneBy: 'Fresh Coat Painting', date: '04/13/2024', qty: '2 gal', totalCost: '$260' },
+      { kind: 'Flooring', where: 'Whole room', product: 'Shaw Paragon Plus', colorName: 'Cut Pine',
+        finish: 'Luxury vinyl plank', qty: '546 sq ft', totalCost: '$2,648.10', notes: '$4.85/sq ft' },
+    ],
+    'Primary Bedroom': [
+      { kind: 'Paint', where: 'Whole room', product: 'Behr Premium Plus',
+        colorName: 'Behr N510-2 Silver Screen', finish: 'Matte', store: 'Home Depot — Burleson',
+        doneBy: 'Us', date: '09/03/2023', qty: '2 gal', totalCost: '$142.50' },
+      { kind: 'Wallpaper', where: 'Accent wall behind bed', product: 'Brewster grasscloth',
+        colorName: 'Natural jute', doneBy: 'Us', date: '10/14/2023', qty: '4 rolls', totalCost: '$318' },
+      { kind: 'Flooring', where: 'Whole room', product: 'Mohawk SmartStrand', colorName: 'Tahoe Taupe',
+        finish: 'Carpet', doneBy: "Lowe's install", date: '05/15/2021', qty: '374 sq ft',
+        totalCost: '$1,215.50', notes: '$3.25/sq ft' },
+    ],
   }
   return { items, intake, care, pros, finishes }
 }

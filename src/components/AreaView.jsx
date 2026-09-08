@@ -1,7 +1,7 @@
 import { Icon } from '../lib/icons.jsx'
 import { itemsForArea, warrantyStatus, formatPrice } from '../lib/storage.js'
 import { suggestionsFor } from '../lib/suggestions.js'
-import { FINISH_LABELS } from './FinishesForm.jsx'
+
 
 // Detail screen for one room / area: a dropdown-first "Add to this area" and a
 // compact table of everything stored here — item, store/brand, purchase date,
@@ -13,14 +13,12 @@ const POOL_LABELS = [
   ['features', 'Water features'], ['notes', 'Notes'],
 ]
 
-export default function AreaView({ state, area, today, poolValues, finishesValues, onEditFinishes, onEditArea, onQuickAdd, onOpenItem }) {
+export default function AreaView({ state, area, today, poolValues, finishEntries, onAddFinish, onEditFinish, onEditArea, onQuickAdd, onOpenItem }) {
   const isPool = area.variant === 'pool' || /swimming pool/i.test(area.name)
   const poolRows = isPool
     ? POOL_LABELS.map(([k, l]) => [l, (poolValues?.[k] || '').trim()]).filter(([, val]) => val)
     : []
-  const finishRows = FINISH_LABELS
-    .map(([k, l]) => [l, (finishesValues?.[k] || '').trim()])
-    .filter(([, val]) => val)
+  const entries = finishEntries || []
   const items = itemsForArea(state, area.id)
   const AreaIcon = Icon[area.icon] || Icon.box
   const suggestions = suggestionsFor(area.name)
@@ -58,25 +56,37 @@ export default function AreaView({ state, area, today, poolValues, finishesValue
         </button>
       )}
 
-      <button className="pool-summary finishes-summary" onClick={onEditFinishes}>
+      <div className="pool-summary finishes-summary">
         <div className="pool-summary-head">
           <span>🎨 Paint, Flooring and Wallpaper</span>
-          <span className="pool-summary-edit">{finishRows.length ? 'Edit ›' : 'Set it up ›'}</span>
+          <button className="btn small" onClick={onAddFinish}><Icon.plus size={14} /> Add</button>
         </div>
-        {finishRows.length === 0 ? (
-          <div className="pool-summary-empty">Paint colors &amp; codes, flooring product and cost per
-            sq ft, wallpaper, tile, trim — everything needed to match or redo this room exactly.</div>
+        {entries.length === 0 ? (
+          <div className="pool-summary-empty">Each paint job, floor install or wallpaper hang gets
+            its own dated entry here — colors, products and cost, stacked into the room's history.</div>
         ) : (
-          <div className="pool-summary-grid">
-            {finishRows.map(([l, val]) => (
-              <div className="ps-cell" key={l}>
-                <div className="ps-k">{l}</div>
-                <div className="ps-v">{val}</div>
-              </div>
+          <div className="fin-entries">
+            {entries.map((e) => (
+              <button className="fin-entry" key={e.id} onClick={() => onEditFinish(e.id)}>
+                <span className="fe-kind">{e.kind || 'Other'}</span>
+                <span className="fe-body">
+                  <span className="fe-title">
+                    {[e.where, e.colorName || e.product].filter(Boolean).join(' — ') || 'Entry'}
+                  </span>
+                  <span className="fe-sub">
+                    {[e.product && e.colorName ? e.product : '', e.finish, e.doneBy && 'by ' + e.doneBy]
+                      .filter(Boolean).join(' · ')}
+                  </span>
+                </span>
+                <span className="fe-meta">
+                  {e.date && <span className="fe-date">{e.date}</span>}
+                  {e.totalCost && <span className="fe-cost">{e.totalCost}</span>}
+                </span>
+              </button>
             ))}
           </div>
         )}
-      </button>
+      </div>
 
       <div className="quickadd">
         <label htmlFor="quickadd-select">Add to this area</label>
