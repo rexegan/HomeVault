@@ -1,12 +1,8 @@
-import { Icon } from '../lib/icons.jsx'
-
-// The opening-page welcome: a warm, plain-language explanation of what HomeVault is
-// and why it exists. Dismissible (persisted by App); reopen from the topbar “i”.
-export default function WelcomeIntro({ onDismiss, onLoadSample }) {
+// The opening-page welcome: a warm, plain-language explanation of what HomeVault
+// is and why it exists. Always shown — it's part of the front page.
+export default function WelcomeIntro({ onLoadSample }) {
   return (
     <section className="welcome">
-      <button className="welcome-x" onClick={onDismiss} aria-label="Hide intro">×</button>
-
       <h1 className="welcome-h">Your entire home&hellip; finally in one place.</h1>
       <p className="welcome-p">
         Every home, over time, fills with a mountain of documents and a running list of “where did I
@@ -16,14 +12,13 @@ export default function WelcomeIntro({ onDismiss, onLoadSample }) {
         never have to chase down another warranty, receipt, or repair detail again.
       </p>
 
-      <div className="welcome-cta-row" style={{ marginTop: 14 }}>
-        <button className="btn welcome-cta" onClick={onDismiss}>Start with your home <Icon.chevron size={18} /></button>
-        {onLoadSample && (
+      {onLoadSample && (
+        <div className="welcome-cta-row" style={{ marginTop: 10 }}>
           <button className="welcome-sample" onClick={onLoadSample}>
-            …or load a <b>sample home</b> to see it all filled in
+            New here? Load a <b>sample home</b> to see it all filled in →
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </section>
   )
 }

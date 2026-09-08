@@ -55,11 +55,7 @@ export default function App() {
     } catch { /* ignore */ }
     return m
   })
-  // The welcome intro greets you on every open; the X only hides it for this session.
-  const [showWelcome, setShowWelcome] = useState(true)
   const importRef = useRef(null)
-
-  const dismissWelcome = () => setShowWelcome(false)
 
   // "Today" at midnight — stable for the session, used for warranty math.
   const today = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d }, [])
@@ -195,7 +191,6 @@ export default function App() {
     setIntake(sample.intake)
     setCare(sample.care)
     setPros(sample.pros(store.newProId))
-    setShowWelcome(false)
     flash('Sample home loaded — explore away!')
   }
 
@@ -351,7 +346,7 @@ export default function App() {
       <main className={'content' + (view.name === 'home' ? ' wide' : '')}>
         {view.name === 'home' && (
           <>
-            {showWelcome && <WelcomeIntro onDismiss={dismissWelcome} onLoadSample={loadSample} />}
+            <WelcomeIntro onLoadSample={loadSample} />
 
             <div className="dash">
               <button className="stat as-btn" onClick={() => setView({ name: 'allItems' })}>
