@@ -19,6 +19,7 @@ export default function WeatherView({ profile, cached, onCache }) {
   const [days, setDays] = useState(cached?.days || null)
   const [place, setPlace] = useState(cached?.address || '')
   const [busy, setBusy] = useState(false)
+  const [openDay, setOpenDay] = useState(null)
   const [error, setError] = useState(null)
   const ran = useRef(false)
 
@@ -83,26 +84,47 @@ export default function WeatherView({ profile, cached, onCache }) {
         <div className="items" style={{ marginTop: 4 }}>
           {shown.map((d, i) => {
             const w = wx(d.code)
+            const open = openDay === d.date
             return (
-              <div className="wx-day" key={d.date}>
-                <span className="wx-icon">{w.icon}</span>
-                <span className="wx-body">
-                  <span className="wx-name">{dayName(d.date, i)}
-                    <span className="wx-cond"> — {w.label}{d.feels > d.hi + 2 ? ` · feels ${d.feels}°` : ''}</span>
+              <div className={'wx-day' + (open ? ' open' : '')} key={d.date}>
+                <div className="wx-day-main">
+                  <span className="wx-icon">{w.icon}</span>
+                  <span className="wx-body">
+                    <span className="wx-name">{dayName(d.date, i)}
+                      <span className="wx-cond"> — {w.label}{d.feels > d.hi + 2 ? ` · feels ${d.feels}°` : ''}</span>
+                    </span>
+                    <span className="wx-chips">
+                      <span className="wx-chip">💧 {d.rain}% rain{d.rainAmt >= 0.05 ? ` · ${d.rainAmt}"` : ''}{d.rainHrs > 0 ? ` over ${d.rainHrs}h` : ''}</span>
+                      <span className="wx-chip">💦 {d.hum}% humidity</span>
+                      <span className="wx-chip">💨 {d.wind} mph{d.gust >= d.wind + 8 ? ` (gusts ${d.gust})` : ''}</span>
+                      <span className="wx-chip">☀️ UV {d.uv}</span>
+                      {d.sunrise && <span className="wx-chip">🌅 {d.sunrise}</span>}
+                      {d.sunset && <span className="wx-chip">🌇 {d.sunset}</span>}
+                    </span>
                   </span>
-                  <span className="wx-chips">
-                    <span className="wx-chip">💧 {d.rain}% rain{d.rainAmt >= 0.05 ? ` · ${d.rainAmt}"` : ''}{d.rainHrs > 0 ? ` over ${d.rainHrs}h` : ''}</span>
-                    <span className="wx-chip">💦 {d.hum}% humidity</span>
-                    <span className="wx-chip">💨 {d.wind} mph{d.gust >= d.wind + 8 ? ` (gusts ${d.gust})` : ''}</span>
-                    <span className="wx-chip">☀️ UV {d.uv}</span>
-                    {d.sunrise && <span className="wx-chip">🌅 {d.sunrise}</span>}
-                    {d.sunset && <span className="wx-chip">🌇 {d.sunset}</span>}
+                  {d.hours?.length > 0 && (
+                    <button className={'wx-hourly-btn' + (open ? ' on' : '')}
+                      onClick={() => setOpenDay(open ? null : d.date)}>
+                      Hourly {open ? '▴' : '▾'}
+                    </button>
+                  )}
+                  <span className="wx-temps">
+                    <b className={d.hi >= 100 ? 'hot' : ''}>{d.hi}°</b>
+                    <span className={'lo' + (d.lo <= 32 ? ' cold' : '')}>{d.lo}°</span>
                   </span>
-                </span>
-                <span className="wx-temps">
-                  <b className={d.hi >= 100 ? 'hot' : ''}>{d.hi}°</b>
-                  <span className={'lo' + (d.lo <= 32 ? ' cold' : '')}>{d.lo}°</span>
-                </span>
+                </div>
+                {open && (
+                  <div className="wx-hours">
+                    {d.hours.map((hr) => (
+                      <div className="wx-hour" key={hr.label}>
+                        <div className="wxh-t">{hr.label}</div>
+                        <div className="wxh-i">{wx(hr.code).icon}</div>
+                        <div className="wxh-temp">{hr.temp}°</div>
+                        <div className={'wxh-rain' + (hr.rain >= 40 ? ' wet' : '')}>{hr.rain > 0 ? hr.rain + '%' : '·'}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )
           })}

@@ -8,6 +8,7 @@ export async function fetchForecast(lat, lon) {
     '&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,' +
     'precipitation_probability_max,precipitation_sum,precipitation_hours,' +
     'relative_humidity_2m_mean,wind_speed_10m_max,wind_gusts_10m_max,uv_index_max,sunrise,sunset' +
+    '&hourly=temperature_2m,precipitation_probability,weather_code' +
     '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch' +
     '&timezone=auto&forecast_days=16'
   const res = await fetch(url)
@@ -15,7 +16,23 @@ export async function fetchForecast(lat, lon) {
   const js = await res.json()
   const d = js.daily
   const clock = (iso) => iso ? new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase().replace(' ', '') : ''
+  // Group hourly data by date for the per-day hourly breakdown.
+  const hoursByDate = {}
+  const h = js.hourly
+  if (h?.time) {
+    h.time.forEach((iso, i) => {
+      const date = iso.slice(0, 10)
+      const hr = parseInt(iso.slice(11, 13), 10)
+      ;(hoursByDate[date] = hoursByDate[date] || []).push({
+        label: hr === 0 ? '12a' : hr < 12 ? hr + 'a' : hr === 12 ? '12p' : (hr - 12) + 'p',
+        temp: Math.round(h.temperature_2m[i]),
+        rain: h.precipitation_probability?.[i] ?? 0,
+        code: h.weather_code?.[i] ?? 0,
+      })
+    })
+  }
   return d.time.map((date, i) => ({
+    hours: hoursByDate[date] || [],
     date,
     code: d.weather_code[i],
     hi: Math.round(d.temperature_2m_max[i]),
