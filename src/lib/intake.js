@@ -296,8 +296,11 @@ export function homeFacts(profile) {
     const n = parseInt(sqft.replace(/[^0-9]/g, ''), 10)
     facts.push(isNaN(n) ? sqft : '≈ ' + n.toLocaleString() + ' sq ft')
   }
+  const styleVal = g(KEY_FIELDS.style)
   const stories = g(KEY_FIELDS.stories)
-  if (stories) facts.push(stories === '1' ? '1 story' : stories + ' stories')
+  // Skip the story count when the style already says it ("Two-story" etc.) —
+  // no "2 stories · Two-story" repetition on the plan.
+  if (stories && !/stor/i.test(styleVal)) facts.push(stories === '1' ? '1 story' : stories + ' stories')
   const year = g(KEY_FIELDS.yearBuilt)
   if (year) facts.push('Built ' + year)
   const style = g(KEY_FIELDS.style)
