@@ -1,6 +1,7 @@
 import { Icon } from '../lib/icons.jsx'
 import { itemsForArea, warrantyStatus, formatPrice } from '../lib/storage.js'
 import { suggestionsFor } from '../lib/suggestions.js'
+import { FINISH_LABELS } from './FinishesForm.jsx'
 
 // Detail screen for one room / area: a dropdown-first "Add to this area" and a
 // compact table of everything stored here — item, store/brand, purchase date,
@@ -12,11 +13,14 @@ const POOL_LABELS = [
   ['features', 'Water features'], ['notes', 'Notes'],
 ]
 
-export default function AreaView({ state, area, today, poolValues, onEditArea, onQuickAdd, onOpenItem }) {
+export default function AreaView({ state, area, today, poolValues, finishesValues, onEditFinishes, onEditArea, onQuickAdd, onOpenItem }) {
   const isPool = area.variant === 'pool' || /swimming pool/i.test(area.name)
   const poolRows = isPool
     ? POOL_LABELS.map(([k, l]) => [l, (poolValues?.[k] || '').trim()]).filter(([, val]) => val)
     : []
+  const finishRows = FINISH_LABELS
+    .map(([k, l]) => [l, (finishesValues?.[k] || '').trim()])
+    .filter(([, val]) => val)
   const items = itemsForArea(state, area.id)
   const AreaIcon = Icon[area.icon] || Icon.box
   const suggestions = suggestionsFor(area.name)
@@ -53,6 +57,26 @@ export default function AreaView({ state, area, today, poolValues, onEditArea, o
           )}
         </button>
       )}
+
+      <button className="pool-summary finishes-summary" onClick={onEditFinishes}>
+        <div className="pool-summary-head">
+          <span>🎨 Paint &amp; finishes</span>
+          <span className="pool-summary-edit">{finishRows.length ? 'Edit ›' : 'Set it up ›'}</span>
+        </div>
+        {finishRows.length === 0 ? (
+          <div className="pool-summary-empty">Paint colors &amp; codes, flooring product and cost per
+            sq ft, wallpaper, tile, trim — everything needed to match or redo this room exactly.</div>
+        ) : (
+          <div className="pool-summary-grid">
+            {finishRows.map(([l, val]) => (
+              <div className="ps-cell" key={l}>
+                <div className="ps-k">{l}</div>
+                <div className="ps-v">{val}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </button>
 
       <div className="quickadd">
         <label htmlFor="quickadd-select">Add to this area</label>

@@ -26,6 +26,7 @@ import PoolForm from './components/PoolForm.jsx'
 import CivicView from './components/CivicView.jsx'
 import FinanceView from './components/FinanceView.jsx'
 import MoneyView from './components/MoneyView.jsx'
+import FinishesForm from './components/FinishesForm.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
 import { buildSample } from './lib/sample.js'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL, KEY_FIELDS } from './lib/intake.js'
@@ -174,6 +175,16 @@ export default function App() {
   }, [moneyRec])
   const setMoneyValue = (id, val) => setMoneyRec((m) => ({ ...m, [id]: val }))
 
+  // Paint & finishes per room: { [areaId]: { field: value } }.
+  const [finishes, setFinishes] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('homevault:finishes:v1') || '{}') } catch { return {} }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('homevault:finishes:v1', JSON.stringify(finishes)) } catch { /* ignore */ }
+  }, [finishes])
+  const setFinishValue = (areaId, key, val) =>
+    setFinishes((m) => ({ ...m, [areaId]: { ...(m[areaId] || {}), [key]: val } }))
+
   // Load the complete sample home (items, profile, care history, pros).
   const loadSample = () => {
     if (state.items.length > 0 || pros.length > 0) {
@@ -191,6 +202,14 @@ export default function App() {
     setIntake(sample.intake)
     setCare(sample.care)
     setPros(sample.pros(store.newProId))
+    if (sample.finishes) {
+      const fm = {}
+      for (const [areaName, vals] of Object.entries(sample.finishes)) {
+        const area = next.areas.find((a) => a.name.toLowerCase() === areaName.toLowerCase())
+        if (area) fm[area.id] = vals
+      }
+      setFinishes(fm)
+    }
     flash('Sample home loaded — explore away!')
   }
 
@@ -507,6 +526,8 @@ export default function App() {
             area={currentArea}
             today={today}
             poolValues={pool}
+            finishesValues={finishes[currentArea.id]}
+            onEditFinishes={() => setModal({ type: 'finishes', areaId: currentArea.id })}
             onEditArea={() => setModal({ type: 'area', area: currentArea, zone: currentArea.zone })}
             onQuickAdd={(nm) => setModal({ type: 'item', item: null, areaId: currentArea.id, presetName: nm })}
             onOpenItem={openItem}
@@ -621,6 +642,19 @@ export default function App() {
           onClose={() => setModal(null)}
         />
       )}
+
+      {modal?.type === 'finishes' && (() => {
+        const fa = store.areaById(state, modal.areaId)
+        return fa ? (
+          <FinishesForm
+            area={fa}
+            values={finishes[fa.id]}
+            onChange={(k, val) => setFinishValue(fa.id, k, val)}
+            onSaved={() => { setModal(null); flash('Finishes saved') }}
+            onClose={() => setModal(null)}
+          />
+        ) : null
+      })()}
 
       {modal?.type === 'snap' && (
         <SnapCapture areas={state.areas} onSave={saveSnap} onClose={() => setModal(null)} />

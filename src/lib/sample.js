@@ -182,5 +182,33 @@ export function buildSample(today) {
     },
   ]
 
-  return { items, intake, care, pros }
+  const finishes = {
+    'Kitchen': {
+      paintBrand: 'Sherwin-Williams', wallColor: 'SW 7029 Agreeable Gray', sheen: 'Eggshell',
+      trimColor: 'SW 7006 Extra White, semi-gloss', paintStore: 'Sherwin-Williams — Cleburne',
+      paintedDate: '04/12/2024', paintedBy: 'Fresh Coat Painting', gallons: '3', paintCost: '$780',
+      floorType: 'Luxury vinyl plank', floorBrand: 'Shaw Paragon Plus', floorColor: 'Cut Pine',
+      floorStore: "Floor & Decor", floorInstaller: 'Metro Flooring', floorDate: '06/20/2022',
+      floorArea: '364', floorCostSqft: '$4.85', floorCost: '$1,765.40',
+      tile: 'Daltile 3x6 subway, Arctic White, gray grout', countertops: 'Granite — Santa Cecilia',
+      hardware: 'Brushed nickel, Amerock',
+    },
+    'Great Room': {
+      paintBrand: 'Sherwin-Williams', wallColor: 'SW 7015 Repose Gray', sheen: 'Eggshell',
+      ceilingColor: 'SW 7757 High Reflective White', paintedDate: '04/12/2024',
+      paintedBy: 'Fresh Coat Painting', gallons: '5', paintCost: '$1,150',
+      floorType: 'Luxury vinyl plank', floorBrand: 'Shaw Paragon Plus', floorColor: 'Cut Pine',
+      floorArea: '546', floorCostSqft: '$4.85', floorCost: '$2,648.10',
+      molding: '5.25\" crown, painted trim white',
+    },
+    'Primary Bedroom': {
+      paintBrand: 'Behr', wallColor: 'Behr N510-2 Silver Screen', sheen: 'Matte',
+      paintStore: 'Home Depot — Burleson', paintedDate: '09/03/2023', paintedBy: 'Us',
+      gallons: '2', paintCost: '$142.50',
+      floorType: 'Carpet', floorBrand: 'Mohawk SmartStrand', floorColor: 'Tahoe Taupe',
+      floorInstaller: "Lowe's install", floorDate: '05/15/2021', floorArea: '374',
+      floorCostSqft: '$3.25', floorCost: '$1,215.50',
+    },
+  }
+  return { items, intake, care, pros, finishes }
 }
