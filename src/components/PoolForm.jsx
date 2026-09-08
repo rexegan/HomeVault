@@ -31,7 +31,7 @@ function Select({ id, label, value, options, onChange, allowOther = true }) {
   )
 }
 
-export default function PoolForm({ area, values, onChange, coords, onAddPro, onClose }) {
+export default function PoolForm({ area, values, onChange, coords, onAddPro, onClose, onSaved }) {
   const v = (k) => values?.[k] || ''
   const [companies, setCompanies] = useState(null)
   const ran = useRef(false)
@@ -60,7 +60,7 @@ export default function PoolForm({ area, values, onChange, coords, onAddPro, onC
 
   return (
     <Sheet title="Swimming Pool profile" onClose={onClose}
-      footer={<button className="btn" onClick={onClose} style={{ flex: 1 }}>Done</button>}>
+      footer={<button className="btn" onClick={onSaved || onClose} style={{ flex: 1 }}>Save</button>}>
 
       <div className={'intake-field' + (builder ? ' filled' : '')}>
         <label htmlFor="pool-builder">

@@ -1415,3 +1415,24 @@ button.sum-btn:active { background: var(--bg-2); }
   font-weight: 600;
 }
 .intake-field.filled select { border-color: #a9cfa2; background: #f6faf4; }
+
+/* Pool profile summary card in the Swimming Pool room */
+.pool-summary {
+  width: 100%; text-align: left; cursor: pointer;
+  background: linear-gradient(160deg, #eef6f9, #e3eff4);
+  border: 1px solid #bcd8e4; border-radius: var(--radius);
+  padding: 14px 16px; box-shadow: var(--shadow); margin-bottom: 14px;
+}
+.pool-summary:active { background: #e0edf3; }
+.pool-summary-head {
+  display: flex; justify-content: space-between; align-items: center;
+  font-weight: 800; font-size: 15px; color: #14657f;
+}
+.pool-summary-edit { font-size: 13px; color: var(--brand-dark); }
+.pool-summary-empty { margin-top: 8px; font-size: 13px; color: var(--ink-soft); line-height: 1.45; }
+.pool-summary-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px 16px; margin-top: 12px;
+}
+.ps-k { font-size: 10.5px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; color: #4f7d90; }
+.ps-v { font-size: 14px; font-weight: 600; margin-top: 2px; }

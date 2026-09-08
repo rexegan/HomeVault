@@ -25,6 +25,7 @@ import WeatherView from './components/WeatherView.jsx'
 import PoolForm from './components/PoolForm.jsx'
 import CivicView from './components/CivicView.jsx'
 import FinanceView from './components/FinanceView.jsx'
+import MoneyView from './components/MoneyView.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
 import { buildSample } from './lib/sample.js'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL, KEY_FIELDS } from './lib/intake.js'
@@ -168,6 +169,15 @@ export default function App() {
   }, [finance])
   const setFinanceValue = (id, val) => setFinance((m) => ({ ...m, [id]: val }))
 
+  // Financial (mortgage, value, utilities).
+  const [moneyRec, setMoneyRec] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('homevault:money:v1') || '{}') } catch { return {} }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('homevault:money:v1', JSON.stringify(moneyRec)) } catch { /* ignore */ }
+  }, [moneyRec])
+  const setMoneyValue = (id, val) => setMoneyRec((m) => ({ ...m, [id]: val }))
+
   // Load the complete sample home (items, profile, care history, pros).
   const loadSample = () => {
     if (state.items.length > 0 || pros.length > 0) {
@@ -304,7 +314,7 @@ export default function App() {
   const liveItem = (id) => state.items.find((it) => it.id === id) || null
   const openItem = (id) => setModal({ type: 'itemDetail', itemId: id })
 
-  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans', weather: 'Weather at home', civic: 'County / City', finance: 'Insurance / Taxes' }
+  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans', weather: 'Weather at home', civic: 'County / City', finance: 'Insurance / Taxes', money: 'Financial' }
 
   return (
     <div className="app">
@@ -333,7 +343,7 @@ export default function App() {
             <Icon.plus size={18} /> Add
           </button>
         )}
-        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans' || view.name === 'weather' || view.name === 'civic' || view.name === 'finance') && (
+        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans' || view.name === 'weather' || view.name === 'civic' || view.name === 'finance' || view.name === 'money') && (
           <div className="brand" style={{ fontSize: 18 }}>{titles[view.name]}</div>
         )}
       </header>
@@ -360,10 +370,6 @@ export default function App() {
                 <div className="n">{dashTotals.expired}</div>
                 <div className="l">Warranties expired</div>
               </button>
-              <button className="stat as-btn stat-tool" onClick={() => setView({ name: 'finance' })}>
-                <div className="n">🛡️</div>
-                <div className="l">Insurance / Taxes</div>
-              </button>
               <button className="stat as-btn stat-tool" onClick={() => setView({ name: 'civic' })}>
                 <div className="n">🏛️</div>
                 <div className="l">County / City</div>
@@ -371,6 +377,14 @@ export default function App() {
               <button className="stat as-btn stat-tool" onClick={() => setView({ name: 'weather' })}>
                 <div className="n">🌤️</div>
                 <div className="l">Weather &amp; maintenance</div>
+              </button>
+              <button className="stat as-btn stat-tool" onClick={() => setView({ name: 'finance' })}>
+                <div className="n">🛡️</div>
+                <div className="l">Insurance / Taxes</div>
+              </button>
+              <button className="stat as-btn stat-tool" onClick={() => setView({ name: 'money' })}>
+                <div className="n">💵</div>
+                <div className="l">Financial</div>
               </button>
             </div>
 
@@ -497,6 +511,7 @@ export default function App() {
             state={state}
             area={currentArea}
             today={today}
+            poolValues={pool}
             onEditArea={() => setModal({ type: 'area', area: currentArea, zone: currentArea.zone })}
             onQuickAdd={(nm) => setModal({ type: 'item', item: null, areaId: currentArea.id, presetName: nm })}
             onOpenItem={openItem}
@@ -543,6 +558,10 @@ export default function App() {
           <ReferralsView profile={intake} />
         )}
 
+        {view.name === 'money' && (
+          <MoneyView values={moneyRec} onChange={setMoneyValue} />
+        )}
+
         {view.name === 'finance' && (
           <FinanceView values={finance} onChange={setFinanceValue} civicInfo={civic?.info} />
         )}
@@ -578,6 +597,7 @@ export default function App() {
           coords={weather?.lat ? { lat: weather.lat, lon: weather.lon } : null}
           onAddPro={(data) => addPro(data)}
           onClose={() => setModal(null)}
+          onSaved={() => { setModal(null); flash('Pool profile saved') }}
         />
       ) : modal?.type === 'area' && (
         <AreaForm

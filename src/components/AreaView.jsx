@@ -5,7 +5,18 @@ import { suggestionsFor } from '../lib/suggestions.js'
 // Detail screen for one room / area: a dropdown-first "Add to this area" and a
 // compact table of everything stored here — item, store/brand, purchase date,
 // price and warranty all visible together.
-export default function AreaView({ state, area, today, onEditArea, onQuickAdd, onOpenItem }) {
+const POOL_LABELS = [
+  ['builder', 'Built by'], ['yearBuilt', 'Year built'], ['gallons', 'Gallons'],
+  ['type', 'Type'], ['surface', 'Surface'], ['sanitizer', 'Sanitizer'],
+  ['heated', 'Heated'], ['hotTub', 'Hot tub / spa'], ['maxDepth', 'Deepest point'],
+  ['features', 'Water features'], ['notes', 'Notes'],
+]
+
+export default function AreaView({ state, area, today, poolValues, onEditArea, onQuickAdd, onOpenItem }) {
+  const isPool = area.variant === 'pool' || /swimming pool/i.test(area.name)
+  const poolRows = isPool
+    ? POOL_LABELS.map(([k, l]) => [l, (poolValues?.[k] || '').trim()]).filter(([, val]) => val)
+    : []
   const items = itemsForArea(state, area.id)
   const AreaIcon = Icon[area.icon] || Icon.box
   const suggestions = suggestionsFor(area.name)
@@ -20,6 +31,28 @@ export default function AreaView({ state, area, today, onEditArea, onQuickAdd, o
         </div>
         <button className="edit" onClick={onEditArea}><Icon.edit size={18} /> Edit</button>
       </div>
+
+      {isPool && (
+        <button className="pool-summary" onClick={onEditArea}>
+          <div className="pool-summary-head">
+            <span>🏊 Pool profile</span>
+            <span className="pool-summary-edit">{poolRows.length ? 'Edit ›' : 'Set it up ›'}</span>
+          </div>
+          {poolRows.length === 0 ? (
+            <div className="pool-summary-empty">Who built it, gallons, type, surface, salt or
+              chlorine, heated, hot tub — tap to fill in your pool's profile.</div>
+          ) : (
+            <div className="pool-summary-grid">
+              {poolRows.map(([l, val]) => (
+                <div className="ps-cell" key={l}>
+                  <div className="ps-k">{l}</div>
+                  <div className="ps-v">{val}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </button>
+      )}
 
       <div className="quickadd">
         <label htmlFor="quickadd-select">Add to this area</label>
