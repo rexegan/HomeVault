@@ -64,7 +64,7 @@ export const FINISH_LABELS = FINISH_SECTIONS.flatMap((s) => s.fields.map(([k, l]
 export default function FinishesForm({ area, values, onChange, onSaved, onClose }) {
   const v = (k) => values?.[k] || ''
   return (
-    <Sheet title={area.name + ' — paint & finishes'} onClose={onClose}
+    <Sheet title={area.name + ' — Paint, Flooring, and Wallpaper'} onClose={onClose}
       footer={<button className="btn" onClick={onSaved || onClose} style={{ flex: 1 }}>Save</button>}>
 
       <div className="hint" style={{ marginBottom: 6 }}>

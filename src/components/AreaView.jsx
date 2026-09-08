@@ -60,7 +60,7 @@ export default function AreaView({ state, area, today, poolValues, finishesValue
 
       <button className="pool-summary finishes-summary" onClick={onEditFinishes}>
         <div className="pool-summary-head">
-          <span>🎨 Paint &amp; finishes</span>
+          <span>🎨 Paint, Flooring, and Wallpaper</span>
           <span className="pool-summary-edit">{finishRows.length ? 'Edit ›' : 'Set it up ›'}</span>
         </div>
         {finishRows.length === 0 ? (
