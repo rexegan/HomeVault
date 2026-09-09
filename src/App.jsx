@@ -693,6 +693,7 @@ export default function App() {
           <FinishesForm
             area={fa}
             entry={entry}
+            nearbyStores={(hardware?.stores || []).filter((s) => s.dist <= 20).slice(0, 12)}
             onSave={(draft) => { saveFinishEntry(fa.id, modal.entryId, draft); setModal(null) }}
             onDelete={() => { deleteFinishEntry(fa.id, modal.entryId); setModal(null) }}
             onClose={() => setModal(null)}
