@@ -251,6 +251,7 @@ export default function App() {
       }
       setFinishes(fm)
     }
+    if (sample.pool) setPool(sample.pool)
     flash('Sample home loaded — explore away!')
   }
 

@@ -215,5 +215,10 @@ export function buildSample(today) {
         totalCost: '$1,215.50', notes: '$3.25/sq ft' },
     ],
   }
-  return { items, intake, care, pros, finishes }
+  const pool = {
+    builder: 'Bluebonnet Pool & Spa', gallons: '18,000', type: 'Freeform', surface: 'Pebble (PebbleTec)',
+    sanitizer: 'Saltwater', heated: 'Yes', hotTub: 'Yes', yearBuilt: '2015', maxDepth: '8 ft',
+    features: 'Waterfall, tanning ledge, color LED lights', notes: 'Salt cell replaced 2023; pump serviced each spring.',
+  }
+  return { items, intake, care, pros, finishes, pool }
 }
