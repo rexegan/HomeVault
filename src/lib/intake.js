@@ -22,7 +22,7 @@ const SECTIONS = [
         ['Foundation type?', 'Slab, pier & beam, crawl space, basement', ['Slab', 'Pier & beam', 'Crawl space', 'Basement', 'Full basement']],
         ['Do you own or rent it?', null, ['Own', 'Rent']],
         'Purchase / closing date?',
-        ['Is there an HOA?', 'Name and dues, if so'],
+        ['Is there an HOA?', null, ['Yes', 'No']],
         'Parcel / APN & legal description?',
       ] },
     ],
@@ -284,6 +284,7 @@ export const KEY_FIELDS = {
   style: 'property:0:3',
   stories: 'property:0:4',
   sqft: 'property:0:5',
+  hoa: 'property:0:10',
 }
 
 // Build a home name + a short facts line from whatever the user has filled in.

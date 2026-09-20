@@ -1,5 +1,7 @@
 import { Icon } from '../lib/icons.jsx'
+import { useState } from 'react'
 import { INTAKE, INTAKE_TOTAL, KEY_FIELDS } from '../lib/intake.js'
+import { formatPrice } from '../lib/storage.js'
 
 // The Home Profile: the full intake questionnaire, inside the app — but now every
 // question is an input you fill in. Questions with a defined set of choices show a
@@ -86,7 +88,50 @@ function maskDate(v) {
   return digits
 }
 
+// HOA: a Yes/No dropdown, and — only when Yes — a Monthly dues box on the same
+// line. Saved as one answer: "No", "Yes", or "Yes · $250/mo".
+function HoaField({ item, value, onChange }) {
+  const trimmed = value.trim()
+  const yes = /^yes/i.test(trimmed) || (trimmed !== '' && !/^no/i.test(trimmed))
+  const no = /^no/i.test(trimmed)
+  const legacy = trimmed !== '' && !/^(yes|no)\b/i.test(trimmed) ? trimmed : ''
+  const savedDues = (trimmed.match(/\$[\d,]+(\.\d+)?/) || [''])[0]
+  const [dues, setDues] = useState(savedDues)
+  const compose = (isYes, d) => (isYes ? 'Yes' + (d.trim() ? ' · ' + d.trim() + '/mo' : '') : 'No')
+  const filled = trimmed !== ''
+  return (
+    <div className={'intake-field' + (filled ? ' filled' : '')}>
+      <label htmlFor={item.id}>
+        <span className="chk" aria-hidden="true">{filled ? '✓' : ''}</span>
+        <span className="q">{item.q}</span>
+      </label>
+      <div className="hoa-row">
+        <select id={item.id} value={yes ? 'Yes' : (no ? 'No' : '')}
+          onChange={(e) => {
+            const v = e.target.value
+            onChange(v === '' ? '' : compose(v === 'Yes', dues))
+          }}>
+          <option value="">Pick one…</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+        {yes && (
+          <div className="hoa-dues">
+            <span className="hoa-dues-label">Monthly dues</span>
+            <input type="text" inputMode="decimal" value={dues} placeholder="$ per month"
+              aria-label="HOA monthly dues"
+              onChange={(e) => { setDues(e.target.value); onChange(compose(true, e.target.value)) }}
+              onBlur={() => { const f = formatPrice(dues); setDues(f); onChange(compose(true, f)) }} />
+          </div>
+        )}
+      </div>
+      {legacy && <div className="hint" style={{ marginTop: 6 }}>Earlier note: {legacy}</div>}
+    </div>
+  )
+}
+
 function Field({ item, value, onChange, isFiled, onFile, onAddPro }) {
+  if (item.id === KEY_FIELDS.hoa) return <HoaField item={item} value={value} onChange={onChange} />
   const filled = value.trim() !== ''
   const isDate = /\bdate\b/i.test(item.q)
   const handleChange = (v) => onChange(isDate ? maskDate(v) : v)
