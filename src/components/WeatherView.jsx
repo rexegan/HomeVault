@@ -21,7 +21,38 @@ export default function WeatherView({ profile, cached, onCache }) {
   const [busy, setBusy] = useState(false)
   const [openDay, setOpenDay] = useState(null)
   const [error, setError] = useState(null)
+  const [cityText, setCityText] = useState('')
+  const [elsewhere, setElsewhere] = useState(false) // viewing a typed city, not home
   const ran = useRef(false)
+
+  // Look up the forecast for any typed city or ZIP. Not cached — the saved
+  // forecast always stays the home address.
+  const lookupCity = async () => {
+    const q = cityText.trim()
+    if (!q || busy) return
+    setBusy(true); setError(null)
+    try {
+      const geo = await geocodeAddress(q)
+      if (!geo) { setError(`Couldn't find "${q}" — try a city and state, like Austin, TX.`); return }
+      const fc = await fetchForecast(geo.lat, geo.lon)
+      const parts = (geo.display || q).split(',').map((x) => x.trim()).filter(Boolean)
+      const nice = parts.length > 2
+        ? parts[0] + ', ' + (parts[parts.length - 2] === 'United States' ? parts[parts.length - 1] : parts[parts.length - 2])
+        : (geo.display || q)
+      setDays(fc); setPlace(nice); setElsewhere(true); setOpenDay(null)
+    } catch (e) {
+      console.warn('City forecast failed', e)
+      setError('The weather service didn\'t answer — try again in a minute.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const backHome = () => {
+    setElsewhere(false); setCityText(''); setOpenDay(null)
+    if (cached?.days && cached.address === profileAddress) { setDays(cached.days); setPlace(profileAddress) }
+    load()
+  }
 
   const load = async () => {
     if (!profileAddress && !cached?.lat) {
@@ -39,6 +70,7 @@ export default function WeatherView({ profile, cached, onCache }) {
       const fc = await fetchForecast(lat, lon)
       setDays(fc)
       setPlace(profileAddress)
+      setElsewhere(false)
       onCache({ address: profileAddress, lat, lon, days: fc, when: fc[0]?.date })
     } catch (e) {
       console.warn('Weather fetch failed', e)
@@ -61,9 +93,23 @@ export default function WeatherView({ profile, cached, onCache }) {
 
   return (
     <div className="wxv">
-      <div className="intake-lede">
-        <h2>Weather at home</h2>
-        <p>{place ? `Forecast for ${place}.` : 'The forecast for your address, and what it means for the house.'}</p>
+      <div className="intake-lede wx-lede">
+        <div className="wx-lede-text">
+          <h2>{elsewhere ? 'Weather elsewhere' : 'Weather at home'}</h2>
+          <p>{place ? `Forecast for ${place}` : 'The forecast for your address, and what it means for the house'}</p>
+        </div>
+        <form className="wx-city" onSubmit={(e) => { e.preventDefault(); lookupCity() }}>
+          <label htmlFor="wx-city-input" className="wx-city-label">Check another city</label>
+          <div className="wx-city-row">
+            <input id="wx-city-input" type="text" value={cityText} enterKeyHint="go"
+              placeholder="City, state or ZIP" autoComplete="off"
+              onChange={(e) => setCityText(e.target.value)} />
+            <button type="submit" className="btn small" disabled={busy || !cityText.trim()}>Go</button>
+            {elsewhere && (
+              <button type="button" className="btn secondary small" onClick={backHome}>🏠 Home</button>
+            )}
+          </div>
+        </form>
       </div>
 
       <div className="wx-tabs">
@@ -134,7 +180,7 @@ export default function WeatherView({ profile, cached, onCache }) {
       {tab === 'care' && (
         <>
           <div className="section-row" style={{ marginTop: 6 }}>
-            <h3>Coming up at your address</h3>
+            <h3>{elsewhere ? `Coming up in ${place}` : 'Coming up at your address'}</h3>
           </div>
           <div className="items">
             {alerts.map((a, i) => (
