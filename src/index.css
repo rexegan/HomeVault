@@ -1494,3 +1494,21 @@ button.sum-btn:active { background: var(--bg-2); }
 .wx-city-row { display: flex; gap: 8px; }
 .wx-city-row input { flex: 1; min-width: 0; }
 .wx-city-row .btn { flex-shrink: 0; }
+
+/* Mortgage company → customer-service number card */
+.lender-card { margin-top: 10px; padding: 12px 14px; border-radius: 12px; background: rgba(217,236,243,0.55); border: 1px solid #cfe0e8; }
+.lender-card.unknown { background: rgba(178,106,18,0.07); border-color: rgba(178,106,18,0.3); }
+.lc-name { font-weight: 800; font-size: 14px; }
+.lc-dept { font-weight: 600; font-size: 12px; color: var(--ink-soft); margin-left: 6px; }
+.lc-phone { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
+.lc-phone a { font-size: 20px; font-weight: 800; color: #14657f; text-decoration: none; font-variant-numeric: tabular-nums; }
+.lc-line { margin-top: 6px; font-size: 13.5px; }
+.lc-line a { color: #14657f; font-weight: 600; }
+.lc-small { font-size: 12px; color: var(--ink-soft); }
+
+/* Utility provider picker card */
+.prov-card { margin-top: 8px; padding: 10px 12px; border-radius: 10px; background: rgba(217,236,243,0.5); border: 1px solid #cfe0e8; font-size: 13.5px; }
+.pv-name { font-weight: 700; }
+.pv-note { font-weight: 500; color: var(--ink-soft); }
+.pv-links { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 6px; }
+.pv-links a { color: #14657f; font-weight: 600; }

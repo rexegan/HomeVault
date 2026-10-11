@@ -618,7 +618,8 @@ export default function App() {
         )}
 
         {view.name === 'money' && (
-          <MoneyView values={moneyRec} onChange={setMoneyValue} />
+          <MoneyView values={moneyRec} onChange={setMoneyValue}
+            address={intake[KEY_FIELDS.address]} civicInfo={civic?.info} />
         )}
 
         {view.name === 'finance' && (
