@@ -57,7 +57,7 @@ const STORES = {
   'Other': ['Home Depot', "Lowe's", 'Amazon', 'Walmart', 'Costco', 'Ace Hardware'],
 }
 
-function Select({ id, label, value, options, onChange, otherLabel = 'Other…' }) {
+export function Select({ id, label, value, options, onChange, otherLabel = 'Other…' }) {
   const custom = value.trim() !== '' && !options.some((o) => (o.value ?? o) === value)
   return (
     <div className={'intake-field' + (value.trim() ? ' filled' : '')} style={{ marginBottom: 12 }}>
@@ -85,7 +85,7 @@ function Select({ id, label, value, options, onChange, otherLabel = 'Other…' }
   )
 }
 
-function TextField({ id, label, value, onChange, opt = {} }) {
+export function TextField({ id, label, value, onChange, opt = {} }) {
   const filled = value.trim() !== ''
   return (
     <div className={'intake-field' + (filled ? ' filled' : '')} style={{ marginBottom: 12 }}>

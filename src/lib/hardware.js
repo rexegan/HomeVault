@@ -190,3 +190,69 @@ export function formatHours(oh) {
       .trim()
   ).filter(Boolean)
 }
+
+// ── Deals / weekly ad / coupons ─────────────────────────────────────────────
+// Browsers can't read other sites' sale listings (they block it, and retailers
+// block bots), so each store gets a straight link to the retailer's OWN deals
+// pages. URLs were checked against each retailer's own site. [key, {deals,
+// coupons, weeklyAd, note}] — first match on the store name wins.
+const DEALS = [
+  ['home depot', { weeklyAd: 'https://www.homedepot.com/c/localad', deals: 'https://www.homedepot.com/c/Savings_Center',
+    note: 'The local ad is for your store — it asks for a store or ZIP if none is saved.' }],
+  ["lowe's", { weeklyAd: 'https://www.lowes.com/weekly-ad', deals: 'https://www.lowes.com/l/savings', coupons: 'https://www.lowes.com/l/savings/coupons',
+    note: 'The weekly ad follows the store saved on Lowes.com.' }],
+  ['lowes', { weeklyAd: 'https://www.lowes.com/weekly-ad', deals: 'https://www.lowes.com/l/savings', coupons: 'https://www.lowes.com/l/savings/coupons',
+    note: 'The weekly ad follows the store saved on Lowes.com.' }],
+  ['ace hardware', { weeklyAd: 'https://www.acehardware.com/local-ads-2', deals: 'https://www.acehardware.com/shop-all-sales-specials/c/15557',
+    coupons: 'https://www.acehardware.com/coupons',
+    note: 'Ace ads are per store. Ace’s site sometimes asks you to confirm you’re human before showing a page.' }],
+  ['harbor freight', { deals: 'https://www.harborfreight.com/coupons',
+    note: 'Harbor Freight keeps its deals and coupons on one page.' }],
+  ['tractor supply', { weeklyAd: 'https://www.tractorsupply.com/tsc/cms/digital-flyer', deals: 'https://www.tractorsupply.com/tsc/sale',
+    note: 'Prices and the flyer follow the store chosen on their site (it starts from your ZIP).' }],
+  ['menards', { weeklyAd: 'https://www.menards.com/main/flyerselectstore.html?flyer_type_name=Weekly&locale=en',
+    deals: 'https://www.menards.com/main/sale-items/c-1642874320226744.htm',
+    note: 'Menards has no coupons — it uses an 11% mail-in rebate instead.' }],
+  ['atwoods', { weeklyAd: 'https://www.atwoods.com/deals/current-ad/', deals: 'https://www.atwoods.com/deals/',
+    note: 'The ad follows the Atwoods store selected on their site.' }],
+  ["mccoy's", { deals: 'https://www.mccoys.com/on-sale' }],
+  ['mccoys', { deals: 'https://www.mccoys.com/on-sale' }],
+  ['true value', { weeklyAd: 'https://www.truevalue.com/localad/', deals: 'https://www.truevalue.com/global/deals/',
+    note: 'True Value stores are independent — pick yours on their site to see its ad.' }],
+  ['northern tool', { weeklyAd: 'https://catalog.northerntool.com/weeklyads', deals: 'https://www.northerntool.com/deals',
+    coupons: 'https://www.northerntool.com/rebates-special-offers' }],
+  ['do it best', { weeklyAd: 'https://www.doitbest.com/localad/', deals: 'https://www.doitbest.com/global/deals/',
+    note: 'Do it Best stores are independent — pick yours on their site to see its ad.' }],
+  ['orscheln', { weeklyAd: 'https://www.tractorsupply.com/tsc/cms/digital-flyer', deals: 'https://www.tractorsupply.com/tsc/sale',
+    note: 'Orscheln Farm & Home is now part of Tractor Supply, so these are Tractor Supply’s pages.' }],
+  ['rural king', { weeklyAd: 'https://www.ruralking.com/weeklyad', note: 'Rural King shows the ad for the store selected on their site.' }],
+  ['floor & decor', { deals: 'https://www.flooranddecor.com/clearance' }],
+  ['floor and decor', { deals: 'https://www.flooranddecor.com/clearance' }],
+  ['sherwin', { deals: 'https://www.sherwin-williams.com/en-us/special-offers',
+    note: 'Sale pricing needs a free PaintPerks sign-in at checkout.' }],
+  ['walmart', { deals: 'https://www.walmart.com/shop/deals/home-improvement' }],
+  ['costco', { deals: 'https://www.costco.com/o/-/warehouse-savings', note: 'This is Costco’s online coupon book.' }],
+]
+
+export function dealsFor(s) {
+  const n = (s.name || '').toLowerCase()
+  for (const [key, d] of DEALS) {
+    if (!n.includes(key)) continue
+    const links = []
+    if (d.weeklyAd) links.push({ icon: '📰', label: 'Weekly ad', desc: 'This week’s sale flyer', url: d.weeklyAd })
+    if (d.deals) links.push({ icon: '🏷️', label: 'Sales & special buys', desc: 'Discounted items right now', url: d.deals })
+    if (d.coupons && d.coupons !== d.deals) links.push({ icon: '✂️', label: 'Coupons & offers', desc: 'Printable and digital coupons', url: d.coupons })
+    return { official: true, links, note: d.note || '' }
+  }
+  const where = (s.addr || '').replace(/^\d+\s+/, '')
+  return {
+    official: false,
+    links: [
+      { icon: '📰', label: 'Weekly ad & sales', desc: 'First result for their current deals',
+        url: 'https://duckduckgo.com/?q=' + encodeURIComponent('\\' + s.name + ' ' + where + ' weekly ad sale') },
+      { icon: '✂️', label: 'Coupons', desc: 'First result for their coupons',
+        url: 'https://duckduckgo.com/?q=' + encodeURIComponent('\\' + s.name + ' ' + where + ' coupons') },
+    ],
+    note: '',
+  }
+}

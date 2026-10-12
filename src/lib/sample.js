@@ -220,5 +220,43 @@ export function buildSample(today) {
     sanitizer: 'Saltwater', heated: 'Yes', hotTub: 'Yes', yearBuilt: '2015', maxDepth: '8 ft',
     features: 'Waterfall, tanning ledge, color LED lights', notes: 'Salt cell replaced 2023; pump serviced each spring.',
   }
-  return { items, intake, care, pros, finishes, pool }
+  const ymd = (days) => {
+    const x = new Date(today); x.setDate(x.getDate() + days)
+    return String(x.getMonth() + 1).padStart(2, '0') + '/' + String(x.getDate()).padStart(2, '0') + '/' + x.getFullYear()
+  }
+  const lawn = {
+    profile: { grass: 'St. Augustine', sqft: '11,500', soil: 'Black clay (blackland)', sun: 'Part sun',
+      irrigation: 'Yes', controller: 'Rachio 3, 8 zones', mowHeight: '3.5 inches',
+      who: 'Lawn service mows it', service: 'Green Acres Lawn & Landscape', water: 'City water' },
+    entries: [
+      { kind: 'Grass — sod / seed', where: 'Front yard', product: 'St. Augustine', brand: 'Local sod farm', size: 'Sod pallet',
+        status: 'Thriving', store: 'Landscape supply yard', doneBy: 'Green Acres Lawn & Landscape', date: '05/28/2016',
+        qty: '14 pallets', totalCost: '$2,380', notes: 'Palmetto variety; laid over tilled black clay' },
+      { kind: 'Fertilizer', where: 'Whole property', product: '15-5-10 slow-release', brand: 'Scotts', store: 'Home Depot',
+        doneBy: 'Us / family', date: ymd(-45), qty: '3 bags · 15,000 sq ft', totalCost: '$118', nextDue: ymd(40),
+        notes: 'Spring feeding after second mow' },
+      { kind: 'Weed control', where: 'Front yard', product: 'Pre-emergent', brand: 'Barricade', store: 'Tractor Supply',
+        doneBy: 'Us / family', date: ymd(-120), qty: '1 bag', totalCost: '$64', nextDue: ymd(150), notes: 'Apply again before first frost' },
+      { kind: 'Trees', where: 'Back yard', product: 'Shumard oak', brand: "Calloway's", size: '30 gallon', status: 'Thriving',
+        store: "Calloway's Nursery", doneBy: 'Us / family', date: '10/22/2022', qty: '2', totalCost: '$540',
+        notes: 'Planted 25 ft from the pool equipment pad' },
+      { kind: 'Shrubs & hedges', where: 'Front yard', product: 'Indian hawthorn', brand: 'Local nursery', size: '5 gallon',
+        status: 'Doing OK', store: 'Local nursery / garden center', doneBy: 'Us / family', date: '04/09/2021', qty: '9',
+        totalCost: '$288' },
+      { kind: 'Flowers & annuals', where: 'Flower beds', product: 'Pentas & vinca', brand: 'Proven Winners', size: '1 gallon',
+        status: 'Thriving', store: 'Home Depot', doneBy: 'Us / family', date: ymd(-30), qty: '24', totalCost: '$96' },
+      { kind: 'Trees', where: 'Left side yard', product: 'Crape myrtle — Natchez', size: '15 gallon', status: 'Died',
+        store: 'Lowe\'s', doneBy: 'Us / family', date: '03/14/2020', qty: '3', totalCost: '$267',
+        notes: 'Lost to the 2021 freeze — replaced with Tuscarora' },
+      { kind: 'Mulch / soil / compost', where: 'Flower beds', product: 'Hardwood mulch, dark brown', brand: 'Vigoro',
+        store: 'Home Depot', doneBy: 'Us / family', date: ymd(-60), qty: '20 bags', totalCost: '$98', nextDue: ymd(300) },
+      { kind: 'Irrigation / sprinklers', where: 'Whole property', product: 'Smart controller + 4 new heads', brand: 'Rachio',
+        store: 'Amazon', doneBy: 'Cool Breeze HVAC — Danny', date: '06/02/2023', qty: '1 controller', totalCost: '$389' },
+      { kind: 'Outdoor lighting', where: 'Back yard', product: 'Low-voltage path & uplights', brand: 'Kichler',
+        store: 'Lowe\'s', doneBy: 'Us / family', date: '11/18/2022', qty: '12 fixtures', totalCost: '$612' },
+      { kind: 'Tree trimming / removal', where: 'Right side yard', product: 'Trimmed live oak limbs off the roof',
+        doneBy: 'Hill Country Tree Service', date: '02/08/2024', totalCost: '$850' },
+    ],
+  }
+  return { items, intake, care, pros, finishes, pool, lawn }
 }

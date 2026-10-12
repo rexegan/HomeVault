@@ -27,6 +27,7 @@ import CivicView from './components/CivicView.jsx'
 import FinanceView from './components/FinanceView.jsx'
 import MoneyView from './components/MoneyView.jsx'
 import FinishesForm from './components/FinishesForm.jsx'
+import LawnView from './components/LawnView.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
 import { buildSample } from './lib/sample.js'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL, KEY_FIELDS } from './lib/intake.js'
@@ -252,8 +253,28 @@ export default function App() {
       setFinishes(fm)
     }
     if (sample.pool) setPool(sample.pool)
+    if (sample.lawn) setLawn({ profile: sample.lawn.profile, entries: sample.lawn.entries.map((e) => ({ id: store.newProId(), ...e })) })
     flash('Sample home loaded — explore away!')
   }
+
+  // Lawn & Landscape: profile + stacked job log.
+  const [lawn, setLawn] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('homevault:lawn:v1') || '{"profile":{},"entries":[]}') } catch { return { profile: {}, entries: [] } }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('homevault:lawn:v1', JSON.stringify(lawn)) } catch { /* ignore */ }
+  }, [lawn])
+  const setLawnProfile = (k, val) => setLawn((l) => ({ ...l, profile: { ...l.profile, [k]: val } }))
+  const saveLawnEntry = (id, draft) => {
+    setLawn((l) => ({
+      ...l,
+      entries: id
+        ? l.entries.map((e) => (e.id === id ? { ...e, ...draft, id } : e))
+        : [...l.entries, { ...draft, id: store.newProId() }],
+    }))
+    flash('Yard job saved')
+  }
+  const deleteLawnEntry = (id) => { setLawn((l) => ({ ...l, entries: l.entries.filter((e) => e.id !== id) })); flash('Deleted') }
 
   // Swimming Pool profile.
   const [pool, setPool] = useState(() => {
@@ -370,7 +391,7 @@ export default function App() {
   const liveItem = (id) => state.items.find((it) => it.id === id) || null
   const openItem = (id) => setModal({ type: 'itemDetail', itemId: id })
 
-  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans', weather: 'Weather at home', civic: 'County / City', finance: 'Insurance / Taxes', money: 'Financial' }
+  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans', lawn: 'Lawn & Landscape', weather: 'Weather at home', civic: 'County / City', finance: 'Insurance / Taxes', money: 'Financial' }
 
   return (
     <div className="app">
@@ -399,7 +420,7 @@ export default function App() {
             <Icon.plus size={18} /> Add
           </button>
         )}
-        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans' || view.name === 'weather' || view.name === 'civic' || view.name === 'finance' || view.name === 'money') && (
+        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans' || view.name === 'lawn' || view.name === 'weather' || view.name === 'civic' || view.name === 'finance' || view.name === 'money') && (
           <div className="brand" style={{ fontSize: 18 }}>{titles[view.name]}</div>
         )}
       </header>
@@ -492,6 +513,16 @@ export default function App() {
                 <strong>Repair Referrals</strong>
                 <span className="profile-sub">Angi, Christian home repair, Thumbtack — trusted ways to find help.</span>
               </span>
+              <span className="profile-chev"><Icon.chevron size={20} /></span>
+            </button>
+
+            <button className="profile-card" onClick={() => setView({ name: 'lawn' })}>
+              <span className="profile-icon lawn-icon"><Icon.yard size={22} /></span>
+              <span className="profile-body">
+                <strong>Lawn &amp; Landscape</strong>
+                <span className="profile-sub">Every grass job, fertilizer, plant and tree — front, back and sides.</span>
+              </span>
+              {lawn.entries.length > 0 && <span className="pros-count-pill">{lawn.entries.length}</span>}
               <span className="profile-chev"><Icon.chevron size={20} /></span>
             </button>
 
@@ -632,6 +663,12 @@ export default function App() {
 
         {view.name === 'weather' && (
           <WeatherView profile={intake} cached={weather} onCache={cacheWeather} />
+        )}
+
+        {view.name === 'lawn' && (
+          <LawnView lawn={lawn} onProfile={setLawnProfile} onSaveEntry={saveLawnEntry}
+            onDeleteEntry={deleteLawnEntry}
+            nearbyStores={(hardware?.stores || []).filter((s) => s.dist <= 20).slice(0, 12)} />
         )}
 
         {view.name === 'scans' && (

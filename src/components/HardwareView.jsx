@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import Sheet from './Sheet.jsx'
 import { Icon } from '../lib/icons.jsx'
 import { KEY_FIELDS } from '../lib/intake.js'
-import { geocodeAddress, findHardwareStores, directionsURL, fallbackSearchURL, webSearchURL, websiteFor, formatHours } from '../lib/hardware.js'
+import { geocodeAddress, findHardwareStores, directionsURL, fallbackSearchURL, webSearchURL, websiteFor, formatHours, dealsFor } from '../lib/hardware.js'
 
 // Local Hardware: the closest hardware & home-improvement stores to the home
 // address, sorted by distance, with one-tap directions.
@@ -15,6 +15,7 @@ export default function HardwareView({ profile, cached, onCache }) {
   const [error, setError] = useState(null)
   const [radius, setRadius] = useState(cached?.radius || 15)
   const [openStore, setOpenStore] = useState(null)
+  const [dealsStore, setDealsStore] = useState(null)
   const ranAuto = useRef(false)
 
   // Picking a distance shows stores in that range immediately: results already
@@ -68,9 +69,9 @@ export default function HardwareView({ profile, cached, onCache }) {
     <div className="hw">
       <div className="intake-lede">
         <h2>Local Hardware</h2>
-        <p>The closest hardware and home-improvement stores to your front door — so mid-project
-          runs for a part take seconds to plan. Distances are as the crow flies; tap a store for
-          driving directions.</p>
+        <p>The closest hardware and home improvement stores to your front door… so in the middle
+          of a project, runs for a part take seconds to plan. Distances are as the crow flies.
+          Tap a store for driving directions.</p>
       </div>
 
       <div className="hw-search">
@@ -122,15 +123,22 @@ export default function HardwareView({ profile, cached, onCache }) {
           </div>
           <div className="items">
             {shown.map((s, i) => (
-              <button className="hw-store" key={i} onClick={() => setOpenStore(s)}>
-                <span className="hw-rank">{i + 1}</span>
-                <span className="hw-body">
-                  <span className="hw-name">{s.name} {s.chain && <em className="hw-chain">chain</em>}</span>
-                  {s.addr && <span className="hw-addr">{s.addr}</span>}
-                </span>
-                <span className="hw-dist">{s.distLabel}</span>
-                <span className="hw-go">Details ›</span>
-              </button>
+              <div className="hw-row" key={i}>
+                <button className="hw-store" onClick={() => setOpenStore(s)}>
+                  <span className="hw-rank">{i + 1}</span>
+                  <span className="hw-body">
+                    <span className="hw-name">{s.name} {s.chain && <em className="hw-chain">chain</em>}</span>
+                    {s.addr && <span className="hw-addr">{s.addr}</span>}
+                  </span>
+                  <span className="hw-dist">{s.distLabel}</span>
+                  <span className="hw-go">Details ›</span>
+                </button>
+                <button className="hw-deals-btn" onClick={() => setDealsStore(s)}
+                  aria-label={'Deals and coupons at ' + s.name}>
+                  <span className="hw-deals-ico" aria-hidden="true">🏷️</span>
+                  <span>Deals</span>
+                </button>
+              </div>
             ))}
           </div>
           <div className="intake-foot" style={{ marginTop: 16 }}>
@@ -142,7 +150,39 @@ export default function HardwareView({ profile, cached, onCache }) {
       )}
 
       {openStore && <StoreCard store={openStore} onClose={() => setOpenStore(null)} />}
+      {dealsStore && <DealsCard store={dealsStore} onClose={() => setDealsStore(null)} />}
     </div>
+  )
+}
+
+// Sales, weekly ad and coupons for one store — straight to the retailer's own pages.
+function DealsCard({ store, onClose }) {
+  const d = dealsFor(store)
+  return (
+    <Sheet
+      title={'Deals at ' + store.name}
+      onClose={onClose}
+      footer={<button className="btn secondary" onClick={onClose} style={{ flex: 1 }}>Close</button>}
+    >
+      <p className="hint" style={{ marginTop: 0 }}>
+        {d.official
+          ? 'These open ' + store.name + '’s own pages, so what you see is what is on sale right now.'
+          : 'This opens the first result for ' + store.name + '’s weekly ad and coupons — local shops post deals on their own site or Facebook page.'}
+      </p>
+      <div className="items">
+        {d.links.map((l) => (
+          <a className="ref-row" key={l.label} href={l.url} target="_blank" rel="noopener noreferrer">
+            <span className="wx-icon" style={{ fontSize: 20 }}>{l.icon}</span>
+            <span className="ref-body">
+              <span className="ref-name">{l.label}</span>
+              <span className="ref-desc">{l.desc}</span>
+            </span>
+            <span className="ref-open">Open ↗</span>
+          </a>
+        ))}
+      </div>
+      {d.note && <div className="hint" style={{ marginTop: 12 }}>{d.note}</div>}
+    </Sheet>
   )
 }
 

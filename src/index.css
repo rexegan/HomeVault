@@ -1512,3 +1512,32 @@ button.sum-btn:active { background: var(--bg-2); }
 .pv-note { font-weight: 500; color: var(--ink-soft); }
 .pv-links { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 6px; }
 .pv-links a { color: #14657f; font-weight: 600; }
+
+/* Local Hardware: full-width description, and a Deals tab at the right of each store */
+.hw .intake-lede p { max-width: none; }
+.hw-row { display: flex; gap: 8px; align-items: stretch; }
+.hw-row .hw-store { flex: 1; min-width: 0; width: auto; }
+.hw-deals-btn {
+  flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-width: 66px; padding: 8px 10px; border-radius: var(--radius); cursor: pointer;
+  background: rgba(178,106,18,0.10); border: 1px solid rgba(178,106,18,0.45);
+  color: #8a5209; font: 700 12px/1.1 inherit; font-family: inherit;
+}
+.hw-deals-btn:active { background: rgba(178,106,18,0.22); }
+.hw-deals-ico { font-size: 18px; }
+
+/* Lawn & Landscape */
+.lawn-icon { background: #e3f0dd !important; color: #3b7a2c !important; }
+.lawn-kind { background: #e3f0dd !important; color: #2f6b22 !important; }
+.fe-qty { font-weight: 500; color: var(--ink-soft); }
+.lawn-areas { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 12px; }
+.lawn-chip {
+  font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+  padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink);
+}
+.lawn-chip span { font-weight: 500; color: var(--ink-soft); margin-left: 4px; }
+.lawn-chip.on { background: #3b7a2c; border-color: #3b7a2c; color: #fff; }
+.lawn-chip.on span { color: rgba(255,255,255,0.85); }
+.lawn-due { margin: 0 0 12px; padding: 9px 12px; border-radius: 10px; background: rgba(178,106,18,0.1); border: 1px solid rgba(178,106,18,0.35); font-size: 13.5px; }
+.lawn .lawn-entries { margin-top: 0; }
+.lawn .section-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
