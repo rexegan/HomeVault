@@ -1541,3 +1541,29 @@ button.sum-btn:active { background: var(--bg-2); }
 .lawn-due { margin: 0 0 12px; padding: 9px 12px; border-radius: 10px; background: rgba(178,106,18,0.1); border: 1px solid rgba(178,106,18,0.35); font-size: 13.5px; }
 .lawn .lawn-entries { margin-top: 0; }
 .lawn .section-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+/* Replacement forecast & calendar reminders */
+.forecast-icon { background: #fbe9d0 !important; color: #a35d0c !important; }
+.reminders-icon { background: #e1ecf7 !important; color: #1f5f99 !important; }
+.fc-years { display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
+.fc-year { display: grid; grid-template-columns: 44px 1fr minmax(120px, auto); gap: 10px; align-items: center; font-size: 13.5px; }
+.fc-y { font-weight: 800; font-variant-numeric: tabular-nums; }
+.fc-bar { height: 12px; border-radius: 6px; background: rgba(22,52,79,0.08); overflow: hidden; }
+.fc-bar span { display: block; height: 100%; background: #b26a12; border-radius: 6px; }
+.fc-amt { text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }
+.fc-amt em { font-style: normal; font-weight: 500; color: var(--ink-soft); }
+.fc-count { font-weight: 600; font-size: 12px; color: var(--ink-soft); margin-left: 4px; }
+.fc-row { cursor: default; }
+.fc-row.past { border-color: rgba(178,106,18,0.55); background: rgba(178,106,18,0.07); }
+.fc-kind { background: #fbe9d0 !important; color: #8a5209 !important; }
+.rem-cta { margin: 4px 0 14px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.rem-counts { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+.rem-pill { font-size: 12.5px; font-weight: 600; padding: 5px 10px; border-radius: 999px; background: rgba(22,52,79,0.08); }
+.rem-pill b { margin-left: 4px; }
+.rem-row { cursor: default; }
+.rem-kind { background: rgba(22,52,79,0.1) !important; color: var(--ink) !important; }
+.rk-warranty { background: #fde2e0 !important; color: #a3261b !important; }
+.rk-care { background: #e1ecf7 !important; color: #1f5f99 !important; }
+.rk-lawn { background: #e3f0dd !important; color: #2f6b22 !important; }
+.rk-money { background: #efe6f7 !important; color: #5b45a8 !important; }
+.rk-replace { background: #fbe9d0 !important; color: #8a5209 !important; }

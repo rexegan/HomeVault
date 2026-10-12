@@ -14,12 +14,15 @@ export function buildSample(today) {
     ['Kitchen', 'Refrigerator', 'Best Buy', d(-820), '$2,399', d(275), 'Samsung RF28 French door, serial 0347X'],
     ['Kitchen', 'Range / stove', 'Home Depot', d(-820), '$1,149', d(-90), 'GE gas range, model JGB735'],
     ['Kitchen', 'Dishwasher', 'Lowe\'s', d(-410), '$749', d(320), 'Bosch 300 series, quiet 44 dBA'],
-    ['Kitchen', 'Microwave', 'Costco', d(-600), '$289', null, 'Over-the-range, Whirlpool'],
+    ['Kitchen', 'Microwave', 'Costco', d(-3400), '$289', null, 'Over-the-range, Whirlpool'],
+    ['Kitchen', 'Garbage disposal', 'Home Depot', d(-4100), '$179', null, 'InSinkErator Evolution, from the 2016 kitchen refresh'],
     ['Kitchen', 'Coffee maker', 'Amazon', d(-150), '$199', d(215), 'Breville grind & brew'],
     // Laundry
     ['Laundry Room', 'Washer', 'Lowe\'s', d(-1100), '$998', d(30), 'LG front load WM4000, 10-yr motor warranty'],
     ['Laundry Room', 'Dryer', 'Lowe\'s', d(-1100), '$948', d(30), 'LG electric DLEX4000, matches washer'],
     // Great Room
+    ['Hall Closet', 'Thermostat', 'Home Depot', d(-4000), '$129', null, 'Honeywell programmable, original'],
+    ['Study', 'Printer', 'Staples', d(-2600), '$229', null, 'HP LaserJet, toner in the shed'],
     ['Great Room', 'TV', 'Costco', d(-390), '$1,299', d(340), 'LG 77" OLED C4'],
     ['Great Room', 'Soundbar / speakers', 'Best Buy', d(-380), '$499', d(350), 'Sonos Arc'],
     ['Great Room', 'Sofa / sectional', 'Living Spaces', d(-700), '$2,150', null, 'Fabric sectional, pet-friendly weave'],
@@ -258,5 +261,10 @@ export function buildSample(today) {
         doneBy: 'Hill Country Tree Service', date: '02/08/2024', totalCost: '$850' },
     ],
   }
-  return { items, intake, care, pros, finishes, pool, lawn }
+  const nextJan31 = (() => { const y = today.getMonth() === 0 && today.getDate() <= 31 ? today.getFullYear() : today.getFullYear() + 1; return '01/31/' + y })()
+  const finance = {
+    'ins.company': 'Farm Bureau', 'ins.premium': '$2,640', 'ins.renewal': ymd(75),
+    'tax.dueDate': nextJan31, 'tax.annualTax': '$6,180',
+  }
+  return { items, intake, care, pros, finishes, pool, lawn, finance }
 }

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Icon } from './lib/icons.jsx'
 import * as store from './lib/storage.js'
 import { warrantyStatus } from './lib/storage.js'
-import { exportBackup, importBackup } from './lib/backup.js'
+import { exportBackup, importBackup, lastBackupDate } from './lib/backup.js'
 import FloorPlan from './components/FloorPlan.jsx'
 import AreaView from './components/AreaView.jsx'
 import AreaForm from './components/AreaForm.jsx'
@@ -28,6 +28,8 @@ import FinanceView from './components/FinanceView.jsx'
 import MoneyView from './components/MoneyView.jsx'
 import FinishesForm from './components/FinishesForm.jsx'
 import LawnView from './components/LawnView.jsx'
+import ForecastView from './components/ForecastView.jsx'
+import RemindersView from './components/RemindersView.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
 import { buildSample } from './lib/sample.js'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL, KEY_FIELDS } from './lib/intake.js'
@@ -253,6 +255,7 @@ export default function App() {
       setFinishes(fm)
     }
     if (sample.pool) setPool(sample.pool)
+    if (sample.finance) setFinance((f) => ({ ...f, ...sample.finance }))
     if (sample.lawn) setLawn({ profile: sample.lawn.profile, entries: sample.lawn.entries.map((e) => ({ id: store.newProId(), ...e })) })
     flash('Sample home loaded — explore away!')
   }
@@ -363,10 +366,12 @@ export default function App() {
   }
 
   // ---- Backup ----
+  const [backedUp, setBackedUp] = useState(() => lastBackupDate())
   const doExport = async () => {
     try {
-      const n = await exportBackup(state)
-      flash(`Backup saved (${n} file${n === 1 ? '' : 's'})`)
+      const r = await exportBackup(state)
+      setBackedUp(lastBackupDate())
+      flash(`Everything saved — ${r.settings} sections, ${r.files} file${r.files === 1 ? '' : 's'}`)
     } catch (e) {
       console.warn(e); alert('Sorry, the backup could not be created.')
     }
@@ -377,10 +382,11 @@ export default function App() {
     if (!file) return
     if (!confirm('Restoring a backup will replace everything currently in HomeVault. Continue?')) return
     try {
-      const restored = await importBackup(file)
-      setState(restored)
+      const r = await importBackup(file)
+      if (r.reload) { flash('Restored — reloading…'); setTimeout(() => window.location.reload(), 500); return }
+      setState(r.state)
       setView({ name: 'home' })
-      flash('Backup restored')
+      flash('Backup restored (items only — this was an older backup)')
     } catch (err) {
       console.warn(err)
       alert(err.message || 'That file could not be restored.')
@@ -391,7 +397,7 @@ export default function App() {
   const liveItem = (id) => state.items.find((it) => it.id === id) || null
   const openItem = (id) => setModal({ type: 'itemDetail', itemId: id })
 
-  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans', lawn: 'Lawn & Landscape', weather: 'Weather at home', civic: 'County / City', finance: 'Insurance / Taxes', money: 'Financial' }
+  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans', lawn: 'Lawn & Landscape', forecast: 'Replacement forecast', reminders: 'Calendar reminders', weather: 'Weather at home', civic: 'County / City', finance: 'Insurance / Taxes', money: 'Financial' }
 
   return (
     <div className="app">
@@ -420,7 +426,7 @@ export default function App() {
             <Icon.plus size={18} /> Add
           </button>
         )}
-        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans' || view.name === 'lawn' || view.name === 'weather' || view.name === 'civic' || view.name === 'finance' || view.name === 'money') && (
+        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans' || view.name === 'lawn' || view.name === 'forecast' || view.name === 'reminders' || view.name === 'weather' || view.name === 'civic' || view.name === 'finance' || view.name === 'money') && (
           <div className="brand" style={{ fontSize: 18 }}>{titles[view.name]}</div>
         )}
       </header>
@@ -485,6 +491,24 @@ export default function App() {
                 <span className="profile-sub">Your house's own maintenance schedule — what to do and when.</span>
               </span>
               {careDue > 0 && <span className="care-due-pill">{careDue} due</span>}
+              <span className="profile-chev"><Icon.chevron size={20} /></span>
+            </button>
+
+            <button className="profile-card" onClick={() => setView({ name: 'forecast' })}>
+              <span className="profile-icon forecast-icon"><Icon.tag size={22} /></span>
+              <span className="profile-body">
+                <strong>Replacement Forecast</strong>
+                <span className="profile-sub">What will wear out, when, and what to set aside each month.</span>
+              </span>
+              <span className="profile-chev"><Icon.chevron size={20} /></span>
+            </button>
+
+            <button className="profile-card" onClick={() => setView({ name: 'reminders' })}>
+              <span className="profile-icon reminders-icon"><Icon.clock size={22} /></span>
+              <span className="profile-body">
+                <strong>Calendar Reminders</strong>
+                <span className="profile-sub">Warranties, maintenance, taxes and more — straight into your calendar.</span>
+              </span>
               <span className="profile-chev"><Icon.chevron size={20} /></span>
             </button>
 
@@ -580,7 +604,11 @@ export default function App() {
             <div className="backup-bar">
               <div className="backup-text">
                 <strong>Backup &amp; restore</strong>
-                <span>Save everything to a file, or move it to another device.</span>
+                <span>{backedUp
+                  ? 'Everything saved to a file — last backup ' + backedUp + '. Do it again after big changes.'
+                  : state.items.length > 0
+                    ? 'Not backed up yet — save everything to a file so nothing can be lost.'
+                    : 'Save everything to a file, or move it to another device.'}</span>
               </div>
               <div className="backup-actions">
                 <button className="btn secondary small" onClick={doExport}><Icon.box size={16} /> Export</button>
@@ -663,6 +691,15 @@ export default function App() {
 
         {view.name === 'weather' && (
           <WeatherView profile={intake} cached={weather} onCache={cacheWeather} />
+        )}
+
+        {view.name === 'forecast' && (
+          <ForecastView state={state} finishes={finishes} today={today} onOpenItem={openItem} />
+        )}
+
+        {view.name === 'reminders' && (
+          <RemindersView state={state} intake={intake} care={care} lawn={lawn} finance={finance}
+            finishes={finishes} today={today} />
         )}
 
         {view.name === 'lawn' && (

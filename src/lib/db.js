@@ -90,3 +90,9 @@ function promisify(req) {
     req.onerror = () => reject(req.error)
   })
 }
+
+// Every stored file record (receipt photos, PDFs, 3D scans) — used by the full backup.
+export async function getAllFiles() {
+  const store = await tx('readonly')
+  return promisify(store.getAll())
+}
