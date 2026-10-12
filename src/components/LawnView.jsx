@@ -126,7 +126,7 @@ export default function LawnView({ lawn, onProfile, onSaveEntry, onDeleteEntry, 
       <section className="intake-sec" data-accent="wood">
         <div className="intake-sec-head">
           <div className="intake-num">🌱</div>
-          <div><h3>Your lawn</h3><p>The basics that decide what to plant, feed and when.</p></div>
+          <div><h3>Your lawn</h3></div>
         </div>
         <div className="intake-qs" style={{ marginTop: 10 }}>
           {PROFILE.map(([key, label, type, opts, hint]) => (
