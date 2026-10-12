@@ -13,7 +13,7 @@ export default function FloorPlan({ state, today, profile, onOpenArea, onAddArea
       <div className="plan-header">
         <div>
           <h2>Your Home</h2>
-          <div className="sub">Tap a room to see or add warranties, receipts &amp; info</div>
+          <div className="sub">Tap a room to see or add warranties, receipts, and other important information</div>
         </div>
         {!name && facts.length === 0 && (
           <button className="btn secondary small" onClick={onOpenProfile}>
