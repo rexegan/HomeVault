@@ -61,6 +61,9 @@ function finishLife(e) {
     if (/vinyl|lvp|lvt|luxury/.test(text)) return 20
     if (/tile|stone|porcelain/.test(text)) return 40
     if (/hardwood|oak|maple/.test(text)) return 30
+    if (/brick|paver/.test(text)) return 50
+    if (/concrete|terrazzo|linoleum|cork|bamboo/.test(text)) return 25
+    if (/epoxy|polyaspartic|turf|rubber/.test(text)) return 15
     if (/laminate/.test(text)) return 15
     return 15
   }

@@ -70,25 +70,47 @@ export const PAINT_GRADES = {
   'Rust-Oleum': L('Specialty', "Painter's Touch 2X", 'Universal', 'Cabinet Transformations', 'Chalked', 'Stops Rust', 'EpoxyShield (garage floor)'),
   'Magnolia Home': L('Better', 'Magnolia Home Interior', 'Magnolia Home Exterior'),
 }
-// Flooring and wood types — hardwood species, engineered, laminate, vinyl, tile, carpet…
-export const FLOORING_TYPES = [
-  // Waterproof & water-resistant
-  'Waterproof laminate', 'Water-resistant laminate', 'Waterproof luxury vinyl plank (LVP)', 'Luxury vinyl plank (LVP)',
-  'Luxury vinyl tile (LVT)', 'Rigid-core vinyl (SPC / WPC)', 'Waterproof engineered hardwood', 'Sheet vinyl',
-  // Laminate & engineered
-  'Laminate', 'Engineered hardwood',
-  // Solid hardwoods by species
-  'Solid hardwood — Red oak', 'Solid hardwood — White oak', 'Solid hardwood — Hickory', 'Solid hardwood — Maple',
-  'Solid hardwood — Walnut', 'Solid hardwood — Cherry', 'Solid hardwood — Ash', 'Solid hardwood — Birch',
-  'Solid hardwood — Beech', 'Solid hardwood — Pine (heart / southern yellow)', 'Solid hardwood — Mahogany',
-  'Solid hardwood — Teak', 'Solid hardwood — Brazilian cherry (Jatoba)', 'Solid hardwood — Brazilian walnut (Ipe)',
-  'Solid hardwood — Tigerwood', 'Solid hardwood — Acacia', 'Solid hardwood — Reclaimed wood',
-  'Bamboo (strand-woven)', 'Bamboo',
-  // Everything else
-  'Tile — Porcelain', 'Tile — Ceramic', 'Tile — Natural stone (slate, travertine, marble)',
-  'Carpet — Nylon', 'Carpet — Triexta', 'Carpet — Polyester', 'Carpet — Wool', 'Carpet — Berber / loop',
-  'Cork', 'Polished or stained concrete', 'Epoxy (garage floor)',
-]
+// Flooring: first pick the kind of flooring, then the specific type (which wood,
+// which carpet fiber, which tile…). Each category lists its own choices.
+const HARDWOODS = ['Red oak', 'White oak', 'Hickory', 'Maple', 'Walnut', 'Cherry', 'Ash', 'Birch', 'Beech',
+  'Pine (heart / southern yellow)', 'Mahogany', 'Teak', 'Brazilian cherry (Jatoba)', 'Brazilian walnut (Ipe)', 'Tigerwood', 'Acacia', 'Reclaimed wood']
+export const FLOOR_CATEGORIES = {
+  'Wood': { label: 'Type of wood', options: [...HARDWOODS.map((h) => 'Solid hardwood — ' + h), 'Engineered hardwood', 'Waterproof engineered hardwood'] },
+  'Carpet': { label: 'Carpet fiber / style', options: ['Carpet — Nylon', 'Carpet — Triexta', 'Carpet — Polyester', 'Carpet — Wool', 'Carpet — Olefin', 'Carpet — Berber / loop', 'Carpet tile'] },
+  'Tile': { label: 'Tile material', options: ['Tile — Porcelain', 'Tile — Ceramic', 'Tile — Wood-look porcelain', 'Tile — Glass', 'Tile — Mosaic', 'Tile — Cement / encaustic'] },
+  'Brick': { label: 'Brick type', options: ['Brick — Clay paver', 'Brick — Thin brick', 'Brick — Herringbone pattern', 'Brick — Basket-weave pattern', 'Brick — Reclaimed / antique'] },
+  'Laminate': { label: 'Laminate type', options: ['Waterproof laminate', 'Water-resistant laminate', 'Laminate'] },
+  'Vinyl': { label: 'Vinyl type', options: ['Waterproof luxury vinyl plank (LVP)', 'Luxury vinyl plank (LVP)', 'Luxury vinyl tile (LVT)', 'Rigid-core vinyl (SPC / WPC)', 'Sheet vinyl'] },
+  'Natural stone': { label: 'Stone type', options: ['Stone — Slate', 'Stone — Travertine', 'Stone — Marble', 'Stone — Granite', 'Stone — Limestone', 'Stone — Flagstone'] },
+  'Concrete': { label: 'Concrete finish', options: ['Polished concrete', 'Stained concrete', 'Stamped concrete', 'Epoxy-coated concrete'] },
+  'Bamboo': { label: 'Bamboo type', options: ['Bamboo (strand-woven)', 'Bamboo'] },
+  'Cork': { label: 'Cork type', options: ['Cork'] },
+  'Linoleum': { label: 'Linoleum type', options: ['Linoleum'] },
+  'Terrazzo': { label: 'Terrazzo type', options: ['Terrazzo'] },
+  'Epoxy / garage coating': { label: 'Coating type', options: ['Epoxy (garage floor)', 'Polyaspartic coating', 'Interlocking garage tiles'] },
+  'Rubber': { label: 'Rubber type', options: ['Rubber flooring'] },
+  'Artificial turf': { label: 'Turf type', options: ['Artificial turf'] },
+}
+const ALL_FLOOR_TYPES = Object.values(FLOOR_CATEGORIES).flatMap((c) => c.options)
+// Guess the category from an older entry's free-text type.
+function inferFloorCategory(text) {
+  const t = (text || '').toLowerCase()
+  if (!t) return ''
+  if (/carpet|berber/.test(t)) return 'Carpet'
+  if (/brick|paver/.test(t)) return 'Brick'
+  if (/laminate/.test(t)) return 'Laminate'
+  if (/vinyl|lvp|lvt|spc|wpc/.test(t)) return 'Vinyl'
+  if (/slate|marble|travertine|granite|limestone|flagstone|stone/.test(t)) return 'Natural stone'
+  if (/tile|porcelain|ceramic/.test(t)) return 'Tile'
+  if (/concrete/.test(t)) return 'Concrete'
+  if (/bamboo/.test(t)) return 'Bamboo'
+  if (/cork/.test(t)) return 'Cork'
+  if (/linoleum/.test(t)) return 'Linoleum'
+  if (/terrazzo/.test(t)) return 'Terrazzo'
+  if (/epoxy|polyaspartic/.test(t)) return 'Epoxy / garage coating'
+  if (/hardwood|wood|oak|maple|hickory|walnut|cherry|ash|pine|teak|mahogany/.test(t)) return 'Wood'
+  return ''
+}
 const GENERIC_TIERS = ['Economy / builder grade', 'Standard', 'Premium', 'Ultra-premium', 'Contractor grade', 'Primer', 'Specialty / cabinet & trim']
 const SHEENS = ['Flat', 'Matte', 'Low-luster / Velvet', 'Eggshell', 'Satin', 'Pearl', 'Semi-gloss', 'Gloss', 'High-gloss']
 
@@ -204,7 +226,11 @@ const PRO_TRADE = { 'Paint': 'Painter', 'Wallpaper': 'Painter', 'Flooring': 'Flo
   'Countertops': 'General contractor', 'Trim / molding': 'Handyman', 'Hardware': 'Handyman' }
 
 export default function FinishesForm({ area, entry, nearbyStores = [], pros = [], knownPeople = [], onAddPro, onSave, onDelete, onClose }) {
-  const [draft, setDraft] = useState(() => ({ kind: 'Paint', ...parseQty(entry?.qty), ...entry }))
+  const [draft, setDraft] = useState(() => {
+    const d = { kind: 'Paint', ...parseQty(entry?.qty), ...entry }
+    if (d.kind === 'Flooring' && !d.floorCategory && d.finish) d.floorCategory = inferFloorCategory(d.finish)
+    return d
+  })
   const [scan, setScan] = useState(null)          // null | { busy, msg }
   const camRef = useRef(null)
   const libRef = useRef(null)
@@ -221,6 +247,9 @@ export default function FinishesForm({ area, entry, nearbyStores = [], pros = []
     .map((s) => ({ value: s.name, text: s.name + ' · ' + s.distLabel }))
   const storeOptions = [...baseStores, ...nearby]
 
+  const floorCatKey = v('floorCategory').trim()
+  const floorCat = floorCatKey ? (FLOOR_CATEGORIES[floorCatKey] || { label: '', options: [] }) : null
+  const floorCatKnown = !!(floorCat && FLOOR_CATEGORIES[floorCatKey])
   const setQty = (unit, count) => setDraft((d) => ({ ...d, qtyUnit: unit, qtyCount: count, qty: composeQty(unit, count) || d.qty }))
 
   // "Done by": Us, then the pros who fit this work, the rest of My Pros, then
@@ -275,7 +304,7 @@ export default function FinishesForm({ area, entry, nearbyStores = [], pros = []
             }}><Icon.trash size={18} /></button>
           )}
           <button className="btn secondary" onClick={onClose}>Cancel</button>
-          <button className="btn" onClick={() => onSave(kind === 'Paint' ? draft : { ...draft, grade: '' })}>Save</button>
+          <button className="btn" onClick={() => onSave({ ...draft, grade: kind === 'Paint' ? draft.grade : '', floorCategory: kind === 'Flooring' ? draft.floorCategory : '' })}>Save</button>
         </>
       }>
 
@@ -288,6 +317,15 @@ export default function FinishesForm({ area, entry, nearbyStores = [], pros = []
 
       <Select id="fx-where" label="Where in the room?" value={v('where')}
         options={WHERE_OPTIONS} onChange={(val) => set('where', val)} otherLabel="Somewhere else…" />
+
+      {kind === 'Flooring' && (
+        <Select id="fx-floorCategory" label="What type of flooring?" value={v('floorCategory')} options={Object.keys(FLOOR_CATEGORIES)}
+          onChange={(val) => setDraft((d) => {
+            const opts = FLOOR_CATEGORIES[val.trim()]?.options || []
+            return { ...d, floorCategory: val, finish: opts.includes(d.finish) ? d.finish : '' }
+          })}
+          otherLabel="Something else…" />
+      )}
 
       {brandOptions.length > 0 ? (
         <Select id="fx-product" label={kind + ' brand'} value={v('product')}
@@ -302,10 +340,18 @@ export default function FinishesForm({ area, entry, nearbyStores = [], pros = []
           onChange={(val) => set('product', val)} opt={{ hint: 'Brand & product line' }} />
       )}
 
-      {kind === 'Flooring' && (
-        <Select id="fx-finish" label="Type of wood (or flooring)" value={v('finish')} options={FLOORING_TYPES}
+      {kind === 'Flooring' && (floorCat ? (
+        floorCatKnown ? (
+          <Select id="fx-finish" label={floorCat.label} value={v('finish')} options={floorCat.options}
+            onChange={(val) => set('finish', val)} otherLabel="Another type…" />
+        ) : (
+          <TextField id="fx-finish" label="Describe the flooring" value={v('finish')}
+            onChange={(val) => set('finish', val)} opt={{ hint: 'What is it made of?' }} />
+        )
+      ) : (
+        <Select id="fx-finish" label="Type of wood (or flooring)" value={v('finish')} options={ALL_FLOOR_TYPES}
           onChange={(val) => set('finish', val)} otherLabel="Another type…" />
-      )}
+      ))}
 
       {kind === 'Paint' && (
         <Select id="fx-grade" label="Paint grade / quality tiers" value={v('grade')}
