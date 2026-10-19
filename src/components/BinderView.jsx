@@ -132,7 +132,7 @@ export default function BinderView({ state, profile, finishes, lawn, pool, money
                           {fin.map((e) => (
                             <tr key={e.id}>
                               <td>{e.kind}</td><td>{e.where || '—'}</td>
-                              <td>{[e.product, e.colorName, e.finish].filter(Boolean).join(' · ') || '—'}{e.store ? <div className="cell-notes">Bought at {e.store}</div> : null}</td>
+                              <td>{[e.product, e.grade, e.colorName, e.finish].filter(Boolean).join(' · ') || '—'}{e.store ? <div className="cell-notes">Bought at {e.store}</div> : null}</td>
                               <td>{e.date || '—'}</td>
                               {showPaid && <td className="num">{e.totalCost || '—'}</td>}
                             </tr>

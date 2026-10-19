@@ -187,7 +187,7 @@ export function buildSample(today) {
 
   const finishes = {
     'Kitchen': [
-      { kind: 'Paint', where: 'Whole room', product: 'Sherwin-Williams Duration',
+      { kind: 'Paint', where: 'Whole room', product: 'Sherwin-Williams', grade: 'Duration (Best)',
         colorName: 'SW 7029 Agreeable Gray', finish: 'Eggshell', store: 'Sherwin-Williams — Cleburne',
         doneBy: 'Fresh Coat Painting', date: '04/12/2024', qty: '3 gal', totalCost: '$780',
         notes: 'Trim: SW 7006 Extra White semi-gloss' },
@@ -199,16 +199,16 @@ export function buildSample(today) {
       { kind: 'Countertops', product: 'Granite — Santa Cecilia', date: '05/10/2016' },
     ],
     'Great Room': [
-      { kind: 'Paint', where: 'Walls', product: 'Sherwin-Williams Duration',
+      { kind: 'Paint', where: 'Walls', product: 'Sherwin-Williams', grade: 'Duration (Best)',
         colorName: 'SW 7015 Repose Gray', finish: 'Eggshell', doneBy: 'Fresh Coat Painting',
         date: '04/12/2024', qty: '5 gal', totalCost: '$1,150' },
-      { kind: 'Paint', where: 'Ceiling', colorName: 'SW 7757 High Reflective White',
+      { kind: 'Paint', where: 'Ceiling', product: 'Sherwin-Williams', grade: 'ProMar 200 Zero VOC (Good)', colorName: 'SW 7757 High Reflective White',
         finish: 'Flat', doneBy: 'Fresh Coat Painting', date: '04/13/2024', qty: '2 gal', totalCost: '$260' },
       { kind: 'Flooring', where: 'Whole room', product: 'Shaw Paragon Plus', colorName: 'Cut Pine',
         finish: 'Luxury vinyl plank', qty: '546 sq ft', totalCost: '$2,648.10', notes: '$4.85/sq ft' },
     ],
     'Primary Bedroom': [
-      { kind: 'Paint', where: 'Whole room', product: 'Behr Premium Plus',
+      { kind: 'Paint', where: 'Whole room', product: 'Behr', grade: 'Premium Plus (Good)',
         colorName: 'Behr N510-2 Silver Screen', finish: 'Matte', store: 'Home Depot — Burleson',
         doneBy: 'Us', date: '09/03/2023', qty: '2 gal', totalCost: '$142.50' },
       { kind: 'Wallpaper', where: 'Accent wall behind bed', product: 'Brewster grasscloth',

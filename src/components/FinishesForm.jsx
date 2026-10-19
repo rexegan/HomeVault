@@ -39,6 +39,35 @@ const BRANDS = {
   'Other': [],
 }
 
+// Paint lines by brand, grouped into the usual Good / Better / Best retail tiers.
+// (Tiers are how each brand positions its lines at the store — Best usually costs
+// the most and covers, scrubs and lasts the best.)
+const L = (tier, ...names) => names.map((n) => n + ' (' + tier + ')')
+export const PAINT_GRADES = {
+  'Sherwin-Williams': [...L('Good', 'ProMar 200 Zero VOC', 'A-100 Exterior'), ...L('Better', 'SuperPaint', 'ProClassic', 'Harmony', 'Latitude Exterior'),
+    ...L('Best', 'Duration', 'Emerald', 'Cashmere', 'Resilience Exterior')],
+  'Behr': [...L('Good', 'Premium Plus'), ...L('Better', 'Ultra'), ...L('Best', 'Ultra Scuff Defense', 'Marquee', 'Dynasty'), ...L('Contractor', 'Behr Pro')],
+  'Benjamin Moore': [...L('Good', 'Ultra Spec 500'), ...L('Better', 'Ben', 'Regal Select'), ...L('Best', 'Aura', 'Natura'),
+    ...L('Specialty', 'Advance (trim & cabinets)', 'Scuff-X', 'Waterborne Ceiling Paint')],
+  'PPG': [...L('Good', 'Speedhide'), ...L('Better', 'Pure Performance'), ...L('Best', 'Timeless', 'Manor Hall'),
+    ...L('Specialty', 'Break-Through! (trim & cabinets)', 'Seal-Grip (primer)')],
+  'Valspar': [...L('Good', 'Ultra'), ...L('Better', 'Signature'), ...L('Best', 'Reserve', 'Duramax Exterior')],
+  'Glidden': [...L('Good', 'Essentials'), ...L('Better', 'Premium'), ...L('Best', 'Diamond')],
+  'Kilz': L('Primer', 'Original (oil-based)', '2 All-Purpose', 'Premium', 'Adhesion', 'Restoration', 'Complete'),
+  'Zinsser': L('Primer', 'Bulls Eye 1-2-3', 'Cover Stain (oil-based)', 'B-I-N (shellac)', 'Gardz (sealer)', 'Smart Prime', 'Perma-White'),
+  'Rust-Oleum': L('Specialty', "Painter's Touch 2X", 'Universal', 'Cabinet Transformations', 'Chalked', 'Stops Rust', 'EpoxyShield (garage floor)'),
+  'Magnolia Home': L('Better', 'Magnolia Home Interior', 'Magnolia Home Exterior'),
+}
+const GENERIC_TIERS = ['Economy / builder grade', 'Standard', 'Premium', 'Ultra-premium', 'Contractor grade', 'Primer', 'Specialty / cabinet & trim']
+const SHEENS = ['Flat', 'Matte', 'Low-luster / Velvet', 'Eggshell', 'Satin', 'Pearl', 'Semi-gloss', 'Gloss', 'High-gloss']
+
+const COLOR_LABEL = {
+  'Paint': ['Color name or code', 'e.g. SW 7029 Agreeable Gray'],
+  'Wallpaper': ['Pattern name or number', 'Pattern, colorway & roll count'],
+  'Flooring': ['Color / style — name or code', 'e.g. Cut Pine, Tahoe Taupe'],
+  'Tile / backsplash': ['Color / style — name or code', 'e.g. Arctic White 3x6'],
+}
+
 const STORES = {
   'Paint': ['Sherwin-Williams store', 'Home Depot', "Lowe's", 'Benjamin Moore dealer',
     'PPG Paints store', 'Ace Hardware', 'Walmart', 'Menards', 'True Value', 'Amazon'],
@@ -129,7 +158,7 @@ export default function FinishesForm({ area, entry, nearbyStores = [], onSave, o
             }}><Icon.trash size={18} /></button>
           )}
           <button className="btn secondary" onClick={onClose}>Cancel</button>
-          <button className="btn" onClick={() => onSave(draft)}>Save</button>
+          <button className="btn" onClick={() => onSave(kind === 'Paint' ? draft : { ...draft, grade: '' })}>Save</button>
         </>
       }>
 
@@ -145,16 +174,32 @@ export default function FinishesForm({ area, entry, nearbyStores = [], onSave, o
 
       {brandOptions.length > 0 ? (
         <Select id="fx-product" label={kind + ' brand'} value={v('product')}
-          options={brandOptions} onChange={(val) => set('product', val)} otherLabel="Another brand…" />
+          options={brandOptions}
+          onChange={(val) => setDraft((d) => {
+            const lines = PAINT_GRADES[val.trim()] || GENERIC_TIERS
+            return { ...d, product: val, grade: lines.includes(d.grade) ? d.grade : '' }
+          })}
+          otherLabel="Another brand…" />
       ) : (
         <TextField id="fx-product" label="Brand & product" value={v('product')}
           onChange={(val) => set('product', val)} opt={{ hint: 'Brand & product line' }} />
       )}
 
-      <TextField id="fx-colorName" label="Color / pattern — name & code" value={v('colorName')}
-        onChange={(val) => set('colorName', val)} opt={{ hint: 'e.g. SW 7029 Agreeable Gray' }} />
-      <TextField id="fx-finish" label="Sheen / type" value={v('finish')}
-        onChange={(val) => set('finish', val)} opt={{ hint: 'Eggshell, LVP, 3x6 subway…' }} />
+      {kind === 'Paint' && (
+        <Select id="fx-grade" label="Paint grade / quality tiers" value={v('grade')}
+          options={PAINT_GRADES[v('product').trim()] || GENERIC_TIERS}
+          onChange={(val) => set('grade', val)} otherLabel="Another line…" />
+      )}
+
+      <TextField id="fx-colorName" label={(COLOR_LABEL[kind] || ['Color / pattern — name & code'])[0]} value={v('colorName')}
+        onChange={(val) => set('colorName', val)} opt={{ hint: (COLOR_LABEL[kind] || ['', 'e.g. color name and code'])[1] }} />
+      {kind === 'Paint' ? (
+        <Select id="fx-finish" label="Sheen type" value={v('finish')} options={SHEENS}
+          onChange={(val) => set('finish', val)} otherLabel="Another sheen…" />
+      ) : (
+        <TextField id="fx-finish" label="Sheen / type" value={v('finish')}
+          onChange={(val) => set('finish', val)} opt={{ hint: 'LVP, carpet, 3x6 subway…' }} />
+      )}
 
       <Select id="fx-store" label="Bought at" value={v('store')}
         options={storeOptions} onChange={(val) => set('store', val)} otherLabel="Somewhere else…" />
