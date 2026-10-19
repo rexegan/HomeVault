@@ -30,8 +30,19 @@ const isoToMdy = (v) => {
 export const FINISH_KINDS = ['Paint', 'Flooring', 'Wallpaper', 'Tile / backsplash',
   'Countertops', 'Trim / molding', 'Hardware', 'Other']
 
-const WHERE_OPTIONS = ['Whole room', 'Accent wall', 'Ceiling', 'Front wall', 'Back wall',
-  'Side walls', 'Backsplash', 'Trim & baseboards', 'Floor', 'Cabinets', 'Stairs / hallway']
+// "Where in the room?" depends on the work: paint goes on walls, flooring goes on floors.
+export const WHERE_BY_KIND = {
+  'Paint': ['Whole room', 'Accent wall', 'Ceiling', 'Front wall', 'Back wall', 'Side walls', 'Trim & baseboards', 'Cabinets', 'Doors', 'Hallway walls', 'Stairwell walls'],
+  'Flooring': ['Whole room', 'Hallway', 'Stairs', 'Stair landing', 'Entry / foyer', 'Closet', 'Pantry', 'Half of the room', 'Just one section', 'Transition strip / threshold'],
+  'Wallpaper': ['Whole room', 'Accent wall', 'Front wall', 'Back wall', 'Side walls', 'Ceiling', 'Behind the bed', 'Behind the vanity', 'Closet', 'Hallway'],
+  'Tile / backsplash': ['Backsplash', 'Shower walls', 'Tub surround', 'Shower floor', 'Floor', 'Fireplace surround', 'Accent wall', 'Entry / foyer floor', 'Whole room'],
+  'Countertops': ['Kitchen counters', 'Island', 'Bathroom vanity', 'Bar', 'Laundry counter', 'Outdoor kitchen', 'Desk / built-in'],
+  'Trim / molding': ['Baseboards', 'Crown molding', 'Door casings', 'Window casings', 'Chair rail', 'Wainscoting', 'Whole room'],
+  'Hardware': ['Cabinet knobs & pulls', 'Door handles & locks', 'Hinges', 'Light switches & outlets', 'Towel bars & hooks', 'Drawer pulls', 'Whole room'],
+  'Other': ['Whole room', 'Accent wall', 'Ceiling', 'Floor', 'Walls', 'Cabinets', 'Stairs', 'Hallway'],
+}
+const whereFor = (kind) => WHERE_BY_KIND[kind] || WHERE_BY_KIND.Other
+const ALL_WHERE = new Set(Object.values(WHERE_BY_KIND).flat())
 
 const BRANDS = {
   'Paint': ['Sherwin-Williams', 'Behr', 'Benjamin Moore', 'PPG', 'Valspar', 'Glidden',
@@ -310,13 +321,20 @@ export default function FinishesForm({ area, entry, nearbyStores = [], pros = []
 
       <div className="intake-field filled" style={{ marginBottom: 12 }}>
         <label htmlFor="fx-kind"><span className="chk">✓</span><span className="q">What was done?</span></label>
-        <select id="fx-kind" value={kind} onChange={(e) => set('kind', e.target.value)}>
+        <select id="fx-kind" value={kind} onChange={(e) => {
+          const next = e.target.value
+          setDraft((d) => {
+            const w = (d.where || '').trim()
+            const stale = w && ALL_WHERE.has(w) && !whereFor(next).includes(w)
+            return { ...d, kind: next, where: stale ? '' : d.where }
+          })
+        }}>
           {FINISH_KINDS.map((k) => <option key={k} value={k}>{k}</option>)}
         </select>
       </div>
 
       <Select id="fx-where" label="Where in the room?" value={v('where')}
-        options={WHERE_OPTIONS} onChange={(val) => set('where', val)} otherLabel="Somewhere else…" />
+        options={whereFor(kind)} onChange={(val) => set('where', val)} otherLabel="Somewhere else…" />
 
       {kind === 'Flooring' && (
         <Select id="fx-floorCategory" label="What type of flooring?" value={v('floorCategory')} options={Object.keys(FLOOR_CATEGORIES)}
