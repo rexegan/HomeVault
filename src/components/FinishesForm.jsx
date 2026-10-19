@@ -72,11 +72,20 @@ export const PAINT_GRADES = {
 }
 // Flooring and wood types — hardwood species, engineered, laminate, vinyl, tile, carpet…
 export const FLOORING_TYPES = [
+  // Waterproof & water-resistant
+  'Waterproof laminate', 'Water-resistant laminate', 'Waterproof luxury vinyl plank (LVP)', 'Luxury vinyl plank (LVP)',
+  'Luxury vinyl tile (LVT)', 'Rigid-core vinyl (SPC / WPC)', 'Waterproof engineered hardwood', 'Sheet vinyl',
+  // Laminate & engineered
+  'Laminate', 'Engineered hardwood',
+  // Solid hardwoods by species
   'Solid hardwood — Red oak', 'Solid hardwood — White oak', 'Solid hardwood — Hickory', 'Solid hardwood — Maple',
-  'Solid hardwood — Walnut', 'Solid hardwood — Cherry', 'Solid hardwood — Ash', 'Solid hardwood — Pine',
-  'Solid hardwood — Brazilian cherry (Jatoba)', 'Solid hardwood — Acacia', 'Bamboo',
-  'Engineered hardwood', 'Laminate', 'Luxury vinyl plank (LVP)', 'Luxury vinyl tile (LVT)', 'Rigid-core vinyl (SPC / WPC)',
-  'Sheet vinyl', 'Tile — Porcelain', 'Tile — Ceramic', 'Tile — Natural stone (slate, travertine, marble)',
+  'Solid hardwood — Walnut', 'Solid hardwood — Cherry', 'Solid hardwood — Ash', 'Solid hardwood — Birch',
+  'Solid hardwood — Beech', 'Solid hardwood — Pine (heart / southern yellow)', 'Solid hardwood — Mahogany',
+  'Solid hardwood — Teak', 'Solid hardwood — Brazilian cherry (Jatoba)', 'Solid hardwood — Brazilian walnut (Ipe)',
+  'Solid hardwood — Tigerwood', 'Solid hardwood — Acacia', 'Solid hardwood — Reclaimed wood',
+  'Bamboo (strand-woven)', 'Bamboo',
+  // Everything else
+  'Tile — Porcelain', 'Tile — Ceramic', 'Tile — Natural stone (slate, travertine, marble)',
   'Carpet — Nylon', 'Carpet — Triexta', 'Carpet — Polyester', 'Carpet — Wool', 'Carpet — Berber / loop',
   'Cork', 'Polished or stained concrete', 'Epoxy (garage floor)',
 ]
@@ -294,7 +303,7 @@ export default function FinishesForm({ area, entry, nearbyStores = [], pros = []
       )}
 
       {kind === 'Flooring' && (
-        <Select id="fx-finish" label="Flooring & wood type" value={v('finish')} options={FLOORING_TYPES}
+        <Select id="fx-finish" label="Type of wood (or flooring)" value={v('finish')} options={FLOORING_TYPES}
           onChange={(val) => set('finish', val)} otherLabel="Another type…" />
       )}
 
