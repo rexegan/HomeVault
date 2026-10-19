@@ -293,5 +293,21 @@ export function buildSample(today) {
         { kind: 'Brakes', what: 'Front pads and rotors', date: '11/09/2025', mileage: '55,000', shop: 'Local mechanic', totalCost: '$540' },
       ] },
   ]
-  return { items, intake, care, pros, finishes, pool, lawn, finance, vehicles }
+  const emergency = {
+    waterMain: 'Garage, left wall behind the water heater — quarter-turn lever', waterHeater: 'Cold valve on top of the tank; gas knob at its base',
+    gas: 'Propane tank at the back fence; shutoff on top of the tank', panel: 'Garage, right wall; main breaker is the big one at the top',
+    subpanel: 'Pool equipment pad has its own sub-panel (labeled)', irrigation: 'Backflow valve by the front flower bed; controller in the garage',
+    hvac: 'Outdoor disconnect on the north wall; switch in the hall closet', garageRelease: 'Red cord hangs from the opener rail',
+    extinguishers: 'Kitchen, garage by the door, upstairs hall', detectors: '9 detectors — every bedroom, hall, kitchen, garage',
+    firstAid: 'Hall closet top shelf; flashlights in the kitchen drawer', generator: 'Storage shed — pull-start, extension cord on the wall hook',
+    safe: 'Primary closet floor safe', alarm: 'SimpliSafe — phone is in the Pros list', attic: 'Hatch in the garage ceiling',
+    meet: 'The mailbox at the road', outOfTown: 'Aunt Carol — fictional (555) 010-0100', neighbor: 'The Hendersons next door — spare key',
+    pets: 'Biscuit the beagle — vet is Cleburne Animal Clinic (fictional)',
+  }
+  const moneySample = {
+    'util.electricProv': 'United Cooperative Services', 'util.electricAmt': '$214', 'util.gasProv': 'Atmos Energy', 'util.gasAmt': '$58',
+    'util.waterProv': 'City of Cleburne — Water & Wastewater', 'util.waterAmt': '$96', 'util.trashProv': 'City of Cleburne Solid Waste',
+    'util.trashAmt': '$24', 'util.internetProv': 'AT&T Fiber', 'util.internetAmt': '$65', 'util.securityProv': 'SimpliSafe', 'util.securityAmt': '$30',
+  }
+  return { items, intake, care, pros, finishes, pool, lawn, finance, vehicles, emergency, money: moneySample }
 }

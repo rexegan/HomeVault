@@ -31,6 +31,9 @@ import LawnView from './components/LawnView.jsx'
 import ForecastView from './components/ForecastView.jsx'
 import RemindersView from './components/RemindersView.jsx'
 import VehicleView, { VehicleForm } from './components/VehicleView.jsx'
+import EmergencyView from './components/EmergencyView.jsx'
+import ClaimKitView from './components/ClaimKitView.jsx'
+import BinderView from './components/BinderView.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
 import { buildSample } from './lib/sample.js'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL, KEY_FIELDS } from './lib/intake.js'
@@ -256,6 +259,8 @@ export default function App() {
       setFinishes(fm)
     }
     if (sample.pool) setPool(sample.pool)
+    if (sample.emergency) setEmergency(sample.emergency)
+    if (sample.money) setMoneyRec((m) => ({ ...m, ...sample.money }))
     if (sample.vehicles) setVehicles(sample.vehicles.map((v) => ({ id: store.newProId(), ...v, log: (v.log || []).map((e) => ({ id: store.newProId(), files: [], ...e })) })))
     if (sample.finance) setFinance((f) => ({ ...f, ...sample.finance }))
     if (sample.lawn) setLawn({ profile: sample.lawn.profile, entries: sample.lawn.entries.map((e) => ({ id: store.newProId(), ...e })) })
@@ -306,6 +311,15 @@ export default function App() {
     setVehicles((l) => l.map((x) => (x.id !== vid ? x : { ...x, log: (x.log || []).filter((e) => e.id !== logId) })))
     flash('Deleted')
   }
+
+  // Emergency card answers.
+  const [emergency, setEmergency] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('homevault:emergency:v1') || '{}') } catch { return {} }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('homevault:emergency:v1', JSON.stringify(emergency)) } catch { /* ignore */ }
+  }, [emergency])
+  const setEmergencyValue = (k, val) => setEmergency((m) => ({ ...m, [k]: val }))
 
   // Swimming Pool profile.
   const [pool, setPool] = useState(() => {
@@ -425,7 +439,7 @@ export default function App() {
   const liveItem = (id) => state.items.find((it) => it.id === id) || null
   const openItem = (id) => setModal({ type: 'itemDetail', itemId: id })
 
-  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans', lawn: 'Lawn & Landscape', forecast: 'Replacement forecast', vehicle: 'Vehicle', reminders: 'Calendar reminders', weather: 'Weather at home', civic: 'County / City', finance: 'Insurance / Taxes', money: 'Financial' }
+  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans', lawn: 'Lawn & Landscape', forecast: 'Replacement forecast', vehicle: 'Vehicle', emergency: 'Emergency card', claim: 'Insurance claim kit', binder: 'Home binder', reminders: 'Calendar reminders', weather: 'Weather at home', civic: 'County / City', finance: 'Insurance / Taxes', money: 'Financial' }
 
   return (
     <div className="app">
@@ -454,7 +468,7 @@ export default function App() {
             <Icon.plus size={18} /> Add
           </button>
         )}
-        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans' || view.name === 'lawn' || view.name === 'vehicle' || view.name === 'forecast' || view.name === 'reminders' || view.name === 'weather' || view.name === 'civic' || view.name === 'finance' || view.name === 'money') && (
+        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans' || view.name === 'lawn' || view.name === 'vehicle' || view.name === 'emergency' || view.name === 'claim' || view.name === 'binder' || view.name === 'forecast' || view.name === 'reminders' || view.name === 'weather' || view.name === 'civic' || view.name === 'finance' || view.name === 'money') && (
           <div className="brand" style={{ fontSize: 18 }}>{titles[view.name]}</div>
         )}
       </header>
@@ -603,6 +617,33 @@ export default function App() {
               <span className="profile-chev"><Icon.chevron size={20} /></span>
             </button>
 
+            <button className="profile-card" onClick={() => setView({ name: 'emergency' })}>
+              <span className="profile-icon emerg-icon"><Icon.shield size={22} /></span>
+              <span className="profile-body">
+                <strong>Emergency Card</strong>
+                <span className="profile-sub">Shutoffs, who to call, the family plan — printable for the fridge.</span>
+              </span>
+              <span className="profile-chev"><Icon.chevron size={20} /></span>
+            </button>
+
+            <button className="profile-card" onClick={() => setView({ name: 'claim' })}>
+              <span className="profile-icon claim-icon"><Icon.receipt size={22} /></span>
+              <span className="profile-body">
+                <strong>Insurance Claim Kit</strong>
+                <span className="profile-sub">Room-by-room, photo-backed — ready the day you need it.</span>
+              </span>
+              <span className="profile-chev"><Icon.chevron size={20} /></span>
+            </button>
+
+            <button className="profile-card" onClick={() => setView({ name: 'binder' })}>
+              <span className="profile-icon binder-icon"><Icon.book size={22} /></span>
+              <span className="profile-body">
+                <strong>Home Binder</strong>
+                <span className="profile-sub">The handoff packet for a buyer — colors, equipment, who fixed what.</span>
+              </span>
+              <span className="profile-chev"><Icon.chevron size={20} /></span>
+            </button>
+
             <div className="backup-bar">
               <div className="backup-text">
                 <strong>Home inventory report</strong>
@@ -733,6 +774,21 @@ export default function App() {
               onDeleteLog={(logId) => deleteVehicleLog(veh.id, logId)} />
           ) : <div className="hint" style={{ padding: 16 }}>That vehicle is gone — go back to the garage.</div>
         })()}
+
+        {view.name === 'emergency' && (
+          <EmergencyView values={emergency} onChange={setEmergencyValue} profile={intake} pros={pros}
+            finance={finance} money={moneyRec} civicInfo={civic?.info} />
+        )}
+
+        {view.name === 'claim' && (
+          <ClaimKitView state={state} profile={intake} finance={finance} finishes={finishes} lawn={lawn}
+            today={today} onOpenItem={openItem} />
+        )}
+
+        {view.name === 'binder' && (
+          <BinderView state={state} profile={intake} finishes={finishes} lawn={lawn} pool={pool}
+            money={moneyRec} pros={pros} care={care} emergency={emergency} today={today} />
+        )}
 
         {view.name === 'forecast' && (
           <ForecastView state={state} finishes={finishes} today={today} onOpenItem={openItem} />
