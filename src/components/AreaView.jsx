@@ -19,6 +19,8 @@ export default function AreaView({ state, area, today, poolValues, finishEntries
     ? POOL_LABELS.map(([k, l]) => [l, (poolValues?.[k] || '').trim()]).filter(([, val]) => val)
     : []
   const entries = finishEntries || []
+  // No paint / flooring / wallpaper history for the pool, shed or garage.
+  const showFinishes = !isPool && !/storage shed|garage/i.test(area.name)
   const items = itemsForArea(state, area.id)
   const AreaIcon = Icon[area.icon] || Icon.box
   const suggestions = suggestionsFor(area.name)
@@ -56,37 +58,39 @@ export default function AreaView({ state, area, today, poolValues, finishEntries
         </button>
       )}
 
-      <div className="pool-summary finishes-summary">
-        <div className="pool-summary-head">
-          <span>🎨 Paint, Flooring and Wallpaper</span>
-          <button className="btn small" onClick={onAddFinish}><Icon.plus size={14} /> Add</button>
-        </div>
-        {entries.length === 0 ? (
-          <div className="pool-summary-empty">Each paint job, floor install or wallpaper hang gets
-            its own dated entry here — colors, products and cost, stacked into the room's history.</div>
-        ) : (
-          <div className="fin-entries">
-            {entries.map((e) => (
-              <button className="fin-entry" key={e.id} onClick={() => onEditFinish(e.id)}>
-                <span className="fe-kind">{e.kind || 'Other'}</span>
-                <span className="fe-body">
-                  <span className="fe-title">
-                    {[e.where, e.colorName || e.product].filter(Boolean).join(' — ') || 'Entry'}
-                  </span>
-                  <span className="fe-sub">
-                    {[e.product && e.colorName ? e.product : '', e.finish, e.doneBy && 'by ' + e.doneBy]
-                      .filter(Boolean).join(' · ')}
-                  </span>
-                </span>
-                <span className="fe-meta">
-                  {e.date && <span className="fe-date">{e.date}</span>}
-                  {e.totalCost && <span className="fe-cost">{e.totalCost}</span>}
-                </span>
-              </button>
-            ))}
+      {showFinishes && (
+        <div className="pool-summary finishes-summary">
+          <div className="pool-summary-head">
+            <span>🎨 Paint, Flooring and Wallpaper</span>
+            <button className="btn small" onClick={onAddFinish}><Icon.plus size={14} /> Add</button>
           </div>
-        )}
-      </div>
+          {entries.length === 0 ? (
+            <div className="pool-summary-empty">Each paint job, floor install or wallpaper hang gets
+              its own dated entry here — colors, products and cost, stacked into the room's history.</div>
+          ) : (
+            <div className="fin-entries">
+              {entries.map((e) => (
+                <button className="fin-entry" key={e.id} onClick={() => onEditFinish(e.id)}>
+                  <span className="fe-kind">{e.kind || 'Other'}</span>
+                  <span className="fe-body">
+                    <span className="fe-title">
+                      {[e.where, e.colorName || e.product].filter(Boolean).join(' — ') || 'Entry'}
+                    </span>
+                    <span className="fe-sub">
+                      {[e.product && e.colorName ? e.product : '', e.finish, e.doneBy && 'by ' + e.doneBy]
+                        .filter(Boolean).join(' · ')}
+                    </span>
+                  </span>
+                  <span className="fe-meta">
+                    {e.date && <span className="fe-date">{e.date}</span>}
+                    {e.totalCost && <span className="fe-cost">{e.totalCost}</span>}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="quickadd">
         <label htmlFor="quickadd-select">Add to this area</label>
