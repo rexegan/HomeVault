@@ -881,6 +881,8 @@ export default function App() {
             area={fa}
             entry={entry}
             nearbyStores={(hardware?.stores || []).filter((s) => s.dist <= 20).slice(0, 12)}
+            pros={pros} onAddPro={addPro}
+            knownPeople={[...new Set(Object.values(finishes).flat().map((e) => (e.doneBy || '').trim()).filter(Boolean))]}
             onSave={(draft) => { saveFinishEntry(fa.id, modal.entryId, draft); setModal(null) }}
             onDelete={() => { deleteFinishEntry(fa.id, modal.entryId); setModal(null) }}
             onClose={() => setModal(null)}

@@ -1622,3 +1622,7 @@ button.sum-btn:active { background: var(--bg-2); }
 .emerg-icon { background: #fde2e0 !important; color: #a3261b !important; }
 .claim-icon { background: #e1ecf7 !important; color: #1f5f99 !important; }
 .binder-icon { background: #ece6f7 !important; color: #5b45a8 !important; }
+
+/* Finishes form: receipt scan row */
+.fx-scan { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: -4px 0 14px; }
+.hint.err { color: #a3261b; }

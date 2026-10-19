@@ -111,7 +111,7 @@ export default function AreaView({ state, area, today, poolValues, finishEntries
                       {[e.where, e.colorName || e.product].filter(Boolean).join(' — ') || 'Entry'}
                     </span>
                     <span className="fe-sub">
-                      {[e.product && e.colorName ? e.product : '', e.grade, e.finish, e.doneBy && 'by ' + e.doneBy]
+                      {[e.product && e.colorName ? e.product : '', e.grade, e.finish, e.doneBy && 'by ' + e.doneBy, e.files?.length && '📎 receipt']
                         .filter(Boolean).join(' · ')}
                     </span>
                   </span>
