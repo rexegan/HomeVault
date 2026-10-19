@@ -94,10 +94,12 @@ export function TextField({ id, label, value, onChange, opt = {} }) {
         <span className="q">{label}</span>
       </label>
       <input id={id} type="text" value={value}
-        inputMode={opt.date || opt.money ? 'numeric' : undefined}
+        inputMode={opt.date || opt.money || opt.miles ? 'numeric' : undefined}
         placeholder={opt.date ? 'MM/DD/YYYY — just type the numbers' : (opt.hint || 'Add detail…')}
         onChange={(e) => onChange(opt.date ? maskDate(e.target.value) : e.target.value)}
-        onBlur={opt.money ? () => onChange(money(value)) : undefined} />
+        onBlur={opt.money ? () => onChange(money(value))
+          : opt.miles ? () => { const n = parseInt(String(value).replace(/\D/g, ''), 10); if (!isNaN(n)) onChange(n.toLocaleString()) }
+          : undefined} />
     </div>
   )
 }

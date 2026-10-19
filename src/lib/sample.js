@@ -266,5 +266,32 @@ export function buildSample(today) {
     'ins.company': 'Farm Bureau', 'ins.premium': '$2,640', 'ins.renewal': ymd(75),
     'tax.dueDate': nextJan31, 'tax.annualTax': '$6,180',
   }
-  return { items, intake, care, pros, finishes, pool, lawn, finance }
+  const vehicles = [
+    { nickname: 'The Blue Truck', year: '2022', make: 'Toyota', model: 'Tacoma', trim: 'TRD Off-Road', color: 'Blueprint (paint code 8X8)',
+      vin: '3TMCZ5AN0NM000123', body: 'Pickup', engine: '3.5L 6-cyl', transmission: 'Automatic', fuel: 'Gasoline', drive: 'Four-wheel drive',
+      plate: 'FAKE-123', plateState: 'TX', regExpires: ymd(96), inspectionDue: ymd(96), tireSize: '265/70R16', oilType: '0W-20',
+      oilCapacity: '6.4 quarts', batteryGroup: 'Group 24F', purchaseDate: '03/12/2022', purchasePrice: '$41,800',
+      purchasedFrom: 'Fictional Toyota of Cleburne', mileageAtPurchase: '12', currentMileage: '38,420', insurer: 'Farm Bureau',
+      policy: 'AUTO-0000000', lender: 'Paid off', warranty: '5 yr / 60,000 mi powertrain', keys: 'Spare fob in the kitchen junk drawer',
+      notes: 'Fictional sample vehicle.',
+      log: [
+        { kind: 'Oil change', what: '0W-20 full synthetic + filter', date: '02/10/2026', mileage: '33,150', shop: 'Dealer service department', totalCost: '$89.95', nextDueMileage: '38,150', nextDueDate: '08/10/2026' },
+        { kind: 'Oil change', what: '0W-20 full synthetic + filter', date: ymd(-120), mileage: '37,600', shop: 'Valvoline Instant Oil Change', totalCost: '$74.99', nextDueMileage: '42,600', nextDueDate: ymd(60) },
+        { kind: 'Tire rotation & balance', what: 'Rotated and balanced all four', date: ymd(-120), mileage: '37,600', shop: 'Discount Tire', totalCost: '$0', nextDueMileage: '45,100' },
+        { kind: 'New tires', what: 'Michelin Defender LTX 265/70R16 (set of 4)', date: '04/20/2025', mileage: '27,900', shop: 'Discount Tire', totalCost: '$862.40', notes: '50,000-mile road-hazard plan included' },
+        { kind: 'Battery', what: 'Interstate Group 24F', date: '12/05/2025', mileage: '31,400', shop: 'Costco Tire Center', totalCost: '$139.99', nextDueDate: '12/05/2029' },
+        { kind: 'Paint & body work', what: 'Fixed door ding and touched up hood chips', date: '07/18/2024', mileage: '22,300', shop: 'Local mechanic', totalCost: '$385' },
+        { kind: 'Detail / wash', what: 'Full interior + exterior detail, ceramic wax', date: ymd(-40), mileage: '38,050', shop: 'Local mechanic', totalCost: '$220' },
+        { kind: 'Manufacturer recall', what: 'Fictional sample recall — software update', date: '08/02/2023', mileage: '15,800', shop: 'Dealer service department', totalCost: '$0', recallNo: '23V-000', recallStatus: 'Fixed' },
+      ] },
+    { nickname: 'Family SUV', year: '2019', make: 'Honda', model: 'CR-V', trim: 'EX-L', color: 'Modern Steel Metallic',
+      vin: '2HKRW2H81KH000456', body: 'SUV', engine: '1.5L 4-cyl turbo', transmission: 'CVT', fuel: 'Gasoline', drive: 'All-wheel drive',
+      plate: 'SAMPLE-9', plateState: 'TX', tireSize: '235/60R18', oilType: '0W-20', purchaseDate: '09/01/2019', purchasePrice: '$31,200',
+      currentMileage: '61,900', insurer: 'Farm Bureau', notes: 'Fictional sample vehicle.',
+      log: [
+        { kind: 'Oil change', what: '0W-20 synthetic', date: ymd(-200), mileage: '57,300', shop: 'Dealer service department', totalCost: '$68', nextDueMileage: '62,300', nextDueDate: ymd(-20) },
+        { kind: 'Brakes', what: 'Front pads and rotors', date: '11/09/2025', mileage: '55,000', shop: 'Local mechanic', totalCost: '$540' },
+      ] },
+  ]
+  return { items, intake, care, pros, finishes, pool, lawn, finance, vehicles }
 }

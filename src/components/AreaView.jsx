@@ -1,3 +1,4 @@
+import { vehicleTitle, currentMileage } from '../lib/vehicles.js'
 import { Icon } from '../lib/icons.jsx'
 import { itemsForArea, warrantyStatus, formatPrice } from '../lib/storage.js'
 import { suggestionsFor } from '../lib/suggestions.js'
@@ -13,13 +14,14 @@ const POOL_LABELS = [
   ['features', 'Water features'], ['notes', 'Notes'],
 ]
 
-export default function AreaView({ state, area, today, poolValues, finishEntries, onAddFinish, onEditFinish, onEditArea, onQuickAdd, onOpenItem }) {
+export default function AreaView({ state, area, today, poolValues, finishEntries, onAddFinish, onEditFinish, vehicles = [], onAddVehicle, onOpenVehicle, onEditArea, onQuickAdd, onOpenItem }) {
   const isPool = area.variant === 'pool' || /swimming pool/i.test(area.name)
   const poolRows = isPool
     ? POOL_LABELS.map(([k, l]) => [l, (poolValues?.[k] || '').trim()]).filter(([, val]) => val)
     : []
   const entries = finishEntries || []
   // No paint / flooring / wallpaper history for the pool, shed or garage.
+  const isGarage = /garage/i.test(area.name)
   const showFinishes = !isPool && !/storage shed|garage/i.test(area.name)
   const items = itemsForArea(state, area.id)
   const AreaIcon = Icon[area.icon] || Icon.box
@@ -56,6 +58,38 @@ export default function AreaView({ state, area, today, poolValues, finishEntries
             </div>
           )}
         </button>
+      )}
+
+      {isGarage && (
+        <div className="pool-summary finishes-summary veh-card">
+          <div className="pool-summary-head">
+            <span>🚗 Vehicles</span>
+            <button className="btn small" onClick={onAddVehicle}><Icon.plus size={14} /> Add vehicle</button>
+          </div>
+          {vehicles.length === 0 ? (
+            <div className="pool-summary-empty">
+              Add each car, truck, motorcycle or trailer — make, model, VIN and more — then keep every oil
+              change, new set of tires, body-work receipt and recall in its own log.
+            </div>
+          ) : (
+            <div className="fin-entries">
+              {vehicles.map((veh) => (
+                <button className="fin-entry" key={veh.id} onClick={() => onOpenVehicle(veh.id)}>
+                  <span className="fe-kind veh-kind">Vehicle</span>
+                  <span className="fe-body">
+                    <span className="fe-title">{vehicleTitle(veh)}</span>
+                    <span className="fe-sub">{[veh.nickname && '“' + veh.nickname + '”', veh.color, veh.plate,
+                      veh.log?.length ? veh.log.length + ' logged' : 'no service logged yet'].filter(Boolean).join(' · ')}</span>
+                  </span>
+                  <span className="fe-meta">
+                    {currentMileage(veh) > 0 && <span className="fe-cost">{currentMileage(veh).toLocaleString()} mi</span>}
+                    <span className="fe-date">Open ›</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       )}
 
       {showFinishes && (

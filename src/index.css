@@ -1567,3 +1567,15 @@ button.sum-btn:active { background: var(--bg-2); }
 .rk-lawn { background: #e3f0dd !important; color: #2f6b22 !important; }
 .rk-money { background: #efe6f7 !important; color: #5b45a8 !important; }
 .rk-replace { background: #fbe9d0 !important; color: #8a5209 !important; }
+
+/* Vehicles */
+.veh-kind { background: #e1ecf7 !important; color: #1f5f99 !important; }
+.veh-due { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.veh-due-chip { font-size: 12.5px; padding: 6px 10px; border-radius: 999px; background: rgba(22,52,79,0.08); }
+.veh-due-chip.soon { background: rgba(178,106,18,0.15); color: #7a4708; }
+.veh-due-chip.due { background: #fde2e0; color: #a3261b; }
+.veh-recalls { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.veh-recall { background: rgba(255,255,255,0.7); border: 1px solid #cfe0e8; border-radius: 10px; padding: 8px 12px; font-size: 13.5px; }
+.veh-recall summary { cursor: pointer; }
+.veh-recall p { margin: 8px 0 0; }
+.vehicle .area-hero { align-items: center; }

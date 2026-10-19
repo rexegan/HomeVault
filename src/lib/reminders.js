@@ -4,6 +4,7 @@
 
 import { careTasks } from './maintenance.js'
 import { buildForecast } from './forecast.js'
+import { dueItems, vehicleTitle } from './vehicles.js'
 
 const parseMDY = (s) => {
   const m = String(s || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
@@ -13,10 +14,11 @@ const parseISO = (s) => {
   const m = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})/)
   return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null
 }
+const pad2 = (n) => String(n).padStart(2, '0')
 const day = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate())
 
 // → [{ uid, date, title, desc, kind, alarms:[daysBefore...] }] sorted by date
-export function buildReminders({ state, intake, care, lawn, finance, finishes, today }) {
+export function buildReminders({ state, intake, care, lawn, finance, finishes, vehicles = [], today }) {
   const out = []
   const t0 = day(today)
   const room = (id) => state.areas.find((a) => a.id === id)?.name || ''
@@ -49,6 +51,16 @@ export function buildReminders({ state, intake, care, lawn, finance, finishes, t
     push({ uid: 'hv-lawn-' + e.id, kind: 'Lawn', date: parseMDY(e.nextDue),
       title: 'Yard: ' + e.kind + (e.where ? ' — ' + e.where : ''),
       desc: [e.product, e.brand && 'Brand: ' + e.brand, e.notes].filter(Boolean).join('\n'), alarms: [3] })
+  }
+
+  for (const veh of vehicles) {
+    for (const d of dueItems(veh, t0)) {
+      const when = parseMDY(d.dueDate)
+      if (!when) continue
+      push({ uid: 'hv-veh-' + veh.id + '-' + d.key + '-' + when.getFullYear() + pad2(when.getMonth() + 1), kind: 'Vehicle', date: when,
+        title: vehicleTitle(veh) + ': ' + d.label,
+        desc: d.dueMiles ? 'Also due at ' + d.dueMiles.toLocaleString() + ' miles.' : '', alarms: [14, 3] })
+    }
   }
 
   const ren = parseMDY(finance?.['ins.renewal'])

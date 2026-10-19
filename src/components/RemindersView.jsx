@@ -4,12 +4,12 @@ import { buildReminders, downloadICS } from '../lib/reminders.js'
 
 // Calendar reminders: every upcoming date HomeVault knows, ready for your calendar.
 const KIND_CLASS = { Warranty: 'rk-warranty', 'Home Care': 'rk-care', Lawn: 'rk-lawn',
-  Insurance: 'rk-money', Taxes: 'rk-money', Replacement: 'rk-replace' }
+  Insurance: 'rk-money', Vehicle: 'rk-care', Taxes: 'rk-money', Replacement: 'rk-replace' }
 
-export default function RemindersView({ state, intake, care, lawn, finance, finishes, today }) {
+export default function RemindersView({ state, intake, care, lawn, finance, finishes, vehicles, today }) {
   const events = useMemo(
-    () => buildReminders({ state, intake, care, lawn, finance, finishes, today }),
-    [state, intake, care, lawn, finance, finishes, today])
+    () => buildReminders({ state, intake, care, lawn, finance, finishes, vehicles, today }),
+    [state, intake, care, lawn, finance, finishes, vehicles, today])
 
   const groups = useMemo(() => {
     const m = new Map()

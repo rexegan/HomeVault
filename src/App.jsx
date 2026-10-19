@@ -30,6 +30,7 @@ import FinishesForm from './components/FinishesForm.jsx'
 import LawnView from './components/LawnView.jsx'
 import ForecastView from './components/ForecastView.jsx'
 import RemindersView from './components/RemindersView.jsx'
+import VehicleView, { VehicleForm } from './components/VehicleView.jsx'
 import { careTasks, careCounts } from './lib/maintenance.js'
 import { buildSample } from './lib/sample.js'
 import { INTAKE_QUESTIONS, INTAKE_TOTAL, KEY_FIELDS } from './lib/intake.js'
@@ -255,6 +256,7 @@ export default function App() {
       setFinishes(fm)
     }
     if (sample.pool) setPool(sample.pool)
+    if (sample.vehicles) setVehicles(sample.vehicles.map((v) => ({ id: store.newProId(), ...v, log: (v.log || []).map((e) => ({ id: store.newProId(), files: [], ...e })) })))
     if (sample.finance) setFinance((f) => ({ ...f, ...sample.finance }))
     if (sample.lawn) setLawn({ profile: sample.lawn.profile, entries: sample.lawn.entries.map((e) => ({ id: store.newProId(), ...e })) })
     flash('Sample home loaded — explore away!')
@@ -278,6 +280,32 @@ export default function App() {
     flash('Yard job saved')
   }
   const deleteLawnEntry = (id) => { setLawn((l) => ({ ...l, entries: l.entries.filter((e) => e.id !== id) })); flash('Deleted') }
+
+  // Vehicles in the garage: [{id, year, make, model, vin, …, log:[entries]}]
+  const [vehicles, setVehicles] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('homevault:vehicles:v1') || '[]') } catch { return [] }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('homevault:vehicles:v1', JSON.stringify(vehicles)) } catch { /* ignore */ }
+  }, [vehicles])
+  const saveVehicle = (id, data) => {
+    if (id) { setVehicles((l) => l.map((x) => (x.id === id ? { ...x, ...data, id, log: x.log || [] } : x))); flash('Vehicle saved'); return id }
+    const nid = store.newProId()
+    setVehicles((l) => [...l, { ...data, id: nid, log: [] }]); flash('Vehicle added'); return nid
+  }
+  const deleteVehicle = (id) => { setVehicles((l) => l.filter((x) => x.id !== id)); flash('Vehicle deleted') }
+  const saveVehicleLog = (vid, logId, draft) => {
+    setVehicles((l) => l.map((x) => (x.id !== vid ? x : {
+      ...x,
+      log: logId ? (x.log || []).map((e) => (e.id === logId ? { ...e, ...draft, id: logId } : e))
+        : [...(x.log || []), { ...draft, id: store.newProId() }],
+    })))
+    flash('Logged')
+  }
+  const deleteVehicleLog = (vid, logId) => {
+    setVehicles((l) => l.map((x) => (x.id !== vid ? x : { ...x, log: (x.log || []).filter((e) => e.id !== logId) })))
+    flash('Deleted')
+  }
 
   // Swimming Pool profile.
   const [pool, setPool] = useState(() => {
@@ -397,7 +425,7 @@ export default function App() {
   const liveItem = (id) => state.items.find((it) => it.id === id) || null
   const openItem = (id) => setModal({ type: 'itemDetail', itemId: id })
 
-  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans', lawn: 'Lawn & Landscape', forecast: 'Replacement forecast', reminders: 'Calendar reminders', weather: 'Weather at home', civic: 'County / City', finance: 'Insurance / Taxes', money: 'Financial' }
+  const titles = { search: 'Search', expiring: 'Warranties', report: 'Inventory report', intake: 'Home Profile', care: 'Home Care', pros: 'My Pros', hardware: 'Local Hardware', referrals: 'Repair Referrals', allItems: 'Everything stored', rooms: 'Rooms & areas', scans: '3D Home Scans', lawn: 'Lawn & Landscape', forecast: 'Replacement forecast', vehicle: 'Vehicle', reminders: 'Calendar reminders', weather: 'Weather at home', civic: 'County / City', finance: 'Insurance / Taxes', money: 'Financial' }
 
   return (
     <div className="app">
@@ -405,8 +433,8 @@ export default function App() {
         {view.name === 'home' ? (
           <div className="brand"><Icon.house size={24} /> HomeVault</div>
         ) : (
-          <button className="back-btn" onClick={() => setView({ name: 'home' })}>
-            <Icon.back size={22} /> {view.name === 'area' && currentArea ? 'Home' : 'Home'}
+          <button className="back-btn" onClick={() => setView(view.name === 'vehicle' && view.areaId ? { name: 'area', areaId: view.areaId } : { name: 'home' })}>
+            <Icon.back size={22} /> {view.name === 'vehicle' && view.areaId ? 'Garage' : 'Home'}
           </button>
         )}
         <div className="spacer" />
@@ -426,7 +454,7 @@ export default function App() {
             <Icon.plus size={18} /> Add
           </button>
         )}
-        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans' || view.name === 'lawn' || view.name === 'forecast' || view.name === 'reminders' || view.name === 'weather' || view.name === 'civic' || view.name === 'finance' || view.name === 'money') && (
+        {(view.name === 'search' || view.name === 'expiring' || view.name === 'report' || view.name === 'intake' || view.name === 'care' || view.name === 'pros' || view.name === 'hardware' || view.name === 'referrals' || view.name === 'allItems' || view.name === 'rooms' || view.name === 'scans' || view.name === 'lawn' || view.name === 'vehicle' || view.name === 'forecast' || view.name === 'reminders' || view.name === 'weather' || view.name === 'civic' || view.name === 'finance' || view.name === 'money') && (
           <div className="brand" style={{ fontSize: 18 }}>{titles[view.name]}</div>
         )}
       </header>
@@ -627,6 +655,9 @@ export default function App() {
             area={currentArea}
             today={today}
             poolValues={pool}
+            vehicles={vehicles}
+            onAddVehicle={() => setModal({ type: 'vehicle', vehicleId: null, areaId: currentArea.id })}
+            onOpenVehicle={(vid) => setView({ name: 'vehicle', vehicleId: vid, areaId: currentArea.id })}
             finishEntries={finishes[currentArea.id]}
             onAddFinish={() => setModal({ type: 'finishes', areaId: currentArea.id, entryId: null })}
             onEditFinish={(entryId) => setModal({ type: 'finishes', areaId: currentArea.id, entryId })}
@@ -693,13 +724,23 @@ export default function App() {
           <WeatherView profile={intake} cached={weather} onCache={cacheWeather} />
         )}
 
+        {view.name === 'vehicle' && (() => {
+          const veh = vehicles.find((x) => x.id === view.vehicleId)
+          return veh ? (
+            <VehicleView vehicle={veh} today={today}
+              onEdit={() => setModal({ type: 'vehicle', vehicleId: veh.id, areaId: view.areaId })}
+              onSaveLog={(logId, draft) => saveVehicleLog(veh.id, logId, draft)}
+              onDeleteLog={(logId) => deleteVehicleLog(veh.id, logId)} />
+          ) : <div className="hint" style={{ padding: 16 }}>That vehicle is gone — go back to the garage.</div>
+        })()}
+
         {view.name === 'forecast' && (
           <ForecastView state={state} finishes={finishes} today={today} onOpenItem={openItem} />
         )}
 
         {view.name === 'reminders' && (
           <RemindersView state={state} intake={intake} care={care} lawn={lawn} finance={finance}
-            finishes={finishes} today={today} />
+            finishes={finishes} vehicles={vehicles} today={today} />
         )}
 
         {view.name === 'lawn' && (
@@ -758,6 +799,20 @@ export default function App() {
           today={today}
           onEdit={() => setModal({ type: 'item', item: liveItem(modal.itemId) })}
           onClose={() => setModal(null)}
+        />
+      )}
+
+      {modal?.type === 'vehicle' && (
+        <VehicleForm
+          vehicle={modal.vehicleId ? vehicles.find((x) => x.id === modal.vehicleId) : {}}
+          onClose={() => setModal(null)}
+          onSave={(draft) => {
+            const id = saveVehicle(modal.vehicleId, draft)
+            const areaId = modal.areaId
+            setModal(null)
+            if (!modal.vehicleId) setView({ name: 'vehicle', vehicleId: id, areaId })
+          }}
+          onDelete={() => { deleteVehicle(modal.vehicleId); setModal(null); setView(modal.areaId ? { name: 'area', areaId: modal.areaId } : { name: 'home' }) }}
         />
       )}
 
