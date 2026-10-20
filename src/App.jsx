@@ -3,6 +3,7 @@ import { Icon } from './lib/icons.jsx'
 import * as store from './lib/storage.js'
 import { warrantyStatus } from './lib/storage.js'
 import { exportBackup, importBackup, lastBackupDate } from './lib/backup.js'
+import { installFormNav } from './lib/formNav.js'
 import FloorPlan from './components/FloorPlan.jsx'
 import AreaView from './components/AreaView.jsx'
 import AreaForm from './components/AreaForm.jsx'
@@ -64,6 +65,7 @@ export default function App() {
     return m
   })
   const importRef = useRef(null)
+  useEffect(() => installFormNav(), [])
 
   // "Today" at midnight — stable for the session, used for warranty math.
   const today = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d }, [])
