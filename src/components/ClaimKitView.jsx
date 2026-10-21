@@ -51,7 +51,7 @@ export default function ClaimKitView({ state, profile, finance, finishes, lawn, 
   const lawnTotal = (lawn?.entries || []).reduce((t, e) => t + num(e.totalCost), 0)
   const areasWithItems = state.areas.filter((a) => itemsForArea(state, a.id).length > 0)
   const g = (q) => 'https://duckduckgo.com/?q=' + encodeURIComponent('\\' + q)
-  const insurer = finance?.['ins.company']
+  const insurer = (finance?.['ins.company'] || '').trim()
 
   return (
     <div className="claimkit">
@@ -77,6 +77,7 @@ export default function ClaimKitView({ state, profile, finance, finishes, lawn, 
           {insurer ? (
             <dl className="bind-kv">
               <dt>Company</dt><dd>{insurer}</dd>
+              {finance['ins.coverage'] && (<><dt>Coverage carried</dt><dd>{finance['ins.coverage']}</dd></>)}
               {finance['ins.policy'] && (<><dt>Policy number</dt><dd>{finance['ins.policy']}</dd></>)}
               {finance['ins.agent'] && (<><dt>Agent</dt><dd>{finance['ins.agent']}{finance['ins.agentPhone'] ? ' · ' + finance['ins.agentPhone'] : ''}</dd></>)}
               {finance['ins.dwelling'] && (<><dt>Dwelling coverage</dt><dd>{finance['ins.dwelling']}</dd></>)}

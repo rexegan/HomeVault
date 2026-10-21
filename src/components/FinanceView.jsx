@@ -1,5 +1,6 @@
 import { Icon } from '../lib/icons.jsx'
 import { formatPrice } from '../lib/storage.js'
+import MultiSelect from './MultiSelect.jsx'
 
 // Insurance / Taxes: the money side of the home in one place — the full
 // homeowners-insurance record, the property-tax record, and the county links.
@@ -7,6 +8,9 @@ const INSURERS = ['State Farm', 'Allstate', 'Farm Bureau', 'USAA', 'Farmers',
   'Liberty Mutual', 'Progressive', 'Nationwide', 'Travelers', 'Germania',
   'Texas Fair Plan', 'Lemonade', 'Other']
 const YESNO = ['Yes', 'No']
+const COVERAGES = ['Homeowners (HO-3)', 'Dwelling fire (DP-3)', 'Windstorm / hail', 'Flood', 'Earthquake', 'Umbrella / liability',
+  'Water / sewer backup', 'Scheduled valuables', 'Equipment breakdown', 'Home warranty plan', 'Renters / personal property',
+  'Landlord / rental dwelling', 'Pool & outdoor structures', 'Identity theft']
 
 const money = (v) => formatPrice(v)
 const maskDate = (v) => {
@@ -22,6 +26,7 @@ const SECTIONS = [
     id: 'ins', icon: '🛡️', title: 'Homeowners insurance',
     intent: 'Everything you need the day you file a claim — before you need it.',
     fields: [
+      ['coverage', 'Types of coverage', { multi: COVERAGES }],
       ['company', 'Insurance company', { options: INSURERS }],
       ['policy', 'Policy number', {}],
       ['agent', 'Agent name', {}],
@@ -111,23 +116,40 @@ export default function FinanceView({ values, onChange, civicInfo }) {
                 set(sec.id, key, val)
               }
               return (
+                opt.multi ? (
+                  <MultiSelect key={key} id={id} label={label} value={raw} options={opt.multi}
+                    onChange={(val) => set(sec.id, key, val)} />
+                ) : (
                 <div className={'intake-field' + (filled ? ' filled' : '')} key={key}>
                   <label htmlFor={id}>
                     <span className="chk" aria-hidden="true">{filled ? '✓' : ''}</span>
                     <span className="q">{label}</span>
                   </label>
-                  <input id={id} type="text" value={raw}
-                    list={opt.options ? id + '-dl' : undefined}
-                    inputMode={opt.date || opt.money ? 'numeric' : (opt.tel ? 'tel' : undefined)}
-                    placeholder={opt.date ? 'MM/DD/YYYY — just type the numbers' : (opt.hint || (opt.options ? 'Pick or type…' : 'Add detail…'))}
-                    onChange={(e) => handle(e.target.value)}
-                    onBlur={opt.money ? () => set(sec.id, key, money(v(sec.id, key))) : undefined} />
-                  {opt.options && (
-                    <datalist id={id + '-dl'}>
-                      {opt.options.map((o) => <option key={o} value={o} />)}
-                    </datalist>
+                  {opt.options ? (
+                    <>
+                      <select id={id} value={raw !== '' && !opt.options.includes(raw) ? '__other' : raw}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          set(sec.id, key, val === '__other' ? (raw !== '' && !opt.options.includes(raw) ? raw : ' ') : val)
+                        }}>
+                        <option value="">Pick one…</option>
+                        {opt.options.map((o) => <option key={o} value={o}>{o}</option>)}
+                        <option value="__other">Other…</option>
+                      </select>
+                      {raw !== '' && !opt.options.includes(raw) && (
+                        <input type="text" value={raw.trim()} style={{ marginTop: 8 }}
+                          placeholder="Type it in" onChange={(e) => set(sec.id, key, e.target.value || ' ')} />
+                      )}
+                    </>
+                  ) : (
+                    <input id={id} type="text" value={raw}
+                      inputMode={opt.date || opt.money ? 'numeric' : (opt.tel ? 'tel' : undefined)}
+                      placeholder={opt.date ? 'MM/DD/YYYY — just type the numbers' : (opt.hint || 'Add detail…')}
+                      onChange={(e) => handle(e.target.value)}
+                      onBlur={opt.money ? () => set(sec.id, key, money(v(sec.id, key))) : undefined} />
                   )}
                 </div>
+                )
               )
             })}
           </div>
