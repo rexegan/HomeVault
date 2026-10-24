@@ -1561,7 +1561,7 @@ button.sum-btn:active { background: var(--bg-2); }
 .rem-pill { font-size: 12.5px; font-weight: 600; padding: 5px 10px; border-radius: 999px; background: rgba(22,52,79,0.08); }
 .rem-pill b { margin-left: 4px; }
 .rem-row { cursor: default; }
-.rem-kind { background: rgba(22,52,79,0.1) !important; color: var(--ink) !important; }
+.rem-kind { background: rgba(22,52,79,0.1); color: var(--ink); }
 .rk-warranty { background: #fde2e0 !important; color: #a3261b !important; }
 .rk-care { background: #e1ecf7 !important; color: #1f5f99 !important; }
 .rk-lawn { background: #e3f0dd !important; color: #2f6b22 !important; }
@@ -1663,3 +1663,36 @@ button.sum-btn:active { background: var(--bg-2); }
 
 /* Every screen's intro text runs the full width of the page (same as the cards below it) */
 .intake-lede p { max-width: none; }
+
+/* Calendar view of the reminders */
+.rem-btns { display: flex; flex-wrap: wrap; gap: 10px; }
+.rem-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+.rcal { margin: 4px 0 18px; padding: 14px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.rcal-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 12px; }
+.rcal-sel { display: flex; flex-direction: column; gap: 3px; font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: var(--ink-soft); }
+.rcal-sel select { font-size: 16px; padding: 8px 10px; min-width: 130px; }
+.rcal-nav { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg-2); font-size: 24px; line-height: 1; cursor: pointer; color: var(--ink); }
+.rcal-today { height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg-2); font: inherit; font-weight: 700; cursor: pointer; color: var(--ink); }
+.rcal-legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-bottom: 14px; font-size: 13px; }
+.rcal-key { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.rcal-key i { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+.rcal-key b { color: var(--ink-soft); font-weight: 700; }
+.rcal-none { color: var(--ink-soft); }
+.rcal-months { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px; }
+.rcal-month h4 { margin: 0 0 6px; font-size: 17px; }
+.rcal-month h4 span { font-weight: 500; color: var(--ink-soft); }
+.rcal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.rcal-dow { text-align: center; font-size: 11px; font-weight: 700; color: var(--ink-soft); padding-bottom: 2px; }
+.rcal-day { aspect-ratio: 1 / 1; display: grid; place-items: center; font-size: 14px; font-variant-numeric: tabular-nums; border-radius: 50%; color: var(--ink-soft); position: relative; border: 0; padding: 0; }
+.rcal-day.today { box-shadow: inset 0 0 0 2px var(--ink); color: var(--ink); font-weight: 800; }
+.rcal-day.has { color: #fff; font-weight: 800; cursor: pointer; text-shadow: 0 1px 2px rgba(0,0,0,0.45); box-shadow: 0 2px 6px rgba(0,0,0,0.22); transition: transform .12s; }
+.rcal-day.has.today { box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--ink); }
+.rcal-day.has:active { transform: scale(0.92); }
+.rcal-day.has.sel { transform: scale(1.12); outline: 3px solid var(--ink); outline-offset: 2px; }
+.rcal-day.has sup { position: absolute; top: -3px; right: -3px; min-width: 16px; height: 16px; border-radius: 8px; background: var(--ink); color: #fff; font-size: 10px; line-height: 16px; text-shadow: none; }
+.rcal-detail { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.rcal-detail-title { font-weight: 800; margin-bottom: 8px; }
+.rcal-ev { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; padding: 8px 10px; margin-bottom: 6px; border-left: 5px solid; background: var(--bg-2); border-radius: 8px; }
+.rcal-ev-kind { color: #fff; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; padding: 2px 8px; border-radius: 999px; }
+.rcal-ev-title { font-weight: 700; }
+.rcal-ev-desc { width: 100%; font-size: 12.5px; color: var(--ink-soft); }

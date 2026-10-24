@@ -1,12 +1,12 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import ReminderCalendar, { KIND_COLORS } from './ReminderCalendar.jsx'
 import { Icon } from '../lib/icons.jsx'
 import { buildReminders, downloadICS } from '../lib/reminders.js'
 
 // Calendar reminders: every upcoming date HomeVault knows, ready for your calendar.
-const KIND_CLASS = { Warranty: 'rk-warranty', 'Home Care': 'rk-care', Lawn: 'rk-lawn',
-  Insurance: 'rk-money', Vehicle: 'rk-care', Taxes: 'rk-money', Replacement: 'rk-replace' }
 
 export default function RemindersView({ state, intake, care, lawn, finance, finishes, vehicles, today }) {
+  const [showCal, setShowCal] = useState(false)
   const events = useMemo(
     () => buildReminders({ state, intake, care, lawn, finance, finishes, vehicles, today }),
     [state, intake, care, lawn, finance, finishes, vehicles, today])
@@ -42,18 +42,25 @@ export default function RemindersView({ state, intake, care, lawn, finance, fini
       ) : (
         <>
           <div className="rem-cta">
-            <button className="btn" onClick={() => downloadICS(events)}>
-              📅 Add {events.length} reminders to my Calendar
-            </button>
+            <div className="rem-btns">
+              <button className="btn" onClick={() => downloadICS(events)}>
+                📅 Add {events.length} reminders to my Calendar
+              </button>
+              <button className="btn" onClick={() => setShowCal((v) => !v)} aria-expanded={showCal}>
+                🗓️ {showCal ? 'Hide calendar' : 'View calendar'}
+              </button>
+            </div>
             <div className="hint">
               iPad / iPhone: tap the file when it downloads, then choose <b>Add All</b>.
               Mac: double-click the file. Run it again anytime — events update instead of duplicating.
             </div>
           </div>
 
+          {showCal && <ReminderCalendar events={events} today={today} />}
+
           <div className="rem-counts">
             {Object.entries(counts).map(([k, n]) => (
-              <span key={k} className={'rem-pill ' + (KIND_CLASS[k] || '')}>{k} <b>{n}</b></span>
+              <span key={k} className="rem-pill" style={{ background: (KIND_COLORS[k] || '#5d7690') + '22', color: KIND_COLORS[k] || '#16344f' }}><i className="rem-dot" style={{ background: KIND_COLORS[k] || '#5d7690' }} />{k} <b>{n}</b></span>
             ))}
           </div>
 
@@ -63,7 +70,7 @@ export default function RemindersView({ state, intake, care, lawn, finance, fini
               <div className="fin-entries">
                 {list.map((e) => (
                   <div className="fin-entry rem-row" key={e.uid}>
-                    <span className={'fe-kind rem-kind ' + (KIND_CLASS[e.kind] || '')}>{e.kind}</span>
+                    <span className="fe-kind rem-kind" style={{ background: (KIND_COLORS[e.kind] || '#5d7690') + '22', color: KIND_COLORS[e.kind] || '#16344f' }}>{e.kind}</span>
                     <span className="fe-body">
                       <span className="fe-title">{e.title}</span>
                       {e.desc && <span className="fe-sub">{e.desc.split('\n')[0]}</span>}
