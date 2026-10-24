@@ -1,3 +1,4 @@
+import Rich from './Rich.jsx'
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../lib/icons.jsx'
 import { KEY_FIELDS } from '../lib/intake.js'
@@ -46,7 +47,7 @@ export default function CivicView({ profile, weatherCache, cached, onCache }) {
         <p>Where your home officially sits — and the local offices every homeowner eventually needs.</p>
       </div>
 
-      {error && <div className="hw-error">{error}</div>}
+      {error && <div className="hw-error"><Rich>{error}</Rich></div>}
       {busy && !info && (
         <div className="snap-reading" style={{ marginTop: 22 }}>
           <div className="snap-progress"><span className="snap-spinner" aria-hidden="true" /> Looking up your jurisdiction…</div>

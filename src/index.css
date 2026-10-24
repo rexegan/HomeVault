@@ -1726,3 +1726,12 @@ button.buys-row:active { background: #fffaf0; }
 .buys-what { font-weight: 700; font-size: 14.5px; }
 .buys-sub { font-size: 12.5px; color: var(--ink-soft); }
 .buys-amt { font-weight: 800; font-variant-numeric: tabular-nums; color: #14657f; }
+
+/* Names of the opening-page cards: dark black, bold, wherever they appear */
+:root { --feat: #0d0d0d; }
+.profile-body strong, .backup-text strong { color: var(--feat); font-weight: 800; }
+.feat { color: var(--feat); font-weight: 800; }
+.backup-bar > .profile-icon { align-self: center; }
+.report-icon { background: #e1ecf7 !important; color: #1f5f99 !important; }
+.zillow-icon { background: #dff0ea !important; color: #12795f !important; }
+.backup-icon { background: #ece6f7 !important; color: #5b45a8 !important; }

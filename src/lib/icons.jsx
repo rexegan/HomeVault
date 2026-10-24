@@ -8,6 +8,9 @@ const S = ({ children, size = 24, ...p }) => (
 )
 
 export const Icon = {
+  clipboard: (p) => <S {...p}><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4V3h6v1" /><path d="M9 10h6M9 14h6M9 18h3" /></S>,
+  homeValue: (p) => <S {...p}><path d="M3 11.5 12 4l9 7.5" /><path d="M5 10v10h14V10" /><path d="M12 12.5v5M10.2 14a1.8 1.2 0 0 1 3.6 0c0 1.4-3.6.9-3.6 2.3a1.8 1.2 0 0 0 3.6 0" /></S>,
+  archive: (p) => <S {...p}><rect x="3" y="4" width="18" height="5" rx="1.2" /><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9" /><path d="M12 11.5v5M9.8 14.5l2.2 2.2 2.2-2.2" /></S>,
   house: (p) => <S {...p}><path d="M3 11.5 12 4l9 7.5" /><path d="M5 10v9h14v-9" /><path d="M9.5 19v-5h5v5" /></S>,
   bed: (p) => <S {...p}><path d="M3 18v-6h13a4 4 0 0 1 4 4v2" /><path d="M3 18v2M20 18v2" /><path d="M3 12V8h6v4" /></S>,
   sofa: (p) => <S {...p}><path d="M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3" /><path d="M3 12a2 2 0 0 1 2 2v3h14v-3a2 2 0 0 1 2-2" /><path d="M5 17v2M19 17v2" /></S>,

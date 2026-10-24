@@ -1,3 +1,4 @@
+import Rich from './Rich.jsx'
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../lib/icons.jsx'
 import { KEY_FIELDS } from '../lib/intake.js'
@@ -119,7 +120,7 @@ export default function WeatherView({ profile, cached, onCache }) {
         ))}
       </div>
 
-      {error && <div className="hw-error">{error}</div>}
+      {error && <div className="hw-error"><Rich>{error}</Rich></div>}
       {busy && !days && (
         <div className="snap-reading" style={{ marginTop: 22 }}>
           <div className="snap-progress"><span className="snap-spinner" aria-hidden="true" /> Getting your forecast…</div>
@@ -209,7 +210,7 @@ export default function WeatherView({ profile, cached, onCache }) {
           <div className="intake-foot" style={{ marginTop: 14 }}>
             <Icon.clock size={18} />
             <span>Alerts read your real forecast, so "cover the faucets" shows up before the freeze —
-              not after. Routine versions of these live in Home Care too.</span>
+              not after. <Rich>Routine versions of these live in Home Care too.</Rich></span>
           </div>
         </>
       )}

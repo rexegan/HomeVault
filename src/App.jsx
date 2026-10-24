@@ -674,6 +674,7 @@ export default function App() {
             </button>
 
             <div className="backup-bar">
+              <span className="profile-icon report-icon"><Icon.clipboard size={22} /></span>
               <div className="backup-text">
                 <strong>Home inventory report</strong>
                 <span>A printable summary of everything, for insurance or your records.</span>
@@ -683,6 +684,7 @@ export default function App() {
               </div>
             </div>
             <div className="backup-bar">
+              <span className="profile-icon zillow-icon"><Icon.homeValue size={22} /></span>
               <div className="backup-text">
                 <strong>Zillow</strong>
                 <span>Your home's page — value, history and details from your address.</span>
@@ -700,6 +702,7 @@ export default function App() {
               </div>
             </div>
             <div className="backup-bar">
+              <span className="profile-icon backup-icon"><Icon.archive size={22} /></span>
               <div className="backup-text">
                 <strong>Backup &amp; restore</strong>
                 <span>{backedUp

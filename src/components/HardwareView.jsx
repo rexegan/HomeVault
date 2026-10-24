@@ -1,3 +1,4 @@
+import Rich from './Rich.jsx'
 import { useEffect, useRef, useState } from 'react'
 import Sheet from './Sheet.jsx'
 import { Icon } from '../lib/icons.jsx'
@@ -97,11 +98,11 @@ export default function HardwareView({ profile, cached, onCache, purchaseData, o
       </div>
       {!profileAddress && !address && (
         <div className="hint" style={{ margin: '8px 2px 0' }}>
-          Tip: fill in your address in the Home Profile and it's used here automatically.
+          <Rich>Tip: fill in your address in the Home Profile and it's used here automatically.</Rich>
         </div>
       )}
 
-      {error && <div className="hw-error">{error} {address.trim() && (
+      {error && <div className="hw-error"><Rich>{error}</Rich> {address.trim() && (
         <a href={fallbackSearchURL(address)} target="_blank" rel="noopener noreferrer">Search on the map instead →</a>
       )}</div>}
 

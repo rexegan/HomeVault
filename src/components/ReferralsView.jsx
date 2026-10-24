@@ -1,3 +1,4 @@
+import Rich from './Rich.jsx'
 import { KEY_FIELDS } from '../lib/intake.js'
 import { Icon } from '../lib/icons.jsx'
 
@@ -41,8 +42,7 @@ export default function ReferralsView({ profile }) {
     <div className="refs">
       <div className="intake-lede">
         <h2>Repair Referrals</h2>
-        <p>When you need someone good and don't have a name yet — the trusted ways to find one.
-          Once they've done the work, save them in My Pros so you never have to search twice.</p>
+        <p><Rich>When you need someone good that you can trust. Once they've done the work, save them in My Pros so you never have to search twice.</Rich></p>
       </div>
 
       <div className="items">

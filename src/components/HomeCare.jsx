@@ -1,3 +1,4 @@
+import Rich from './Rich.jsx'
 import { Icon } from '../lib/icons.jsx'
 import { careTasks, careCounts, intervalLabel } from '../lib/maintenance.js'
 
@@ -17,9 +18,7 @@ export default function HomeCare({ profile, state, lastDone, today, onMarkDone, 
     <div className="care">
       <div className="intake-lede">
         <h2>Home Care</h2>
-        <p>Your house's own maintenance schedule — built from what it has, from the
-          Home Profile and floor plan. Mark a task done and it comes back when it's
-          due again. {due > 0 ? `${due} ${due === 1 ? 'task needs' : 'tasks need'} attention.` :
+        <p><Rich>{"Your house's own maintenance schedule — built from what it has, from the Home Profile and floor plan. Mark a task done and it comes back when it's due again. "}</Rich>{due > 0 ? `${due} ${due === 1 ? 'task needs' : 'tasks need'} attention.` :
           soon > 0 ? 'Nothing overdue — a few things are coming up.' : 'All caught up. 🎉'}</p>
       </div>
 
@@ -37,7 +36,7 @@ export default function HomeCare({ profile, state, lastDone, today, onMarkDone, 
       <div className="intake-foot">
         <Icon.clock size={18} />
         <span>Intervals are sensible defaults for a typical home. Tasks appear or disappear as you
-          fill in the Home Profile — add a generator, well, or fireplace there and its care shows up here.</span>
+          <Rich>fill in the Home Profile — add a generator, well, or fireplace there and its care shows up here.</Rich></span>
       </div>
     </div>
   )
