@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import Sheet from './Sheet.jsx'
 import { Icon } from '../lib/icons.jsx'
 import { KEY_FIELDS } from '../lib/intake.js'
+import { purchasesAt } from '../lib/purchases.js'
 import { geocodeAddress, findHardwareStores, directionsURL, fallbackSearchURL, webSearchURL, websiteFor, formatHours, dealsFor } from '../lib/hardware.js'
 
 // Local Hardware: the closest hardware & home-improvement stores to the home
 // address, sorted by distance, with one-tap directions.
-export default function HardwareView({ profile, cached, onCache }) {
+export default function HardwareView({ profile, cached, onCache, purchaseData, onOpenItem }) {
   const profileAddress = (profile?.[KEY_FIELDS.address] || '').trim()
   const [address, setAddress] = useState(cached?.address || profileAddress)
   const [stores, setStores] = useState(cached?.stores || null)
@@ -16,6 +17,7 @@ export default function HardwareView({ profile, cached, onCache }) {
   const [radius, setRadius] = useState(cached?.radius || 15)
   const [openStore, setOpenStore] = useState(null)
   const [dealsStore, setDealsStore] = useState(null)
+  const [buysStore, setBuysStore] = useState(null)
   const ranAuto = useRef(false)
 
   // Picking a distance shows stores in that range immediately: results already
@@ -133,11 +135,18 @@ export default function HardwareView({ profile, cached, onCache }) {
                   <span className="hw-dist">{s.distLabel}</span>
                   <span className="hw-go">Details ›</span>
                 </button>
-                <button className="hw-deals-btn" onClick={() => setDealsStore(s)}
-                  aria-label={'Deals and coupons at ' + s.name}>
-                  <span className="hw-deals-ico" aria-hidden="true">🏷️</span>
-                  <span>Deals</span>
-                </button>
+                <div className="hw-tabs">
+                  <button className="hw-deals-btn" onClick={() => setDealsStore(s)}
+                    aria-label={'Deals and coupons at ' + s.name}>
+                    <span className="hw-deals-ico" aria-hidden="true">🏷️</span>
+                    <span>Deals</span>
+                  </button>
+                  <button className="hw-deals-btn hw-buys-btn" onClick={() => setBuysStore(s)}
+                    aria-label={'Your purchases at ' + s.name}>
+                    <span className="hw-deals-ico" aria-hidden="true">🧾</span>
+                    <span>Your purchases</span>
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -151,7 +160,53 @@ export default function HardwareView({ profile, cached, onCache }) {
 
       {openStore && <StoreCard store={openStore} onClose={() => setOpenStore(null)} />}
       {dealsStore && <DealsCard store={dealsStore} onClose={() => setDealsStore(null)} />}
+      {buysStore && (
+        <PurchasesCard store={buysStore} data={purchaseData} onClose={() => setBuysStore(null)}
+          onOpenItem={onOpenItem ? (id) => { setBuysStore(null); onOpenItem(id) } : null} />
+      )}
     </div>
+  )
+}
+
+// Everything bought at one store: date, amount and what it was.
+function PurchasesCard({ store, data, onClose, onOpenItem }) {
+  const { rows, total } = data ? purchasesAt(store, data) : { rows: [], total: 0 }
+  const fmtDate = (d) => d ? d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'No date'
+  return (
+    <Sheet title={'Your purchases at ' + store.name} onClose={onClose}
+      footer={<button className="btn secondary" onClick={onClose} style={{ flex: 1 }}>Close</button>}>
+      {rows.length === 0 ? (
+        <p className="hint" style={{ marginTop: 0 }}>
+          Nothing in your vault was bought here yet. Purchases show up automatically whenever an item, a paint
+          or flooring job, a yard job or a vehicle service lists this store.
+        </p>
+      ) : (
+        <>
+          <div className="buys-total">
+            <span><b>{rows.length}</b> purchase{rows.length === 1 ? '' : 's'}</span>
+            <span><b>${Math.round(total).toLocaleString()}</b> total</span>
+          </div>
+          <div className="buys-list">
+            {rows.map((r) => {
+              const inner = (
+                <>
+                  <span className="buys-date">{fmtDate(r.date)}</span>
+                  <span className="buys-body">
+                    <span className="buys-what">{r.what}</span>
+                    <span className="buys-sub">{[r.source + (r.where ? ' · ' + r.where : ''), r.detail].filter(Boolean).join(' — ')}</span>
+                  </span>
+                  <span className="buys-amt">{r.amount ? '$' + r.amount.toLocaleString(undefined, Number.isInteger(r.amount) ? { maximumFractionDigits: 0 } : { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}</span>
+                </>
+              )
+              return r.itemId && onOpenItem
+                ? <button className="buys-row link" key={r.id} onClick={() => onOpenItem(r.itemId)}>{inner}</button>
+                : <div className="buys-row" key={r.id}>{inner}</div>
+            })}
+          </div>
+          <p className="hint" style={{ marginTop: 10 }}>Tap an item to open its details, warranty and receipt photos.</p>
+        </>
+      )}
+    </Sheet>
   )
 }
 

@@ -770,7 +770,8 @@ export default function App() {
         )}
 
         {view.name === 'hardware' && (
-          <HardwareView profile={intake} cached={hardware} onCache={cacheHardware} />
+          <HardwareView profile={intake} cached={hardware} onCache={cacheHardware}
+            purchaseData={{ state, finishes, lawn, vehicles }} onOpenItem={openItem} />
         )}
 
         {view.name === 'referrals' && (
