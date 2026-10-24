@@ -1,6 +1,22 @@
+import { overpassPost, nominatimElements } from './overpass.js'
+
 // Pool Profile helpers: find the pool companies within ~25 miles of the home so
 // "who built your pool" is a dropdown of real local builders — and picking one
 // brings its full details along.
+
+
+// Overpass first; if it can't answer, OpenStreetMap's search service finds the same shops.
+async function poolElements(lat, lon, radiusMiles, q) {
+  try {
+    return await overpassPost(q)
+  } catch (err) {
+    console.warn('Overpass unavailable — using the backup map search', err)
+    const elements = await nominatimElements(lat, lon, radiusMiles, ['pool service', 'pool supplies', 'pool contractor', 'pool repair', 'swimming pool construction', 'pool and spa', 'pool cleaning', 'hot tub'],
+      (x) => ['shop', 'craft', 'office'].includes(x.category) && (/pool/i.test(x.type) || /pool/i.test(x.name || '')))
+    if (!elements.length) throw err
+    return { elements }
+  }
+}
 
 const toRad = (d) => (d * Math.PI) / 180
 function miles(lat1, lon1, lat2, lon2) {
@@ -13,13 +29,7 @@ function miles(lat1, lon1, lat2, lon2) {
 export async function fetchPoolCompanies(lat, lon, radiusMiles = 25) {
   const r = Math.round(radiusMiles * 1609)
   const q = `[out:json][timeout:20];nwr["shop"~"pool"](around:${r},${lat},${lon});out center 60;`
-  const res = await fetch('https://overpass-api.de/api/interpreter', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'data=' + encodeURIComponent(q),
-  })
-  if (!res.ok) throw new Error('pool lookup ' + res.status)
-  const js = await res.json()
+  const js = await poolElements(lat, lon, radiusMiles, q)
   const seen = new Map()
   for (const el of js.elements || []) {
     const t = el.tags || {}
@@ -72,14 +82,8 @@ function classify(name, tags) {
 
 export async function fetchPoolBusinesses(lat, lon, radiusMiles = 35) {
   const r = Math.round(radiusMiles * 1609)
-  const q = `[out:json][timeout:25];(nwr["shop"~"pool"](around:${r},${lat},${lon});nwr["craft"~"pool|swimming"](around:${r},${lat},${lon}););out center 120;`
-  const res = await fetch('https://overpass-api.de/api/interpreter', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'data=' + encodeURIComponent(q),
-  })
-  if (!res.ok) throw new Error('pool business lookup ' + res.status)
-  const js = await res.json()
+  const q = `[out:json][timeout:30];(nwr["shop"~"pool"](around:${r},${lat},${lon});nwr["craft"~"pool|swimming"](around:${r},${lat},${lon}););out center 120;`
+  const js = await poolElements(lat, lon, radiusMiles, q)
   const seen = new Map()
   for (const el of js.elements || []) {
     const t = el.tags || {}
@@ -88,9 +92,10 @@ export async function fetchPoolBusinesses(lat, lon, radiusMiles = 35) {
     if (!name || slat == null) continue
     const dist = miles(lat, lon, slat, slon)
     const street = [t['addr:housenumber'], t['addr:street']].filter(Boolean).join(' ')
-    const prev = seen.get(name.toLowerCase())
-    if (prev && prev.dist <= dist) continue
-    seen.set(name.toLowerCase(), {
+    // Same shop found twice is one shop; two branches of a chain are two.
+    const key = name.toLowerCase() + '|' + slat.toFixed(3) + ',' + slon.toFixed(3)
+    if (seen.has(key)) continue
+    seen.set(key, {
       name, dist, lat: slat, lon: slon, kind: classify(name, t),
       addr: [street, t['addr:city']].filter(Boolean).join(', '),
       fullAddr: [street, t['addr:city'], [t['addr:state'], t['addr:postcode']].filter(Boolean).join(' ')].filter(Boolean).join(', '),

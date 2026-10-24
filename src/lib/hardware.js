@@ -3,6 +3,8 @@
 // turn the address into coordinates, Overpass to find hardware/home-improvement
 // stores nearby. Only the address text is sent; nothing else leaves the device.
 
+import { overpassPost, nominatimElements } from './overpass.js'
+
 const CHAINS = [
   'home depot', "lowe's", 'lowes', 'ace hardware', 'harbor freight',
   'tractor supply', 'menards', 'true value', 'northern tool', 'do it best',
@@ -95,13 +97,17 @@ async function overpassQuery(lat, lon, radiusMiles) {
   // doityourself = Home Depot/Lowe's-style; hardware = local shops;
   // country_store/agrarian = Atwoods, Tractor Supply, feed & farm stores.
   const q = `[out:json][timeout:25];nwr["shop"~"doityourself|hardware|country_store|agrarian"]["name"](around:${r},${lat},${lon});out center 100;`
-  const res = await fetch('https://overpass-api.de/api/interpreter', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'data=' + encodeURIComponent(q),
-  })
-  if (!res.ok) throw new Error('Store lookup failed (' + res.status + ')')
-  return res.json()
+  try {
+    return await overpassPost(q)
+  } catch (err) {
+    console.warn('Overpass unavailable — using the backup map search', err)
+    const NAMES = /home depot|lowe'?s|tractor supply|ace hardware|true value|atwoods|mccoy|menards|harbor freight|northern tool|do it best/i
+    const elements = await nominatimElements(lat, lon, radiusMiles,
+      ['hardware store', 'home improvement store', 'farm and ranch supply', 'building supply'],
+      (x) => x.name && ((x.category === 'shop' && /hardware|doityourself|country_store|agrarian|trade|building_materials|farm/.test(x.type)) || NAMES.test(x.name)))
+    if (!elements.length) throw err
+    return { elements }
+  }
 }
 
 export async function findHardwareStores(lat, lon, radiusMiles = 35) {

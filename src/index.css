@@ -1736,12 +1736,10 @@ button.buys-row:active { background: #fffaf0; }
 .zillow-icon { background: #dff0ea !important; color: #12795f !important; }
 .backup-icon { background: #ece6f7 !important; color: #5b45a8 !important; }
 
-/* Swimming pool room: compact profile on the left, "pool help near you" on the right */
-.pool-split { display: grid; grid-template-columns: minmax(260px, 2fr) 3fr; gap: 14px; align-items: start; margin-bottom: 14px; }
+/* Swimming pool room: the profile runs left to right under the banner, with "pool help near you" under it */
+.pool-split { display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px; }
 .pool-split .pool-summary { margin-bottom: 0; }
-.pool-split .pool-summary-grid { grid-template-columns: repeat(3, 1fr); gap: 10px 10px; }
-.pool-split .ps-v { font-size: 13px; }
-@media (max-width: 820px) { .pool-split { grid-template-columns: 1fr; } }
+.pn-retry { background: none; border: 0; padding: 0; font: inherit; font-weight: 800; color: #14657f; cursor: pointer; text-decoration: underline; }
 .pool-near { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); }
 .pool-near-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-weight: 800; margin-bottom: 8px; }
 .pool-near-dist { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.4px; }
@@ -1764,3 +1762,43 @@ button.buys-row:active { background: #fffaf0; }
 .pn-care { display: flex; flex-direction: column; gap: 6px; }
 .pn-care-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 12px; border-radius: 10px; background: var(--bg-2); font-size: 13.5px; }
 .pn-care-row.due { background: rgba(163,38,27,0.1); } .pn-care-row.soon { background: rgba(178,106,18,0.12); }
+
+/* Home maintenance schedule: a single thin line */
+.profile-card.oneline { padding: 5px 12px; margin-top: 10px; }
+.profile-card.oneline .profile-icon { width: 30px; height: 30px; border-radius: 9px; }
+.profile-card.oneline .profile-icon svg { width: 18px; height: 18px; }
+.profile-card.oneline .profile-body strong { font-size: 15px; }
+
+/* Report / Zillow / Backup: icon on the left, the title right beside it, buttons on the title's row */
+.backup-bar { flex-wrap: nowrap; align-items: center; gap: 12px; padding: 10px 14px; margin-top: 12px; }
+.backup-bar > .profile-icon { flex-shrink: 0; }
+.backup-text { flex: 1 1 0; min-width: 0; }
+.bk-head { display: flex; align-items: center; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap; }
+.bk-head .backup-actions { margin-left: auto; }
+
+/* Wide screens (side rails): same look as everywhere else — icon left, title beside it, one thin line for Home maintenance */
+@media (min-width: 1180px) {
+  .home-rail .profile-card.oneline { padding: 5px 12px; align-items: center; gap: 10px; }
+  .home-rail .profile-card.oneline .profile-icon { width: 30px; height: 30px; }
+  .home-rail .profile-card.oneline .profile-chev { margin-top: 0; }
+  .home-rail .backup-bar { flex-direction: row; align-items: center; gap: 11px; padding: 10px 12px; }
+  .home-rail .backup-bar > .profile-icon { width: 38px; height: 38px; }
+  .home-rail .backup-text { flex: 1 1 0; min-width: 0; }
+  .home-rail .backup-actions .btn { flex: none; }
+}
+
+/* Home maintenance schedule: the 'due' count rides on the icon so the title stays on one line */
+.icon-host { position: relative; overflow: visible; }
+.icon-badge { position: absolute; top: -6px; right: -7px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--warn); color: #fff;
+  font-size: 11px; font-weight: 800; line-height: 18px; text-align: center; box-shadow: 0 0 0 2px var(--card); }
+.profile-card.oneline .profile-body { flex: 1 1 auto; min-width: 0; }
+.profile-card.oneline .profile-body strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14.5px; }
+@media (min-width: 1180px) {
+  .home-rail .backup-bar { align-items: flex-start; }
+  .home-rail .bk-head { gap: 6px 10px; }
+}
+@media (min-width: 1180px) {
+  .home-rail .backup-bar > .profile-icon { align-self: flex-start; }
+  .profile-card.oneline .profile-body strong { font-size: 13.5px; letter-spacing: -0.1px; }
+  .home-rail .profile-card.oneline { gap: 9px; padding-right: 8px; }
+}

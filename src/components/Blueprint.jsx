@@ -76,11 +76,11 @@ export default function Blueprint({ state, today, profile, onOpenArea, onAddArea
       <div className="bp-titleblock">
         <button className="bp-tb-main" onClick={onOpenProfile}
           title="Tap to edit your address & home details">
-          <div className="bp-tb-eyebrow">HomeVault &middot; Floor Plan</div>
+          <div className="bp-tb-eyebrow">HomeVault &middot; Entire House</div>
           <div className="bp-tb-name">{name || 'Your Home'}</div>
           <div className="bp-tb-facts">
             {facts.length > 0 ? facts.join('  ·  ') : 'Tap a room to open it'}
-            <span className="bp-tb-edit"> · edit</span>
+            <span className="bp-tb-edit"> · click here for a deep dive view</span>
           </div>
         </button>
         <div className="bp-tb-tag">

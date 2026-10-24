@@ -555,13 +555,14 @@ export default function App() {
               </div>
 
               <aside className="home-rail rail-left">
-            <button className="profile-card compact" onClick={() => setView({ name: 'care' })}>
-              <span className="profile-icon care-icon"><Icon.clock size={22} /></span>
-              <span className="profile-body">
-                <strong>Home Care</strong>
-                <span className="profile-sub">Your home's maintenance schedule.</span>
+            <button className="profile-card compact oneline" onClick={() => setView({ name: 'care' })}>
+              <span className="profile-icon care-icon icon-host">
+                <Icon.clock size={22} />
+                {careDue > 0 && <span className="icon-badge" title={careDue + ' due'}>{careDue}</span>}
               </span>
-              {careDue > 0 && <span className="care-due-pill">{careDue} due</span>}
+              <span className="profile-body">
+                <strong>Home maintenance schedule</strong>
+              </span>
               <span className="profile-chev"><Icon.chevron size={20} /></span>
             </button>
 
@@ -676,21 +677,16 @@ export default function App() {
             <div className="backup-bar">
               <span className="profile-icon report-icon"><Icon.clipboard size={22} /></span>
               <div className="backup-text">
-                <strong>Home inventory report</strong>
-                <span>A printable summary of everything, for insurance or your records.</span>
-              </div>
-              <div className="backup-actions">
+                <div className="bk-head"><strong>Home inventory report</strong><div className="backup-actions">
                 <button className="btn secondary small" onClick={() => setView({ name: 'report' })}><Icon.file size={16} /> View report</button>
+              </div></div>
+                <span>A printable summary of everything, for insurance or your records.</span>
               </div>
             </div>
             <div className="backup-bar">
               <span className="profile-icon zillow-icon"><Icon.homeValue size={22} /></span>
               <div className="backup-text">
-                <strong>Zillow</strong>
-                <span>Your home's page — value, history and details from your address.</span>
-                <span className="zillow-hint">Signed into Zillow as the owner? Tap “Public view” there to see the photos.</span>
-              </div>
-              <div className="backup-actions">
+                <div className="bk-head"><strong>Zillow</strong><div className="backup-actions">
                 <button className="btn secondary small" onClick={() => {
                   const addr = (intake[KEY_FIELDS.address] || '').trim()
                   if (!addr) { flash('Add your address in the Home Profile first'); setView({ name: 'intake' }); return }
@@ -699,21 +695,23 @@ export default function App() {
                   const slug = encodeURIComponent(addr.replace(/\s+/g, '-')).replace(/%2C/g, ',')
                   window.open('https://www.zillow.com/homes/' + slug + '_rb/', '_blank', 'noopener')
                 }}>🏠 Open Zillow</button>
+              </div></div>
+                <span>Your home's page — value, history and details from your address.</span>
+                <span className="zillow-hint">Signed into Zillow as the owner? Tap “Public view” there to see the photos.</span>
               </div>
             </div>
             <div className="backup-bar">
               <span className="profile-icon backup-icon"><Icon.archive size={22} /></span>
               <div className="backup-text">
-                <strong>Backup &amp; restore</strong>
+                <div className="bk-head"><strong>Backup &amp; restore</strong><div className="backup-actions">
+                <button className="btn secondary small" onClick={doExport}><Icon.box size={16} /> Export</button>
+                <button className="btn secondary small" onClick={() => importRef.current?.click()}><Icon.file size={16} /> Import</button>
+              </div></div>
                 <span>{backedUp
                   ? 'Everything saved to a file — last backup ' + backedUp + '. Do it again after big changes.'
                   : state.items.length > 0
                     ? 'Not backed up yet — save everything to a file so nothing can be lost.'
                     : 'Save everything to a file, or move it to another device.'}</span>
-              </div>
-              <div className="backup-actions">
-                <button className="btn secondary small" onClick={doExport}><Icon.box size={16} /> Export</button>
-                <button className="btn secondary small" onClick={() => importRef.current?.click()}><Icon.file size={16} /> Import</button>
               </div>
               <input ref={importRef} type="file" accept="application/json,.json" style={{ display: 'none' }} onChange={onImportPick} />
             </div>

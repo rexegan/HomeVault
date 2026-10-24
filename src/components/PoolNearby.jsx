@@ -5,8 +5,8 @@ import { geocodeAddress, directionsURL, websiteFor, formatHours } from '../lib/h
 // Everything a pool owner needs nearby: supply stores, repair & service companies
 // and builders within a distance you choose — with a one-tap path to each one's
 // coupons, hours, directions and website, plus the big online pool retailers.
-const DISTANCES = [5, 7, 10, 12, 15, 20, 25, 30, 35]
-const KEY = 'homevault:poolnear:v1'
+const DISTANCES = [5, 7, 10, 12, 15, 20, 25, 30, 35, 40, 50, 75, 100]
+const KEY = 'homevault:poolnear:v2'
 const g = (q) => 'https://duckduckgo.com/?q=' + encodeURIComponent('\\' + q)   // straight to the official page
 const ONLINE = [
   ["Leslie's", "Pool supplies, water testing & chemicals", "Leslie's pool supplies coupons promo codes"],
@@ -19,6 +19,8 @@ export default function PoolNearby({ address, coords, poolCare = [], onAddPro })
   const [radius, setRadius] = useState(15)
   const [kind, setKind] = useState('all')
   const [list, setList] = useState(() => { try { return JSON.parse(localStorage.getItem(KEY) || 'null')?.list || null } catch { return null } })
+  const [fetched, setFetched] = useState(() => { try { return JSON.parse(localStorage.getItem(KEY) || 'null')?.fetched || 0 } catch { return 0 } })
+  const [showAll, setShowAll] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
   const ran = useRef(false)
@@ -33,12 +35,17 @@ export default function PoolNearby({ address, coords, poolCare = [], onAddPro })
         if (!geo) { setError('Couldn’t place your address — check it in the Home Profile.'); setBusy(false); return }
         lat = geo.lat; lon = geo.lon
       }
-      const found = await fetchPoolBusinesses(lat, lon, 35)
-      setList(found)
-      try { localStorage.setItem(KEY, JSON.stringify({ list: found, address })) } catch { /* ignore */ }
+      // Ask for everything out to 100 miles; if the map service is too busy for that, settle for less.
+      let found = null, used = 0, lastErr = null
+      for (const r of [100, 50, 25]) {
+        try { found = await fetchPoolBusinesses(lat, lon, r); used = r; break } catch (e) { lastErr = e }
+      }
+      if (!found) throw lastErr || new Error('lookup failed')
+      setList(found); setFetched(used)
+      try { localStorage.setItem(KEY, JSON.stringify({ list: found, address, fetched: used })) } catch { /* ignore */ }
     } catch (e) {
       console.warn('Pool lookup failed', e)
-      setError('The business lookup didn’t answer — try again in a minute.')
+      setError('The map service is busy right now.')
     } finally { setBusy(false) }
   }
 
@@ -52,6 +59,7 @@ export default function PoolNearby({ address, coords, poolCare = [], onAddPro })
   }, [])
 
   const shown = useMemo(() => (list || []).filter((b) => b.dist <= radius && (kind === 'all' || b.kind === kind)), [list, radius, kind])
+  const visible = showAll ? shown : shown.slice(0, 20)
   const counts = useMemo(() => {
     const c = { all: 0, supply: 0, service: 0, builder: 0, other: 0 }
     for (const b of list || []) if (b.dist <= radius) { c.all++; c[b.kind]++ }
@@ -84,7 +92,9 @@ export default function PoolNearby({ address, coords, poolCare = [], onAddPro })
         ))}
       </div>
 
-      {error && <div className="hw-error">{error}</div>}
+      {error && (
+        <div className="hw-error">{error} <button type="button" className="pn-retry" onClick={load} disabled={busy}>Try again</button></div>
+      )}
       {busy && <div className="snap-progress" style={{ margin: '10px 0' }}><span className="snap-spinner" aria-hidden="true" /> Finding pool companies near you…</div>}
 
       {!busy && list && shown.length === 0 && (
@@ -94,7 +104,7 @@ export default function PoolNearby({ address, coords, poolCare = [], onAddPro })
       )}
 
       <div className="pool-near-list">
-        {shown.slice(0, 15).map((b) => {
+        {visible.map((b) => {
           const hours = formatHours(b.hours)
           return (
             <div className="pn-row" key={b.name}>
@@ -116,6 +126,24 @@ export default function PoolNearby({ address, coords, poolCare = [], onAddPro })
           )
         })}
       </div>
+
+      {shown.length > visible.length && (
+        <button type="button" className="btn secondary small" style={{ marginTop: 10 }} onClick={() => setShowAll(true)}>
+          Show all {shown.length}
+        </button>
+      )}
+      {list && fetched > 0 && radius > fetched && (
+        <div className="hint" style={{ marginTop: 8 }}>
+          The map service only reached out to {fetched} miles this time.{' '}
+          <button type="button" className="pn-retry" onClick={load} disabled={busy}>Search farther</button>
+        </div>
+      )}
+      {list && (
+        <div className="hint" style={{ marginTop: 8 }}>
+          {shown.length} within {radius} miles.{' '}
+          <button type="button" className="pn-retry" onClick={load} disabled={busy}>Refresh</button>
+        </div>
+      )}
 
       <div className="pn-sec">Online pool stores — deals &amp; coupons</div>
       <div className="pn-online">
