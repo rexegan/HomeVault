@@ -1696,3 +1696,10 @@ button.sum-btn:active { background: var(--bg-2); }
 .rcal-ev-kind { color: #fff; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; padding: 2px 8px; border-radius: 999px; }
 .rcal-ev-title { font-weight: 700; }
 .rcal-ev-desc { width: 100%; font-size: 12.5px; color: var(--ink-soft); }
+
+/* My Pros: a green two-line tag beside the arrow, inviting a tap to see more */
+.pro-peek {
+  flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  padding: 6px 10px; border-radius: 10px; background: var(--brand); color: #fff;
+  font-size: 11.5px; font-weight: 800; line-height: 1.15; letter-spacing: 0.2px; text-align: center; white-space: nowrap;
+}

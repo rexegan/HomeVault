@@ -65,6 +65,7 @@ export default function ProsView({ pros, onAdd, onUpdate, onDelete }) {
                       : `${jobs.length} ${jobs.length === 1 ? 'job' : 'jobs'} · last: ${last?.work?.slice(0, 40) || ''}${(last?.work?.length || 0) > 40 ? '…' : ''}`}
                   </span>
                 </div>
+                <span className="pro-peek" aria-hidden="true"><span>Contact info</span><span>Work history</span></span>
                 <span style={{ color: 'var(--line)' }}><Icon.chevron size={20} /></span>
               </button>
             )
