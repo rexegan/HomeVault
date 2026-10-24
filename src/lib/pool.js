@@ -53,3 +53,50 @@ export const POOL_SURFACES = ['White plaster', 'Colored plaster', 'Pebble (Pebbl
 export const POOL_SANITIZERS = ['Chlorine', 'Saltwater', 'Mineral / ozone', 'Other']
 export const POOL_GALLONS = ['8,000', '10,000', '12,000', '15,000', '18,000',
   '20,000', '25,000', '30,000', '35,000', '40,000+']
+
+// ── Pool help near the home: supply stores, repair & service, builders ────────
+const BUILD = /build|construct|custom|design|renovat|remodel|plaster|gunite|shotcrete|install|outdoor living|landscap/i
+const SERVICE = /service|repair|clean|maint|care|equipment|pump|heating|resurfac|\bpro\b|tech/i
+const SUPPLY = /suppl|store|shop|leslie|chemical|mart|depot|warehouse|outlet|discount|hot tub|spa\b|water/i
+
+export const POOL_KINDS = {
+  supply: 'Supply store', service: 'Repair & service', builder: 'Builder / remodel', other: 'Pool company',
+}
+function classify(name, tags) {
+  if (BUILD.test(name)) return 'builder'
+  if (SERVICE.test(name)) return 'service'
+  if (SUPPLY.test(name) || tags.shop === 'swimming_pool') return /pools?\b/i.test(name) && !SUPPLY.test(name) ? 'other' : 'supply'
+  if (tags.craft) return 'builder'
+  return 'other'
+}
+
+export async function fetchPoolBusinesses(lat, lon, radiusMiles = 35) {
+  const r = Math.round(radiusMiles * 1609)
+  const q = `[out:json][timeout:25];(nwr["shop"~"pool"](around:${r},${lat},${lon});nwr["craft"~"pool|swimming"](around:${r},${lat},${lon}););out center 120;`
+  const res = await fetch('https://overpass-api.de/api/interpreter', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'data=' + encodeURIComponent(q),
+  })
+  if (!res.ok) throw new Error('pool business lookup ' + res.status)
+  const js = await res.json()
+  const seen = new Map()
+  for (const el of js.elements || []) {
+    const t = el.tags || {}
+    const name = t.name
+    const slat = el.lat ?? el.center?.lat, slon = el.lon ?? el.center?.lon
+    if (!name || slat == null) continue
+    const dist = miles(lat, lon, slat, slon)
+    const street = [t['addr:housenumber'], t['addr:street']].filter(Boolean).join(' ')
+    const prev = seen.get(name.toLowerCase())
+    if (prev && prev.dist <= dist) continue
+    seen.set(name.toLowerCase(), {
+      name, dist, lat: slat, lon: slon, kind: classify(name, t),
+      addr: [street, t['addr:city']].filter(Boolean).join(', '),
+      fullAddr: [street, t['addr:city'], [t['addr:state'], t['addr:postcode']].filter(Boolean).join(' ')].filter(Boolean).join(', '),
+      street, city: t['addr:city'] || '', state: t['addr:state'] || '', zip: t['addr:postcode'] || '',
+      phone: t.phone || t['contact:phone'] || '', website: t.website || t['contact:website'] || '', hours: t.opening_hours || '',
+    })
+  }
+  return [...seen.values()].sort((a, b) => a.dist - b.dist).map((c) => ({ ...c, distLabel: c.dist.toFixed(1) + ' mi' }))
+}

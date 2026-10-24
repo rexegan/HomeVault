@@ -1,3 +1,4 @@
+import PoolNearby from './PoolNearby.jsx'
 import { vehicleTitle, currentMileage } from '../lib/vehicles.js'
 import { Icon } from '../lib/icons.jsx'
 import { itemsForArea, warrantyStatus, formatPrice } from '../lib/storage.js'
@@ -14,7 +15,7 @@ const POOL_LABELS = [
   ['features', 'Water features'], ['notes', 'Notes'],
 ]
 
-export default function AreaView({ state, area, today, poolValues, finishEntries, onAddFinish, onEditFinish, vehicles = [], onAddVehicle, onOpenVehicle, onEditArea, onQuickAdd, onOpenItem }) {
+export default function AreaView({ state, area, today, poolValues, finishEntries, onAddFinish, onEditFinish, vehicles = [], homeAddress, weatherCoords, poolCare = [], onAddPro, onAddVehicle, onOpenVehicle, onEditArea, onQuickAdd, onOpenItem }) {
   const isPool = area.variant === 'pool' || /swimming pool/i.test(area.name)
   const poolRows = isPool
     ? POOL_LABELS.map(([k, l]) => [l, (poolValues?.[k] || '').trim()]).filter(([, val]) => val)
@@ -39,6 +40,7 @@ export default function AreaView({ state, area, today, poolValues, finishEntries
       </div>
 
       {isPool && (
+        <div className="pool-split">
         <button className="pool-summary" onClick={onEditArea}>
           <div className="pool-summary-head">
             <span>🏊 Pool profile</span>
@@ -58,6 +60,8 @@ export default function AreaView({ state, area, today, poolValues, finishEntries
             </div>
           )}
         </button>
+        <PoolNearby address={homeAddress} coords={weatherCoords} poolCare={poolCare} onAddPro={onAddPro} />
+        </div>
       )}
 
       {isGarage && (

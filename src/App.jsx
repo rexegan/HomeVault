@@ -728,6 +728,10 @@ export default function App() {
             area={currentArea}
             today={today}
             poolValues={pool}
+            homeAddress={(intake[KEY_FIELDS.address] || '').trim()}
+            weatherCoords={weather?.lat ? { lat: weather.lat, lon: weather.lon } : null}
+            poolCare={careTasks(intake, state, care, today).filter((t) => /swimming pool/i.test(t.room || ''))}
+            onAddPro={addPro}
             vehicles={vehicles}
             onAddVehicle={() => setModal({ type: 'vehicle', vehicleId: null, areaId: currentArea.id })}
             onOpenVehicle={(vid) => setView({ name: 'vehicle', vehicleId: vid, areaId: currentArea.id })}
