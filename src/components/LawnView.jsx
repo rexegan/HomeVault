@@ -119,7 +119,7 @@ export default function LawnView({ lawn, onProfile, onSaveEntry, onDeleteEntry, 
       <div className="fin-quick">
         <div className="stat"><div className="n" style={{ fontSize: 18 }}>{entries.length ? dollars(total) : '—'}</div><div className="l">Total spent</div></div>
         <div className="stat"><div className="n" style={{ fontSize: 18 }}>{entries.length}</div><div className="l">Jobs logged</div></div>
-        <div className="stat"><div className="n" style={{ fontSize: 18 }}>{plants || '—'}</div><div className="l">Plants &amp; trees living</div></div>
+        <div className="stat"><div className="n" style={{ fontSize: 18 }}>{plants || '—'}</div><div className="l">Plants &amp; trees</div></div>
         <div className="stat"><div className="n" style={{ fontSize: 16 }}>{lastFert?.date || '—'}</div><div className="l">Last fertilized</div></div>
       </div>
 
