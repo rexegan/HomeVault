@@ -1656,3 +1656,7 @@ button.sum-btn:active { background: var(--bg-2); }
 .profile-card.compact .profile-body { gap: 0; }
 .profile-card.compact .profile-body strong { font-size: 15px; }
 .profile-card.compact .profile-sub { font-size: 12.5px; }
+
+/* Home Profile: the intro runs the full width of the progress box below it, so it takes less height */
+.intake > .intake-lede { margin-bottom: 10px; }
+.intake > .intake-lede p { max-width: none; }

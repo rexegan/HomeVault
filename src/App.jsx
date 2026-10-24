@@ -66,6 +66,20 @@ export default function App() {
   const importRef = useRef(null)
   useEffect(() => installFormNav(), [])
 
+  // Every screen opens at its top (not wherever the page was scrolled), and the
+  // home page remembers where you were when you come back to it.
+  const homeScroll = useRef(0)
+  const viewKey = view.name + ':' + (view.areaId || '') + ':' + (view.vehicleId || '')
+  useEffect(() => {
+    const onScroll = () => { if (view.name === 'home') homeScroll.current = window.scrollY }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [view.name])
+  useEffect(() => {
+    window.scrollTo(0, view.name === 'home' ? homeScroll.current : 0)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewKey])
+
   // "Today" at midnight — stable for the session, used for warranty math.
   const today = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d }, [])
 
