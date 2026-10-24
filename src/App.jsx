@@ -13,7 +13,6 @@ import SearchView from './components/SearchView.jsx'
 import ExpiringView from './components/ExpiringView.jsx'
 import ReportView from './components/ReportView.jsx'
 import HomeProfile from './components/HomeProfile.jsx'
-import WelcomeIntro from './components/WelcomeIntro.jsx'
 import SnapCapture from './components/SnapCapture.jsx'
 import HomeCare from './components/HomeCare.jsx'
 import ProsView from './components/ProsView.jsx'
@@ -323,6 +322,20 @@ export default function App() {
   }, [emergency])
   const setEmergencyValue = (k, val) => setEmergency((m) => ({ ...m, [k]: val }))
 
+  // The on-page sample button is gone, but the sample is still one link away:
+  // open the app with ?sample on the end to fill it with the fictional home.
+  useEffect(() => {
+    try {
+      const u = new URL(window.location.href)
+      if (u.searchParams.has('sample')) {
+        u.searchParams.delete('sample')
+        window.history.replaceState({}, '', u.pathname + (u.search || '') + u.hash)
+        loadSample()
+      }
+    } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Swimming Pool profile.
   const [pool, setPool] = useState(() => {
     try { return JSON.parse(localStorage.getItem('homevault:pool:v1') || '{}') } catch { return {} }
@@ -453,7 +466,9 @@ export default function App() {
             <Icon.back size={22} /> {view.name === 'vehicle' && view.areaId ? 'Garage' : 'Home'}
           </button>
         )}
-        <div className="spacer" />
+        {view.name === 'home'
+          ? <div className="topbar-tag">Your entire home&hellip; finally, all in one place.</div>
+          : <div className="spacer" />}
 
         {view.name === 'home' && (
           <>
@@ -478,8 +493,6 @@ export default function App() {
       <main className={'content' + (view.name === 'home' ? ' wide' : '')}>
         {view.name === 'home' && (
           <>
-            <WelcomeIntro onLoadSample={loadSample} />
-
             <div className="dash">
               <button className="stat as-btn" onClick={() => setView({ name: 'allItems' })}>
                 <div className="n">{state.items.length}</div>
