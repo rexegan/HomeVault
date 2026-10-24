@@ -1649,3 +1649,10 @@ button.sum-btn:active { background: var(--bg-2); }
 }
 @media (max-width: 600px) { .topbar-tag { visibility: hidden; } }
 .content.wide { padding-top: 10px; }
+
+/* Smaller one-line cards (Home Care, Repair Referrals) */
+.profile-card.compact { padding: 8px 12px; gap: 10px; margin-top: 12px; }
+.profile-card.compact .profile-icon { width: 34px; height: 34px; border-radius: 10px; }
+.profile-card.compact .profile-body { gap: 0; }
+.profile-card.compact .profile-body strong { font-size: 15px; }
+.profile-card.compact .profile-sub { font-size: 12.5px; }

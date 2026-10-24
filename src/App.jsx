@@ -541,11 +541,11 @@ export default function App() {
               </div>
 
               <aside className="home-rail rail-left">
-            <button className="profile-card" onClick={() => setView({ name: 'care' })}>
+            <button className="profile-card compact" onClick={() => setView({ name: 'care' })}>
               <span className="profile-icon care-icon"><Icon.clock size={22} /></span>
               <span className="profile-body">
                 <strong>Home Care</strong>
-                <span className="profile-sub">Your house's own maintenance schedule — what to do and when.</span>
+                <span className="profile-sub">Your home's maintenance schedule.</span>
               </span>
               {careDue > 0 && <span className="care-due-pill">{careDue} due</span>}
               <span className="profile-chev"><Icon.chevron size={20} /></span>
@@ -564,7 +564,7 @@ export default function App() {
               <span className="profile-icon reminders-icon"><Icon.clock size={22} /></span>
               <span className="profile-body">
                 <strong>Calendar Reminders</strong>
-                <span className="profile-sub">Warranties, maintenance, taxes and more — straight into your calendar.</span>
+                <span className="profile-sub">Warranties, maintenance, taxes — straight into your calendar.</span>
               </span>
               <span className="profile-chev"><Icon.chevron size={20} /></span>
             </button>
@@ -573,7 +573,7 @@ export default function App() {
               <span className="profile-icon pros-icon"><Icon.tools size={22} /></span>
               <span className="profile-body">
                 <strong>My Pros</strong>
-                <span className="profile-sub">Plumber, electrician, A/C, appliance repair — your home's call list.</span>
+                <span className="profile-sub">Plumber, electrician, A/C, etc. — your call list.</span>
               </span>
               {pros.length > 0 && <span className="pros-count-pill">{pros.length}</span>}
               <span className="profile-chev"><Icon.chevron size={20} /></span>
@@ -588,11 +588,11 @@ export default function App() {
               <span className="profile-chev"><Icon.chevron size={20} /></span>
             </button>
 
-            <button className="profile-card" onClick={() => setView({ name: 'referrals' })}>
+            <button className="profile-card compact" onClick={() => setView({ name: 'referrals' })}>
               <span className="profile-icon refs-icon"><Icon.referral size={22} /></span>
               <span className="profile-body">
                 <strong>Repair Referrals</strong>
-                <span className="profile-sub">Angi, Christian home repair, Thumbtack — trusted ways to find help.</span>
+                <span className="profile-sub">Trusted ways to find help.</span>
               </span>
               <span className="profile-chev"><Icon.chevron size={20} /></span>
             </button>
@@ -601,7 +601,7 @@ export default function App() {
               <span className="profile-icon lawn-icon"><Icon.yard size={22} /></span>
               <span className="profile-body">
                 <strong>Lawn &amp; Landscape</strong>
-                <span className="profile-sub">Every grass job, fertilizer, plant and tree — front, back and sides.</span>
+                <span className="profile-sub">Fertilize plants and trees, front, back, and sides.</span>
               </span>
               {lawn.entries.length > 0 && <span className="pros-count-pill">{lawn.entries.length}</span>}
               <span className="profile-chev"><Icon.chevron size={20} /></span>
@@ -654,7 +654,7 @@ export default function App() {
               <span className="profile-icon binder-icon"><Icon.book size={22} /></span>
               <span className="profile-body">
                 <strong>Home Binder</strong>
-                <span className="profile-sub">The handoff packet for a buyer — colors, equipment, who fixed what.</span>
+                <span className="profile-sub">Handoff packet for a buyer, colors, equipment, who fixed what.</span>
               </span>
               <span className="profile-chev"><Icon.chevron size={20} /></span>
             </button>
