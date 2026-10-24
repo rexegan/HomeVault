@@ -1660,3 +1660,6 @@ button.sum-btn:active { background: var(--bg-2); }
 /* Home Profile: the intro runs the full width of the progress box below it, so it takes less height */
 .intake > .intake-lede { margin-bottom: 10px; }
 .intake > .intake-lede p { max-width: none; }
+
+/* Every screen's intro text runs the full width of the page (same as the cards below it) */
+.intake-lede p { max-width: none; }
