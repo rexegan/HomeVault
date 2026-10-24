@@ -20,6 +20,7 @@ function fillFor(kinds) {
 export default function ReminderCalendar({ events, today }) {
   const [month, setMonth] = useState(today.getMonth())
   const [year, setYear] = useState(today.getFullYear())
+  const [span, setSpan] = useState(3)               // how many months to show
   const [picked, setPicked] = useState(null)       // 'YYYY-MM-DD'
 
   const byDay = useMemo(() => {
@@ -39,7 +40,7 @@ export default function ReminderCalendar({ events, today }) {
     const d = new Date(year, month + delta, 1)
     setMonth(d.getMonth()); setYear(d.getFullYear())
   }
-  const shown = [0, 1, 2].map((i) => new Date(year, month + i, 1))
+  const shown = Array.from({ length: span }, (_, i) => new Date(year, month + i, 1))
   const inView = events.filter((e) => shown.some((s) => s.getFullYear() === e.date.getFullYear() && s.getMonth() === e.date.getMonth()))
   const legend = Object.keys(KIND_COLORS).map((k) => [k, inView.filter((e) => e.kind === k).length]).filter(([, n]) => n > 0)
   const dayEvents = picked ? (byDay.get(picked) || []) : []
@@ -47,7 +48,7 @@ export default function ReminderCalendar({ events, today }) {
   return (
     <div className="rcal">
       <div className="rcal-bar">
-        <button type="button" className="rcal-nav" onClick={() => shift(-1)} aria-label="Earlier months">‹</button>
+        <button type="button" className="rcal-nav" onClick={() => shift(-Math.min(span, 12))} aria-label="Earlier">‹</button>
         <label className="rcal-sel"><span>Month</span>
           <select id="rcal-month" value={month} onChange={(e) => setMonth(+e.target.value)}>
             {MONTHS.map((m, i) => <option key={m} value={i}>{m}</option>)}
@@ -58,18 +59,27 @@ export default function ReminderCalendar({ events, today }) {
             {years.map((y) => <option key={y} value={y}>{y}</option>)}
           </select>
         </label>
-        <button type="button" className="rcal-nav" onClick={() => shift(1)} aria-label="Later months">›</button>
+        <button type="button" className="rcal-nav" onClick={() => shift(Math.min(span, 12))} aria-label="Later">›</button>
         <button type="button" className="rcal-today" onClick={() => { setMonth(today.getMonth()); setYear(today.getFullYear()) }}>Today</button>
+        <label className="rcal-sel"><span>View</span>
+          <select id="rcal-view" value={span} onChange={(e) => setSpan(+e.target.value)}>
+            <option value={3}>3 months</option>
+            <option value={6}>6 months</option>
+            <option value={12}>1 year</option>
+            <option value={24}>2 years</option>
+            <option value={36}>3 years</option>
+          </select>
+        </label>
       </div>
 
       <div className="rcal-legend">
-        {legend.length === 0 && <span className="rcal-none">Nothing due in these months.</span>}
+        {legend.length === 0 && <span className="rcal-none">Nothing due in this time.</span>}
         {legend.map(([k, n]) => (
           <span className="rcal-key" key={k}><i style={{ background: color(k) }} />{k} <b>{n}</b></span>
         ))}
       </div>
 
-      <div className="rcal-months">
+      <div className={'rcal-months' + (span > 6 ? ' dense' : '')}>
         {shown.map((first) => {
           const days = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate()
           const blanks = first.getDay()
