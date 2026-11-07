@@ -2,6 +2,7 @@ import { Icon } from '../lib/icons.jsx'
 import { formatPrice } from '../lib/storage.js'
 import { findLender, isDirectoryPhone, LENDER_NAMES } from '../lib/lenders.js'
 import { parseLocation, providerOptions, findProvider } from '../lib/utilities.js'
+import CostBasis, { basisTotals } from './CostBasis.jsx'
 
 // Financial: the complete money picture of the home — mortgage, value & equity,
 // and every utility account, saving as you type. (Never store passwords here.)
@@ -41,13 +42,11 @@ const SECTIONS = [
   },
   {
     id: 'val', icon: '📈', title: 'Value & equity',
-    intent: 'What it cost, what it\'s worth, and what\'s yours.',
+    intent: 'What it\'s worth today, and what\'s yours.',
     fields: [
-      ['purchase', 'Purchase price', { money: true }],
       ['value', 'Current estimated value', { money: true, hint: 'Zillow tab is one tap away' }],
       ['heloc', 'HELOC / second lien?', { options: YESNO }],
       ['helocDetail', 'HELOC lender & balance', {}],
-      ['improvements', 'Major improvements $ (for cost basis)', { money: true }],
     ],
   },
   {
@@ -165,7 +164,7 @@ function ProviderPicker({ id, cat, loc, label, value, onChange }) {
   )
 }
 
-export default function MoneyView({ values, onChange, address, civicInfo }) {
+export default function MoneyView({ values, onChange, address, civicInfo, areas, pros, finishes }) {
   const loc = parseLocation(address, civicInfo)
   const v = (sec, key) => values?.[sec + '.' + key] || ''
   const set = (sec, key, val) => onChange(sec + '.' + key, val)
@@ -182,12 +181,14 @@ export default function MoneyView({ values, onChange, address, civicInfo }) {
   const utilTotal = ['electricAmt', 'gasAmt', 'waterAmt', 'trashAmt', 'internetAmt', 'securityAmt']
     .reduce((t, k) => t + num(v('util', k)), 0)
   const equity = num(v('val', 'value')) - num(v('mtg', 'balance'))
+  const basis = basisTotals(values)
 
   const quick = [
     ['Mortgage / mo', money(v('mtg', 'payment')) || '—'],
     ['Rate', v('mtg', 'rate') || '—'],
     ['Balance', money(v('mtg', 'balance')) || '—'],
     ['Equity (est.)', v('val', 'value') && v('mtg', 'balance') ? money(String(equity)) : '—'],
+    ['Cost basis', basis.total ? money(String(basis.total)) : '—'],
     ['Utilities / mo', utilTotal ? money(String(utilTotal)) : '—'],
   ]
 
@@ -224,7 +225,7 @@ export default function MoneyView({ values, onChange, address, civicInfo }) {
               const filled = raw.trim() !== ''
               // ' ' (one space) is the "Other…" placeholder: show the type-it-in box straight away.
               const custom = opt.options ? (raw !== '' && !opt.options.includes(raw)) : false
-              return (
+              const field = (
                 <div className={'intake-field' + (filled ? ' filled' : '')} key={key}>
                   <label htmlFor={id}>
                     <span className="chk" aria-hidden="true">{filled ? '✓' : ''}</span>
@@ -265,6 +266,12 @@ export default function MoneyView({ values, onChange, address, civicInfo }) {
                   )}
                 </div>
               )
+              // Cost basis (purchase/build price + improvements) sits right under the loan number.
+              if (sec.id === 'mtg' && key === 'account') {
+                return [field, <CostBasis key="basis" values={values} onChange={onChange}
+                  areas={areas} pros={pros} finishes={finishes} />]
+              }
+              return field
             })}
           </div>
         </section>

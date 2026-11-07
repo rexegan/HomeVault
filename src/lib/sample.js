@@ -308,6 +308,12 @@ export function buildSample(today) {
     'util.electricProv': 'United Cooperative Services', 'util.electricAmt': '$214', 'util.gasProv': 'Atmos Energy', 'util.gasAmt': '$58',
     'util.waterProv': 'City of Cleburne — Water & Wastewater', 'util.waterAmt': '$96', 'util.trashProv': 'City of Cleburne Solid Waste',
     'util.trashAmt': '$24', 'util.internetProv': 'AT&T Fiber', 'util.internetAmt': '$65', 'util.securityProv': 'SimpliSafe', 'util.securityAmt': '$30',
+    'basis.how': 'Bought it', 'basis.price': '$289,000', 'basis.date': '06/14/2019', 'basis.extra': '$6,850',
+    'basis.improvements': [
+      { id: 'imp-s1', kind: 'Fencing', what: '6-ft cedar privacy fence, 240 ft', where: 'Outside / yard', date: '04/02/2020', cost: '$8,400', doneBy: 'Us' },
+      { id: 'imp-s2', kind: 'Swimming pool / spa', what: 'In-ground gunite pool with spa', where: 'Outside / yard', date: '05/20/2021', cost: '$46,500' },
+      { id: 'imp-s3', kind: 'New cabinets', what: 'Shaker kitchen cabinets, soft-close', where: 'Kitchen', date: '09/10/2023', cost: '$12,800' },
+    ],
   }
   return { items, intake, care, pros, finishes, pool, lawn, finance, vehicles, emergency, money: moneySample }
 }

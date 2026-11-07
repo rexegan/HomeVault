@@ -190,7 +190,16 @@ export default function App() {
 
   // Financial (mortgage, value, utilities).
   const [moneyRec, setMoneyRec] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('homevault:money:v1') || '{}') } catch { return {} }
+    try {
+      const m = JSON.parse(localStorage.getItem('homevault:money:v1') || '{}')
+      // Purchase price & lump-sum improvements moved into the Cost basis block.
+      if (m['val.purchase'] && !m['basis.price']) { m['basis.price'] = m['val.purchase']; m['basis.how'] = m['basis.how'] || 'Bought it' }
+      if (m['val.improvements'] && !m['basis.improvements']) {
+        m['basis.improvements'] = [{ id: 'imp-earlier', kind: 'Earlier improvements', what: 'Earlier improvements (lump sum)', cost: m['val.improvements'] }]
+      }
+      delete m['val.purchase']; delete m['val.improvements']
+      return m
+    } catch { return {} }
   })
   useEffect(() => {
     try { localStorage.setItem('homevault:money:v1', JSON.stringify(moneyRec)) } catch { /* ignore */ }
@@ -785,7 +794,8 @@ export default function App() {
 
         {view.name === 'money' && (
           <MoneyView values={moneyRec} onChange={setMoneyValue}
-            address={intake[KEY_FIELDS.address]} civicInfo={civic?.info} />
+            address={intake[KEY_FIELDS.address]} civicInfo={civic?.info}
+            areas={state.areas} pros={pros} finishes={finishes} />
         )}
 
         {view.name === 'finance' && (
