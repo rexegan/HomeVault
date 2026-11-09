@@ -42,7 +42,8 @@ export default function CostBasis({ values, onChange, areas = [], pros = [], fin
   const list = t.list
   const [open, setOpen] = useState(list.length > 0)
   const [editing, setEditing] = useState(null)   // null | entry | {} (new)
-  const built = v('how') === 'Built it'
+  const how = v('how').replace(/ it$/, '')   // older saves said "Bought it" / "Built it"
+  const built = how === 'Built'
 
   const saveEntry = (draft) => {
     const entry = { ...draft, id: draft.id || 'imp-' + Date.now().toString(36) }
@@ -70,7 +71,7 @@ export default function CostBasis({ values, onChange, areas = [], pros = [], fin
       </div>
 
       <div className="basis-cols">
-        <Select id="basis-how" label="Bought or built?" value={v('how')} options={['Bought it', 'Built it']}
+        <Select id="basis-how" label="Bought or built?" value={how} options={['Bought', 'Built']}
           onChange={(val) => set('how', val)} />
         <TextField id="basis-price" label={built ? 'Build price' : 'Purchase price'} value={v('price')}
           onChange={(val) => set('price', val)} opt={{ money: true, hint: '$' }} />

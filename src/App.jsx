@@ -193,10 +193,11 @@ export default function App() {
     try {
       const m = JSON.parse(localStorage.getItem('homevault:money:v1') || '{}')
       // Purchase price & lump-sum improvements moved into the Cost basis block.
-      if (m['val.purchase'] && !m['basis.price']) { m['basis.price'] = m['val.purchase']; m['basis.how'] = m['basis.how'] || 'Bought it' }
+      if (m['val.purchase'] && !m['basis.price']) { m['basis.price'] = m['val.purchase']; m['basis.how'] = m['basis.how'] || 'Bought' }
       if (m['val.improvements'] && !m['basis.improvements']) {
         m['basis.improvements'] = [{ id: 'imp-earlier', kind: 'Earlier improvements', what: 'Earlier improvements (lump sum)', cost: m['val.improvements'] }]
       }
+      if (/ it$/.test(m['basis.how'] || '')) m['basis.how'] = m['basis.how'].replace(/ it$/, '')
       delete m['val.purchase']; delete m['val.improvements']
       return m
     } catch { return {} }
