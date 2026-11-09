@@ -196,8 +196,8 @@ export default function MoneyView({ values, onChange, address, civicInfo, areas,
     <div className="fin">
       <div className="intake-lede">
         <h2>Financial</h2>
-        <p>The complete money picture of this home — mortgage, value, equity, and every utility
-          account. Fill in what you know; it saves as you type and never leaves this device.</p>
+        <p>The complete financial picture of your home. Mortgage, value, equity, and all utility
+          accounts. Fill in what you know. It saves as you type and never leaves this device.</p>
       </div>
 
       <div className="fin-quick">
